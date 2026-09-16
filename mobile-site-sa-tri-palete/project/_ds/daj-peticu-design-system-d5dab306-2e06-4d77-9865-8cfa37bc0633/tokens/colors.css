@@ -1,0 +1,29 @@
+/* Daj Peticu — colour. One saturated primary + one dark neutral + light surfaces + gold (stars only).
+   Default scope = Direction A (Ink Indigo). [data-brand="teal"] and [data-brand="oxblood"] override the
+   primary ramp only, so the whole system re-skins from one attribute until the primary is locked. */
+:root{
+--indigo-950:#0d1030;--indigo-900:#14183a;--indigo-800:#1d2350;--indigo-700:#262f6b;--indigo-600:#313c86;--indigo-500:#4a58ab;--indigo-200:#c3c9e6;--indigo-100:#e2e6f5;--indigo-050:#f0f2fb;
+--teal-950:#04231f;--teal-900:#06302d;--teal-800:#0a433e;--teal-700:#0e5c55;--teal-600:#12756c;--teal-500:#1a9c8f;--teal-200:#b6ded9;--teal-100:#dcefec;--teal-050:#eef8f6;
+--oxblood-950:#2a0b12;--oxblood-900:#3d1119;--oxblood-800:#591a26;--oxblood-700:#7a2233;--oxblood-600:#9b2d42;--oxblood-500:#c04156;--oxblood-200:#e8c6cd;--oxblood-100:#f5e2e6;--oxblood-050:#fbf1f3;
+
+/* gold — reserved for star glyphs and star-adjacent rating marks. Never a button, never a surface. */
+--gold-500:#ffc53d;--gold-600:#e9a800;--gold-700:#b57f00;--star:var(--gold-500);--star-on-dark:var(--gold-500);--star-ink:var(--gold-700);
+
+/* dark neutral + surfaces */
+--ink-900:#15171c;--ink-800:#23262e;--ink-700:#3a3f4a;--ink-500:#5f6672;--ink-400:#858c99;--ink-300:#b3b9c4;
+--surface-0:#ffffff;--surface-1:#f6f7fa;--surface-2:#eceef4;--surface-3:#e0e4ee;
+--border-soft:#e6e9f1;--border:#d7dbe6;--border-strong:#bcc2d1;
+
+/* ---- semantic aliases: this is what components consume ---- */
+--primary:var(--indigo-700);--primary-hover:var(--indigo-800);--primary-active:var(--indigo-900);
+--primary-quiet:var(--indigo-050);--primary-quiet-hover:var(--indigo-100);--primary-line:var(--indigo-200);
+--primary-contrast:#ffffff;--primary-on-light:var(--indigo-700);
+--focus-ring:var(--indigo-500);--shadow-hue:38 47 107; /* @kind other */
+
+--bg:var(--surface-1);--bg-alt:var(--surface-0);--bg-inverse:var(--indigo-900);
+--surface-card:var(--surface-0);--surface-sunken:var(--surface-2);
+--text-strong:var(--ink-900);--text-body:var(--ink-700);--text-muted:var(--ink-500);--text-on-primary:#ffffff;--text-on-inverse:#ffffff;--text-quiet-on-inverse:#c3c9e6;
+--success:#1f7a4d;--success-quiet:#e6f4ec;--warning:#9a5b00;--warning-quiet:#fdf1de;--danger:#a3232c;--danger-quiet:#fbeaea;
+}
+[data-brand="teal"]{--primary:var(--teal-700);--primary-hover:var(--teal-800);--primary-active:var(--teal-900);--primary-quiet:var(--teal-050);--primary-quiet-hover:var(--teal-100);--primary-line:var(--teal-200);--primary-on-light:var(--teal-700);--focus-ring:var(--teal-500);--shadow-hue:14 92 85; /* @kind other */--bg-inverse:var(--teal-900);--text-quiet-on-inverse:#b6ded9}
+[data-brand="oxblood"]{--primary:var(--oxblood-700);--primary-hover:var(--oxblood-800);--primary-active:var(--oxblood-900);--primary-quiet:var(--oxblood-050);--primary-quiet-hover:var(--oxblood-100);--primary-line:var(--oxblood-200);--primary-on-light:var(--oxblood-700);--focus-ring:var(--oxblood-500);--shadow-hue:122 34 51; /* @kind other */--bg-inverse:var(--oxblood-900);--text-quiet-on-inverse:#e8c6cd;--surface-1:#faf8f7;--surface-2:#f2eeed;--border-soft:#efe8e8;--border:#e3dad9}

@@ -1,0 +1,35 @@
+/* Component state tokens — buttons, fields, badges, cards. Lift straight into code.
+   Declared in EVERY theme scope, not just :root: a var() inside a custom-property declaration is
+   substituted at the element where that property is declared. Declared only on :root, these would
+   freeze to the Ink Indigo values and [data-brand] would re-skin nothing that goes through them. */
+:root,[data-brand="teal"],[data-brand="oxblood"]{
+/* button: primary */
+--btn-primary-bg:var(--primary);--btn-primary-fg:var(--text-on-primary);--btn-primary-bg-hover:var(--primary-hover);--btn-primary-bg-active:var(--primary-active);--btn-primary-shadow:var(--shadow-sm);--btn-primary-shadow-hover:var(--shadow-md);
+/* button: secondary (quiet fill) */
+--btn-secondary-bg:var(--primary-quiet);--btn-secondary-fg:var(--primary-on-light);--btn-secondary-bg-hover:var(--primary-quiet-hover);--btn-secondary-border:var(--primary-line);
+/* button: outline + ghost */
+--btn-outline-fg:var(--primary-on-light);--btn-outline-border:var(--primary);--btn-outline-bg-hover:var(--primary-quiet);
+--btn-ghost-fg:var(--text-body);--btn-ghost-bg-hover:var(--surface-2);
+/* shared button metrics — min-widths only, never fixed widths (Serbian labels run long) */
+--btn-h:52px;--btn-h-sm:44px;--btn-h-lg:60px;--btn-px:26px;--btn-px-lg:34px;--btn-gap:10px;--btn-min-w:150px;--btn-fw:var(--fw-semibold); /* @kind other */
+--btn-disabled-bg:var(--surface-3);--btn-disabled-fg:var(--ink-400);--btn-disabled-opacity:1; /* @kind other */
+
+/* field */
+--field-bg:var(--surface-0);--field-bg-disabled:var(--surface-2);--field-fg:var(--text-strong);--field-placeholder:var(--ink-400);
+--field-border:var(--border);--field-border-hover:var(--border-strong);--field-border-focus:var(--primary);--field-border-error:var(--danger);
+--field-h:54px;--field-px:16px;--field-radius:var(--radius-field);--field-shadow:var(--shadow-inset-field);--field-label-fg:var(--text-body);--field-help-fg:var(--text-muted);--field-error-fg:var(--danger);
+
+/* badge */
+--badge-h:28px;--badge-px:12px;--badge-fs:var(--fs-caption); /* @kind font */
+--badge-fw:var(--fw-semibold); /* @kind other */
+--badge-neutral-bg:var(--surface-2);--badge-neutral-fg:var(--text-body);
+--badge-primary-bg:var(--primary-quiet);--badge-primary-fg:var(--primary-on-light);
+--badge-solid-bg:var(--primary);--badge-solid-fg:var(--text-on-primary);
+--badge-success-bg:var(--success-quiet);--badge-success-fg:var(--success);
+--badge-rating-bg:var(--surface-0);--badge-rating-fg:var(--text-strong);--badge-rating-star:var(--star);
+
+/* card */
+--card-bg:var(--surface-card);--card-border:var(--border-soft);--card-radius:var(--radius-card);--card-p:var(--space-6);--card-p-lg:var(--space-8);
+--card-shadow:var(--shadow-sm);--card-shadow-hover:var(--shadow-md);--card-lift-hover:-3px;--card-border-hover:var(--primary-line);
+--card-inverse-bg:var(--bg-inverse);--card-inverse-fg:var(--text-on-inverse);
+}

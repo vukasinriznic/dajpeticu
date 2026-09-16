@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daj Peticu — NFC kartica za Google recenzije</title>
+<link rel="stylesheet" href="_ds/daj-peticu-design-system-d5dab306-2e06-4d77-9865-8cfa37bc0633/tokens/fonts.css" />
+<link rel="stylesheet" href="_ds/daj-peticu-design-system-d5dab306-2e06-4d77-9865-8cfa37bc0633/tokens/colors.css" />
+<link rel="stylesheet" href="_ds/daj-peticu-design-system-d5dab306-2e06-4d77-9865-8cfa37bc0633/tokens/typography.css" />
+<link rel="stylesheet" href="_ds/daj-peticu-design-system-d5dab306-2e06-4d77-9865-8cfa37bc0633/tokens/space.css" />
+<link rel="stylesheet" href="_ds/daj-peticu-design-system-d5dab306-2e06-4d77-9865-8cfa37bc0633/tokens/components.css" />
+<link rel="stylesheet" href="_ds/daj-peticu-design-system-d5dab306-2e06-4d77-9865-8cfa37bc0633/styles.css" />
+<script src="https://unpkg.com/lucide@0.544.0/dist/umd/lucide.js"></script>
+<script src="_ds/daj-peticu-design-system-d5dab306-2e06-4d77-9865-8cfa37bc0633/_ds_bundle.js"></script>
+<style>
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text-body);font-family:var(--font-sans)}
+  a{color:var(--primary);text-decoration:none}
+  a:hover{color:var(--primary-hover)}
+  h1,h2,h3{text-wrap:balance}
+  p{text-wrap:pretty}
+  /* Tap demo — vođen animacijama, pa ga re-render ne prekida */
+  @keyframes dp-tap{0%{transform:translateY(0)}16%,86%{transform:translateY(96px)}100%{transform:translateY(0)}}
+  /* Hero mora da stane u jedan ekran — ovo se ne može napisati inline (media query) */
+  /* Hero: border-box da padding ne bi rastao preko calc() visine.
+     Vrednosti idu kroz custom properties — inline stilovi ih čitaju, pa ih media query može promeniti. */
+  [data-hero]{
+    box-sizing:border-box;
+    --dp-hero-pad:var(--space-8);
+    --dp-hero-gap:var(--space-12);
+    --dp-hero-col-gap:var(--space-5);
+    --dp-hero-art-display:grid;
+    --dp-hero-art-pad:var(--space-6);
+    --dp-hero-lead-fs:var(--fs-body-lg);
+  }
+  [data-hero] *{box-sizing:border-box}
+  [data-hero-h1]{font-size:clamp(1.9rem,4.2vw,3.25rem)}
+  /* Nizak ekran: hero ostaje u jednom ekranu, proizvod se vidi niže na strani */
+  @media (max-height:820px){
+    [data-hero]{
+      --dp-hero-pad:var(--space-4);
+      --dp-hero-gap:var(--space-6);
+      --dp-hero-col-gap:var(--space-3);
+      --dp-hero-art-display:none;
+      --dp-hero-art-pad:0;
+      --dp-hero-lead-fs:var(--fs-body);
+    }
+    [data-hero-h1]{font-size:clamp(1.75rem,3.2vw,2.4rem)}
+  }
+  @keyframes dp-show{0%,15%{opacity:0}20%,88%{opacity:1}100%{opacity:0}}
+  @keyframes dp-hide{0%,15%{opacity:1}20%,88%{opacity:0}100%{opacity:1}}
+  @keyframes dp-pulse{0%{opacity:0;transform:scale(1)}25%{opacity:1;transform:scale(1.9)}55%,100%{opacity:0;transform:scale(1)}}
+</style>
+</helmet>
+
+<div style="background:var(--bg);color:var(--text-body);font-family:var(--font-sans);font-size:var(--fs-body);line-height:var(--lh-body)">
+
+  <x-import component-from-global-scope="DesignSystem_d5dab3.Header" on-order="{{ goOrder }}" on-nav="{{ goNav }}" hint-size="100%,64px"></x-import>
+
+  <!-- Prekidač primarne boje — tri direkcije iz sistema (data-brand) -->
+  <sc-if value="{{ showSwitcher }}" hint-placeholder-val="{{ true }}">
+  <div style="position:fixed;right:16px;top:84px;z-index:19;background:var(--surface-0);border:1px solid var(--border-soft);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);padding:var(--space-3);display:flex;flex-direction:column;gap:var(--space-2);align-items:center">
+    <span style="font-size:var(--fs-eyebrow);letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-muted);font-weight:var(--fw-semibold)">Boja</span>
+    <div style="display:flex;flex-direction:column;gap:var(--space-2)">
+      <button type="button" data-brandpick="indigo" onClick="{{ pickBrand }}" aria-label="Ink Indigo" title="Ink Indigo" style="width:34px;height:34px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#262f6b;cursor:pointer"></button>
+      <button type="button" data-brandpick="teal" onClick="{{ pickBrand }}" aria-label="Deep Teal" title="Deep Teal" style="width:34px;height:34px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#0e5c55;cursor:pointer"></button>
+      <button type="button" data-brandpick="oxblood" onClick="{{ pickBrand }}" aria-label="Oxblood" title="Oxblood" style="width:34px;height:34px;border-radius:var(--radius-sm);border:1px solid var(--border);background:#7a2233;cursor:pointer"></button>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- HERO — pun ekran -->
+  <section id="top" data-hero="1" style="min-height:calc(100svh - var(--dp-header-h, 81px));padding:var(--dp-hero-pad) var(--gutter);background:var(--surface-0);display:grid;align-content:center;position:relative;overflow:hidden">
+    <div style="position:absolute;inset:0;background:radial-gradient(60% 60% at 72% 45%, var(--primary-quiet), transparent 70%);pointer-events:none"></div>
+    <div data-hero-grid="1" style="position:relative;max-width:var(--container);margin:0 auto;width:100%;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:var(--dp-hero-gap);align-items:center">
+      <div data-hero-col="1" style="display:flex;flex-direction:column;gap:var(--dp-hero-col-gap);align-items:flex-start">
+        <x-import component-from-global-scope="DesignSystem_d5dab3.Badge" tone="primary" hint-size="auto,34px">Jedan tap — i recenzija je gotova</x-import>
+        <h1 data-hero-h1="1" style="margin:0;font-family:var(--font-display);font-weight:var(--fw-display-strong);line-height:var(--lh-display);letter-spacing:var(--tracking-display);color:var(--text-strong)">
+          Konkurencija nije bolja od vas. Samo ima više recenzija.
+        </h1>
+        <p data-hero-lead="1" style="margin:0;font-size:var(--dp-hero-lead-fs);line-height:var(--lh-body);color:var(--text-body);max-width:var(--measure-narrow)">
+          Kartica stoji tamo gde mušterija plaća. Prisloni telefon — otvara se vaša Google recenzija. Bez aplikacije, bez kucanja.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--space-3);align-items:center">
+          <x-import component-from-global-scope="DesignSystem_d5dab3.Button" size="lg" on-click="{{ goOrder }}" hint-size="auto,60px">Poruči karticu</x-import>
+          <x-import component-from-global-scope="DesignSystem_d5dab3.Button" variant="ghost" size="lg" on-click="{{ goKako }}" hint-size="auto,60px">Vidi kako radi</x-import>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-3)">
+          <x-import component-from-global-scope="DesignSystem_d5dab3.StarRating" size="{{ n22 }}" hint-size="120px,22px"></x-import>
+          <span style="font-size:var(--fs-body-sm);color:var(--text-muted)">Poruči za 1 minut, stiže poštom. Plaćate pouzećem.</span>
+        </div>
+      </div>
+      <div data-hero-art="1" style="display:var(--dp-hero-art-display);place-items:center;padding:var(--dp-hero-art-pad) 0">
+        <x-import component-from-global-scope="DesignSystem_d5dab3.CardMock" width="{{ n360 }}" tone="ink" hint-size="360px,228px"></x-import>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <x-import component-from-global-scope="DesignSystem_d5dab3.Section" tone="alt" hint-size="100%,420px">
+    <x-import component-from-global-scope="DesignSystem_d5dab3.SectionHeading" eyebrow="Problem" title="Mušterija je zadovoljna. I ode." lead="Recenzija ne izostaje zato što ste loši. Izostaje zato što nema ko da je zatraži u pravom trenutku." hint-size="100%,180px"></x-import>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--space-5);align-items:stretch">
+      <x-import component-from-global-scope="DesignSystem_d5dab3.FeatureCard" icon="zap-off" title="Niko ne piše sam od sebe" hint-size="100%,220px">Zadovoljna mušterija zaboravi na recenziju dva koraka od vrata.</x-import>
+      <x-import component-from-global-scope="DesignSystem_d5dab3.FeatureCard" icon="smartphone" title="Tražiti je nezgodno" hint-size="100%,220px">Osećate se kao da nešto molite, pa najčešće ne pitate nikoga.</x-import>
+      <x-import component-from-global-scope="DesignSystem_d5dab3.FeatureCard" icon="store" title="Kolega ih skuplja svaki dan" hint-size="100%,220px">Zato njega prvog vide na mapi, iako radi isti posao kao vi.</x-import>
+    </div>
+  </x-import>
+
+  <!-- KAKO RADI -->
+  <x-import component-from-global-scope="DesignSystem_d5dab3.Section" id="kako" tone="light" hint-size="100%,520px">
+    <x-import component-from-global-scope="DesignSystem_d5dab3.SectionHeading" eyebrow="Kako radi" title="Tri koraka, i to je sve" lead="Mi je podesimo. Vi je samo stavite na pult." hint-size="100%,180px"></x-import>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--space-5);align-items:stretch">
+      <x-import component-from-global-scope="DesignSystem_d5dab3.StepItem" number="1" title="Postavite karticu" hint-size="100%,180px">Na pult, na sto ili kod kase — tamo gde mušterija plaća.</x-import>
+      <x-import component-from-global-scope="DesignSystem_d5dab3.StepItem" number="2" title="Mušterija prisloni telefon" hint-size="100%,180px">Otvara se vaša Google strana za ocenu. Ništa se ne skida i ništa se ne kuca.</x-import>
+      <x-import component-from-global-scope="DesignSystem_d5dab3.StepItem" number="3" title="Recenzija je objavljena" hint-size="100%,180px">Pet sekundi kod vas na pultu. Vama ostaje na profilu.</x-import>
+    </div>
+
+    <x-import component-from-global-scope="DesignSystem_d5dab3.Card" pad="lg" hint-size="100%,360px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-8);align-items:center">
+        <div style="display:flex;flex-direction:column;gap:var(--space-4);align-items:flex-start">
+          <h3 style="margin:0;font-family:var(--font-display);font-weight:var(--fw-display-strong);font-size:var(--fs-h2);line-height:var(--lh-heading);letter-spacing:var(--tracking-heading);color:var(--text-strong)">Probajte i sami</h3>
+          <p style="margin:0;font-size:var(--fs-body);color:var(--text-body);max-width:var(--measure-card)">Ovako to izgleda vašoj mušteriji — samo vrh telefona i kartica na pultu.</p>
+          <x-import component-from-global-scope="DesignSystem_d5dab3.Button" variant="outline" on-click="{{ playTap }}" hint-size="auto,52px">Prisloni telefon</x-import>
+        </div>
+        <div onClick="{{ playTap }}" role="button" tabindex="0" style="position:relative;height:400px;border-radius:var(--radius-image);background:var(--surface-2);cursor:pointer;overflow:hidden">
+          <div data-demo-phone="1" style="position:absolute;left:50%;top:8px;width:112px;height:146px;margin-left:-56px;border-radius:var(--radius-lg);background:var(--ink-900);border:3px solid var(--ink-900);z-index:2">
+            <div style="position:absolute;inset:5px;border-radius:16px;background:var(--surface-0);overflow:hidden">
+              <div data-demo-idle="1" style="position:absolute;inset:0;display:grid;place-items:center;font-size:var(--fs-caption);font-weight:var(--fw-semibold);color:var(--text-muted)">NFC uključen</div>
+              <div data-demo-form="1" style="position:absolute;inset:0;opacity:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-2);padding:var(--space-3);text-align:center">
+                <span style="font-size:var(--fs-caption);color:var(--text-muted)">Ocenite lokal</span>
+                <x-import component-from-global-scope="DesignSystem_d5dab3.StarRating" size="{{ n16 }}" hint-size="90px,16px"></x-import>
+                <span style="background:var(--primary);color:var(--text-on-primary);font-size:var(--fs-caption);font-weight:var(--fw-semibold);padding:6px 14px;border-radius:var(--radius-pill)">Objavi</span>
+              </div>
+            </div>
+          </div>
+          <div data-demo-pulse="1" style="position:absolute;left:50%;top:132px;margin-left:-28px;width:56px;height:56px;border-radius:var(--radius-pill);border:2px solid var(--primary);opacity:0;z-index:1"></div>
+          <div style="position:absolute;left:50%;bottom:20px;margin-left:-150px">
+            <x-import component-from-global-scope="DesignSystem_d5dab3.CardMock" width="{{ n300 }}" tone="ink" tilt="{{ n0 }}" hint-size="300px,190px"></x-import>
+          </div>
+        </div>
+      </div>
+    </x-import>
+  </x-import>
+
+  <!-- CIJENE -->
+  <x-import component-from-global-scope="DesignSystem_d5dab3.Section" id="cijene" tone="alt" hint-size="100%,700px">
+    <x-import component-from-global-scope="DesignSystem_d5dab3.SectionHeading" eyebrow="Cijene" title="Platite jednom. Kartica je vaša." lead="Više kartica znači više mesta gde mušterija može da vas oceni — i nižu cenu po kartici." hint-size="100%,180px"></x-import>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-5);align-items:stretch">
+      <x-import component-from-global-scope="DesignSystem_d5dab3.PriceCard" name="3 kartice" price="{{ p3 }}" unit="RSD" note="997 RSD po kartici" features="{{ f3 }}" cta="{{ cta3 }}" on-select="{{ pick3 }}" hint-size="100%,420px"></x-import>
+      <x-import component-from-global-scope="DesignSystem_d5dab3.PriceCard" name="5 kartica" price="{{ p5 }}" unit="RSD" note="898 RSD po kartici" features="{{ f5 }}" badge="Najčešći izbor" featured="{{ true }}" cta="{{ cta5 }}" on-select="{{ pick5 }}" hint-size="100%,420px"></x-import>
+      <x-import component-from-global-scope="DesignSystem_d5dab3.PriceCard" name="10 kartica" price="{{ p10 }}" unit="RSD" note="799 RSD po kartici" features="{{ f10 }}" cta="{{ cta10 }}" on-select="{{ pick10 }}" hint-size="100%,420px"></x-import>
+    </div>
+    <p style="margin:0;font-size:var(--fs-caption);color:var(--text-muted)">Cene su placeholder: {CENA_3} · {CENA_5} · {CENA_10} · {CENA_PO_KOMADU}. Poštarina {SLANJE} RSD.</p>
+  </x-import>
+
+  <!-- ZAŠTO RADI — inverzna sekcija -->
+  <x-import component-from-global-scope="DesignSystem_d5dab3.Section" tone="inverse" hint-size="100%,520px">
+    <x-import component-from-global-scope="DesignSystem_d5dab3.SectionHeading" eyebrow="Zašto radi" title="Bez aplikacije. Bez struje. Bez pretplate." tone="inverse" hint-size="100%,160px"></x-import>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:var(--space-5);align-items:stretch">
+      <x-import component-from-global-scope="DesignSystem_d5dab3.FeatureCard" icon="nfc" title="Telefon je sam prepozna" tone="inverse" hint-size="100%,210px">Nema kamere, nema QR koda, nema linka koji se prepisuje.</x-import>
+      <x-import component-from-global-scope="DesignSystem_d5dab3.FeatureCard" icon="smartphone" title="Radi na svakom telefonu" tone="inverse" hint-size="100%,210px">iPhone 7 i noviji čitaju je bez ičega. Kod Androida je dovoljno da je NFC uključen.</x-import>
+      <x-import component-from-global-scope="DesignSystem_d5dab3.FeatureCard" icon="banknote" title="Jedna kupovina, bez pretplate" tone="inverse" hint-size="100%,210px">Nema baterije i nema mesečnih troškova. Traje godinama.</x-import>
+      <x-import component-from-global-scope="DesignSystem_d5dab3.FeatureCard" icon="shield-check" title="Mi je podesimo i zaključamo" tone="inverse" hint-size="100%,210px">Upišemo link vaše Google strane i zaključamo čip. Niko ga posle ne može preusmeriti.</x-import>
+    </div>
+  </x-import>
+
+  <!-- ZA KOGA JE -->
+  <x-import component-from-global-scope="DesignSystem_d5dab3.Section" tone="light" hint-size="100%,300px">
+    <x-import component-from-global-scope="DesignSystem_d5dab3.SectionHeading" eyebrow="Za koga je" title="Svaki posao kod kojeg mušterija plaća na mestu" hint-size="100%,140px"></x-import>
+    <div style="display:flex;flex-wrap:wrap;gap:var(--space-3)">
+      <sc-for list="{{ delatnosti }}" as="d" hint-placeholder-count="8">
+        <x-import component-from-global-scope="DesignSystem_d5dab3.Badge" tone="outline" hint-size="auto,40px">{{ d }}</x-import>
+      </sc-for>
+    </div>
+  </x-import>
+
+  <!-- ISKUSTVA -->
+  <x-import component-from-global-scope="DesignSystem_d5dab3.Section" id="iskustva" tone="alt" hint-size="100%,520px">
+    <x-import component-from-global-scope="DesignSystem_d5dab3.SectionHeading" eyebrow="Iskustva" title="Šta kažu vlasnici" lead="Izjave i brojevi ispod su placeholder — čekaju prave rečenice vaših mušterija." hint-size="100%,180px"></x-import>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-5);align-items:stretch">
+      <x-import component-from-global-scope="DesignSystem_d5dab3.TestimonialCard" quote="{IZJAVA_1} — mesto za pravu izjavu vlasnika." name="{IME_1}" business="{DELATNOST_1}" city="{GRAD_1}" hint-size="100%,260px"></x-import>
+      <x-import component-from-global-scope="DesignSystem_d5dab3.TestimonialCard" quote="{IZJAVA_2} — mesto za pravu izjavu vlasnika." name="{IME_2}" business="{DELATNOST_2}" city="{GRAD_2}" hint-size="100%,260px"></x-import>
+      <x-import component-from-global-scope="DesignSystem_d5dab3.TestimonialCard" quote="{IZJAVA_3} — mesto za pravu izjavu vlasnika." name="{IME_3}" business="{DELATNOST_3}" city="{GRAD_3}" hint-size="100%,260px"></x-import>
+    </div>
+  </x-import>
+
+  <!-- PITANJA -->
+  <x-import component-from-global-scope="DesignSystem_d5dab3.Section" id="pitanja" tone="light" hint-size="100%,600px">
+    <div style="max-width:var(--container-narrow);width:100%">
+      <x-import component-from-global-scope="DesignSystem_d5dab3.SectionHeading" eyebrow="Pitanja" title="Pitanja koja svi pitaju" hint-size="100%,140px"></x-import>
+      <div style="display:flex;flex-direction:column;margin-top:var(--space-8)">
+        <x-import component-from-global-scope="DesignSystem_d5dab3.FaqItem" question="Radi li na svakom telefonu?" default-open="{{ true }}" hint-size="100%,72px">iPhone 7 i noviji čitaju karticu bez ikakve aplikacije. Kod Androida je potrebno da NFC bude uključen — kod većine telefona već jeste.</x-import>
+        <x-import component-from-global-scope="DesignSystem_d5dab3.FaqItem" question="Gde mušterija prislanja telefon?" hint-size="100%,72px">Na vrh telefona, ne na sredinu. Na kartici je oznaka, pa mušterija zna sama gde da prisloni.</x-import>
+        <x-import component-from-global-scope="DesignSystem_d5dab3.FaqItem" question="Šta ako mušterija nema Google nalog?" hint-size="100%,72px">Skoro svi su na telefonu već prijavljeni. Ako nisu, otvara se prijava — to je jedini korak više.</x-import>
+        <x-import component-from-global-scope="DesignSystem_d5dab3.FaqItem" question="Plaćam li nešto mesečno?" hint-size="100%,72px">Ne. Kupujete karticu jednom i ona je vaša. Nema pretplate i nema naknadnih troškova.</x-import>
+        <x-import component-from-global-scope="DesignSystem_d5dab3.FaqItem" question="Koliko brzo stiže?" hint-size="100%,72px">Podesimo je istog ili sledećeg radnog dana i šaljemo poštom. Obično je kod vas za 2 dana.</x-import>
+        <x-import component-from-global-scope="DesignSystem_d5dab3.FaqItem" question="Šta ako se pokvari?" hint-size="100%,72px">Nema bateriju i nema pokretnih delova. Ako ipak ne čita, pošaljite je nazad — zamena bez pitanja u prvih 30 dana.</x-import>
+        <x-import component-from-global-scope="DesignSystem_d5dab3.FaqItem" question="Može li neko da promeni link na kartici?" hint-size="100%,72px">Ne. Posle podešavanja zaključamo čip, tako da se link ne može prepisati.</x-import>
+        <x-import component-from-global-scope="DesignSystem_d5dab3.FaqItem" question="Treba li mi Google profil firme?" hint-size="100%,72px">Da. Ako ga nemate, napravite ga besplatno — ili nam recite i provedemo vas kroz to telefonom.</x-import>
+      </div>
+    </div>
+  </x-import>
+
+  <!-- PORUDŽBINA -->
+  <x-import component-from-global-scope="DesignSystem_d5dab3.Section" id="porudzbina" tone="alt" hint-size="100%,900px">
+    <div style="max-width:var(--container-narrow);width:100%;display:flex;flex-direction:column;gap:var(--space-8)">
+      <x-import component-from-global-scope="DesignSystem_d5dab3.SectionHeading" eyebrow="Porudžbina" title="Poruči za 1 minut" lead="Plaćate poštaru kada paket stigne. Zovemo samo ako nešto nije jasno." hint-size="100%,180px"></x-import>
+
+      <sc-if value="{{ sent }}" hint-placeholder-val="{{ false }}">
+        <x-import component-from-global-scope="DesignSystem_d5dab3.Card" pad="lg" hint-size="100%,320px">
+          <div style="display:flex;flex-direction:column;gap:var(--space-4);align-items:flex-start">
+            <x-import component-from-global-scope="DesignSystem_d5dab3.StarRating" size="{{ n28 }}" hint-size="150px,28px"></x-import>
+            <h3 style="margin:0;font-family:var(--font-display);font-weight:var(--fw-display-strong);font-size:var(--fs-h1);line-height:var(--lh-heading);color:var(--text-strong)">Primili smo porudžbinu.</h3>
+            <p style="margin:0;font-size:var(--fs-body);color:var(--text-body)">Zovemo vas na {{ v_telefon }} da potvrdimo adresu i link vaše Google strane. Zatim podesimo {{ qtyWord }} i šaljemo poštom. Poštaru plaćate {{ totalLabel }}.</p>
+            <x-import component-from-global-scope="DesignSystem_d5dab3.Button" variant="outline" on-click="{{ reset }}" hint-size="auto,52px">Nova porudžbina</x-import>
+          </div>
+        </x-import>
+      </sc-if>
+
+      <sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+      <x-import component-from-global-scope="DesignSystem_d5dab3.Card" pad="lg" hint-size="100%,860px">
+        <form onSubmit="{{ submit }}" style="display:flex;flex-direction:column;gap:var(--space-6)">
+
+          <div style="display:flex;flex-wrap:wrap;gap:var(--space-4);align-items:center;justify-content:space-between;padding:var(--space-5);border-radius:var(--radius-md);background:var(--surface-sunken)">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <span style="font-size:var(--fs-eyebrow);letter-spacing:var(--tracking-eyebrow);text-transform:uppercase;color:var(--text-muted);font-weight:var(--fw-semibold)">Količina</span>
+              <span style="font-size:var(--fs-body);color:var(--text-body)">{{ qtyWord }} · {{ unitLabel }} po kartici</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--space-3)">
+              <x-import component-from-global-scope="DesignSystem_d5dab3.Button" variant="outline" on-click="{{ dec }}" aria-label="Manje kartica" hint-size="52px,52px">−</x-import>
+              <span style="font-family:var(--font-display);font-size:var(--fs-h2);min-width:2.2em;text-align:center;color:var(--text-strong)">{{ qty }}</span>
+              <x-import component-from-global-scope="DesignSystem_d5dab3.Button" variant="outline" on-click="{{ inc }}" aria-label="Više kartica" hint-size="52px,52px">+</x-import>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-5)">
+            <x-import component-from-global-scope="DesignSystem_d5dab3.Input" label="Ime i prezime" name="ime" value="{{ v_ime }}" error="{{ e_ime }}" on-change="{{ onField }}" autoComplete="name" hint-size="100%,86px"></x-import>
+            <x-import component-from-global-scope="DesignSystem_d5dab3.Input" label="Naziv objekta" name="firma" value="{{ v_firma }}" error="{{ e_firma }}" on-change="{{ onField }}" hint-size="100%,86px"></x-import>
+            <x-import component-from-global-scope="DesignSystem_d5dab3.Input" label="Telefon" name="telefon" type="tel" value="{{ v_telefon }}" error="{{ e_telefon }}" on-change="{{ onField }}" prefix="+381" autoComplete="tel" hint-size="100%,86px"></x-import>
+            <x-import component-from-global-scope="DesignSystem_d5dab3.Input" label="Grad" name="grad" value="{{ v_grad }}" error="{{ e_grad }}" on-change="{{ onField }}" hint-size="100%,86px"></x-import>
+            <x-import component-from-global-scope="DesignSystem_d5dab3.Input" label="Adresa za dostavu" name="adresa" value="{{ v_adresa }}" error="{{ e_adresa }}" on-change="{{ onField }}" autoComplete="street-address" hint-size="100%,86px"></x-import>
+            <x-import component-from-global-scope="DesignSystem_d5dab3.Input" label="Poštanski broj" name="ptt" value="{{ v_ptt }}" error="{{ e_ptt }}" on-change="{{ onField }}" inputMode="numeric" hint-size="100%,86px"></x-import>
+          </div>
+
+          <x-import component-from-global-scope="DesignSystem_d5dab3.Input" label="Link vaše Google strane" name="google" value="{{ v_google }}" error="{{ e_google }}" on-change="{{ onField }}" help="Ne znate link? Upišite naziv objekta i grad — mi ćemo ga pronaći." hint-size="100%,110px"></x-import>
+
+          <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+            <span style="font-size:var(--fs-label);font-weight:var(--fw-semibold);color:var(--text-strong)">Način plaćanja</span>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:var(--space-3)">
+              <x-import component-from-global-scope="DesignSystem_d5dab3.Choice" type="radio" name="placanje" value="pouzece" boxed="{{ true }}" checked="{{ payCod }}" on-change="{{ onPay }}" label="Pouzećem" description="Plaćate poštaru kada paket stigne." hint-size="100%,86px"></x-import>
+              <x-import component-from-global-scope="DesignSystem_d5dab3.Choice" type="radio" name="placanje" value="uplatnica" boxed="{{ true }}" checked="{{ payBank }}" on-change="{{ onPay }}" label="Uplatnica" description="Šaljemo podatke za prenos na račun." hint-size="100%,86px"></x-import>
+            </div>
+          </div>
+
+          <x-import component-from-global-scope="DesignSystem_d5dab3.Choice" type="checkbox" name="logo" boxed="{{ true }}" checked="{{ logo }}" on-change="{{ toggleLogo }}" label="Štampa sa vašim logom i imenom" description="{{ logoDesc }}" hint-size="100%,86px"></x-import>
+
+          <x-import component-from-global-scope="DesignSystem_d5dab3.Input" label="Napomena" name="napomena" value="{{ v_napomena }}" on-change="{{ onField }}" multiline="{{ true }}" rows="{{ n3 }}" help="Nije obavezno." hint-size="100%,140px"></x-import>
+
+          <div style="display:flex;flex-direction:column;gap:var(--space-2);padding:var(--space-5);border-radius:var(--radius-md);background:var(--surface-sunken)">
+            <div style="display:flex;justify-content:space-between;gap:var(--space-4);font-size:var(--fs-body)"><span>{{ qty }} × kartica</span><span style="font-weight:var(--fw-semibold);color:var(--text-strong)">{{ cardsLabel }}</span></div>
+            <sc-if value="{{ logo }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;justify-content:space-between;gap:var(--space-4);font-size:var(--fs-body)"><span>Štampa sa logom</span><span style="font-weight:var(--fw-semibold);color:var(--text-strong)">{{ logoTotalLabel }}</span></div>
+            </sc-if>
+            <div style="display:flex;justify-content:space-between;gap:var(--space-4);font-size:var(--fs-body);color:var(--text-muted)"><span>Poštarina</span><span style="font-weight:var(--fw-semibold)">{{ shipLabel }}</span></div>
+            <div style="display:flex;justify-content:space-between;gap:var(--space-4);align-items:baseline;border-top:1px solid var(--border-soft);margin-top:var(--space-2);padding-top:var(--space-4)">
+              <span style="font-size:var(--fs-body);font-weight:var(--fw-semibold);color:var(--text-strong)">Ukupno</span>
+              <span style="font-family:var(--font-display);font-weight:var(--fw-display-strong);font-size:var(--fs-h1);color:var(--primary)">{{ totalLabel }}</span>
+            </div>
+          </div>
+
+          <x-import component-from-global-scope="DesignSystem_d5dab3.Button" size="lg" full="{{ true }}" type="submit" hint-size="100%,60px">{{ submitLabel }}</x-import>
+          <p style="margin:0;text-align:center;font-size:var(--fs-caption);color:var(--text-muted)">Zamena bez pitanja u prvih 30 dana. Javlja se čovek, ne robot.</p>
+        </form>
+      </x-import>
+      </sc-if>
+    </div>
+  </x-import>
+
+  <x-import component-from-global-scope="DesignSystem_d5dab3.Footer" on-order="{{ goOrder }}" hint-size="100%,320px"></x-import>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;boja&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;indigo&quot;,&quot;teal&quot;,&quot;oxblood&quot;],&quot;default&quot;:&quot;indigo&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Brend&quot;},&quot;prikaziBoje&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Brend&quot;}}">
+// Cene su placeholder tokeni: {CENA_3} {CENA_5} {CENA_10} {CENA_PO_KOMADU} {SLANJE}
+const UNIT = { small: 997, mid: 898, big: 799 };
+const SHIPPING = 390;
+const LOGO_FEE = 250;
+const THIN = '\u202F';
+
+class Component extends DCLogic {
+  state = {
+    brand: null, qty: 5, logo: false, sent: false,
+    form: { ime: '', firma: '', telefon: '', grad: '', adresa: '', ptt: '', google: '', napomena: '' },
+    placanje: 'pouzece', errors: {}
+  };
+
+  brandKey() { return this.state.brand || this.props.boja || 'indigo'; }
+  applyBrand() {
+    const b = this.brandKey();
+    if (b === 'indigo') document.documentElement.removeAttribute('data-brand');
+    else document.documentElement.setAttribute('data-brand', b);
+  }
+
+  unit(q) { return q >= 10 ? UNIT.big : q >= 5 ? UNIT.mid : UNIT.small; }
+  cards() { return this.unit(this.state.qty) * this.state.qty; }
+  logoTotal() { return this.state.logo ? LOGO_FEE * this.state.qty : 0; }
+  total() { return this.cards() + this.logoTotal() + SHIPPING; }
+  // 1 kartica · 2-4 kartice · 5+ kartica (uz mod-100 za 21, 22, 101…)
+  kartica(n) {
+    const d100 = n % 100, d10 = n % 10;
+    if (d100 >= 11 && d100 <= 14) return 'kartica';
+    if (d10 === 1) return 'kartica';
+    if (d10 >= 2 && d10 <= 4) return 'kartice';
+    return 'kartica';
+  }
+  qtyWord(n) { return n + ' ' + this.kartica(n); }
+  fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, THIN) + ' RSD'; }
+  num(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, THIN); }
+
+  // Hero se meri od stvarne visine sticky headera, ne od pretpostavljene
+  measureHeader = () => {
+    const h = document.querySelector('header');
+    if (h && h.offsetHeight) document.documentElement.style.setProperty('--dp-header-h', h.offsetHeight + 'px');
+  };
+  componentDidMount() {
+    this.applyBrand();
+    if (window.lucide) window.lucide.createIcons();
+    this.measureHeader();
+    requestAnimationFrame(this.measureHeader);
+    window.addEventListener('resize', this.measureHeader);
+    if ('ResizeObserver' in window) {
+      this.hro = new ResizeObserver(this.measureHeader);
+      const h = document.querySelector('header');
+      if (h) this.hro.observe(h);
+    }
+  }
+  componentDidUpdate() {
+    this.applyBrand();
+    if (window.lucide) window.lucide.createIcons();
+    this.measureHeader();
+  }
+  componentWillUnmount() {
+    clearTimeout(this.t);
+    window.removeEventListener('resize', this.measureHeader);
+    if (this.hro) this.hro.disconnect();
+  }
+
+  scrollTo(id) {
+    const el = document.getElementById(id);
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' });
+  }
+
+  playTap = () => {
+    const q = s => document.querySelector(s);
+    const phone = q('[data-demo-phone]');
+    if (!phone) return;
+    const D = '3.6s cubic-bezier(.2,.7,.3,1) both';
+    const seq = [[phone, 'dp-tap'], [q('[data-demo-form]'), 'dp-show'], [q('[data-demo-idle]'), 'dp-hide'], [q('[data-demo-pulse]'), 'dp-pulse']];
+    seq.forEach(p => { if (p[0]) p[0].style.animation = 'none'; });
+    void phone.offsetWidth;
+    seq.forEach(p => { if (p[0]) p[0].style.animation = p[1] + ' ' + D; });
+  };
+
+  renderVals() {
+    const s = this.state, f = s.form, e = s.errors;
+    const setQty = n => () => this.setState({ qty: n });
+    const ctaFor = n => (s.qty === n ? 'Izabrano' : 'Izaberi ' + this.qtyWord(n));
+
+    return {
+      showSwitcher: this.props.prikaziBoje !== false,
+      n0: 0, n3: 3, n16: 16, n22: 22, n28: 28, n300: 300, n360: 360,
+      qtyWord: this.qtyWord(s.qty),
+
+      qty: s.qty,
+      logo: s.logo,
+      logoDesc: 'Dodatnih ' + this.fmt(LOGO_FEE) + ' po kartici.',
+      unitLabel: this.fmt(this.unit(s.qty)),
+      cardsLabel: this.fmt(this.cards()),
+      logoTotalLabel: this.fmt(this.logoTotal()),
+      shipLabel: this.fmt(SHIPPING),
+      totalLabel: this.fmt(this.total()),
+      submitLabel: 'Poruči ' + this.qtyWord(s.qty),
+
+      p3: this.num(2990), p5: this.num(4490), p10: this.num(7990),
+      f3: ['Za mali salon ili radnju', 'Podešavamo i zaključavamo čip', 'Stiže poštom za 2 dana'],
+      f5: ['Kasa, sto, ulaz, terasa', 'Podešavamo i zaključavamo čip', 'Zamena bez pitanja 30 dana'],
+      f10: ['Po jedna na svaki sto', 'Najniža cena po kartici', 'Zamena bez pitanja 30 dana'],
+      cta3: ctaFor(3), cta5: ctaFor(5), cta10: ctaFor(10),
+      pick3: setQty(3), pick5: setQty(5), pick10: setQty(10),
+
+      delatnosti: ['Kafić', 'Restoran', 'Frizerski salon', 'Brza hrana', 'Teretana', 'Auto-perionica', 'Zubarska ordinacija', 'Zanatlija'],
+
+      sent: s.sent, notSent: !s.sent,
+      payCod: s.placanje === 'pouzece', payBank: s.placanje === 'uplatnica',
+      v_ime: f.ime, v_firma: f.firma, v_telefon: f.telefon, v_grad: f.grad,
+      v_adresa: f.adresa, v_ptt: f.ptt, v_google: f.google, v_napomena: f.napomena,
+      e_ime: e.ime, e_firma: e.firma, e_telefon: e.telefon, e_grad: e.grad,
+      e_adresa: e.adresa, e_ptt: e.ptt, e_google: e.google,
+
+      goOrder: () => this.scrollTo('porudzbina'),
+      goKako: () => this.scrollTo('kako'),
+      goNav: (id) => this.scrollTo(id === 'top' ? 'top' : id),
+      pickBrand: (ev) => this.setState({ brand: ev.currentTarget.getAttribute('data-brandpick') }),
+      inc: () => this.setState(st => ({ qty: Math.min(200, st.qty + 1) })),
+      dec: () => this.setState(st => ({ qty: Math.max(1, st.qty - 1) })),
+      toggleLogo: (ev) => this.setState({ logo: !!(ev && ev.target ? ev.target.checked : !s.logo) }),
+      onPay: (ev) => this.setState({ placanje: ev.target.value }),
+      playTap: this.playTap,
+      onField: (ev) => {
+        const name = ev.target.name, val = ev.target.value;
+        this.setState(st => {
+          const errors = Object.assign({}, st.errors); delete errors[name];
+          return { form: Object.assign({}, st.form, { [name]: val }), errors: errors };
+        });
+      },
+      submit: (ev) => {
+        ev.preventDefault();
+        const errors = {};
+        if (f.ime.trim().length < 3) errors.ime = 'Unesite ime i prezime.';
+        if (!f.firma.trim()) errors.firma = 'Unesite naziv objekta.';
+        if (f.telefon.replace(/\D/g, '').length < 8) errors.telefon = 'Unesite broj telefona.';
+        if (!f.grad.trim()) errors.grad = 'Unesite grad.';
+        if (!f.adresa.trim()) errors.adresa = 'Unesite adresu za dostavu.';
+        if (!/^\d{5}$/.test(f.ptt.trim())) errors.ptt = 'Poštanski broj ima pet cifara.';
+        if (!f.google.trim() && (!f.firma.trim() || !f.grad.trim())) errors.google = 'Unesite link, ili naziv objekta i grad.';
+        if (Object.keys(errors).length) {
+          this.setState({ errors: errors });
+          const first = document.querySelector('[name="' + Object.keys(errors)[0] + '"]');
+          if (first) first.focus();
+          return;
+        }
+        this.setState({ errors: {}, sent: true });
+      },
+      reset: () => this.setState({ sent: false, errors: {} })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

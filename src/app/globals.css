@@ -1,0 +1,334 @@
+@import "tailwindcss";
+
+/*
+  Daj Peticu — design system.
+  Paleta: Emerald (zamenilo Vivid Tangerine 02.09.2026 — birano iz 8 ponuđenih
+  pravaca, vidi boja-finalno.html artifact). Ova boja postaje i boja loga.
+  Jedina obojena stvar van primarne je zlatna (--color-gold) — rezervisana
+  za zvezdice, i kao CTA akcenat na tamnozelenoj pozadini (Dugme
+  variant="gold", nav dugme kad prelazi preko tamne sekcije) gde zelena
+  varijanta gubi kontrast. Zelena sedi naspram zlatne na točku boja — ista
+  logika kao lovorov venac: jasna razdvojenost, a asocira i na uspeh/rast.
+*/
+
+@theme {
+  --font-prikaz: var(--font-prikaz-font), Georgia, "Times New Roman", serif;
+  --font-tekst: var(--font-tekst-font), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* širina desktop kontejnera — jedno mesto za sve sekcije (max-w-[var(--container)]) */
+  --container: 1320px;
+
+  /* primarna — Emerald */
+  --color-primary: #0e7a4f;
+  --color-primary-hover: #0b5f3d;
+  --color-primary-active: #084a30;
+  --color-primary-quiet: #e4f5ec;
+  --color-primary-quiet-hover: #d3eddf;
+  --color-primary-line: #b9e2cc;
+
+  /* zlatna — samo zvezdice */
+  --color-gold: #ffc53d;
+  --color-gold-ink: #b57f00;
+
+  /* tamno neutralno + površine */
+  --color-ink-900: #15171c;
+  --color-ink-800: #23262e;
+  --color-ink-700: #3a3f4a;
+  --color-ink-500: #5f6672;
+  --color-ink-400: #858c99;
+  --color-ink-300: #b3b9c4;
+
+  --color-surface-0: #ffffff;
+  --color-surface-1: #f6f7fa;
+  --color-surface-2: #eceef4;
+  --color-surface-3: #e0e4ee;
+
+  --color-border-soft: #e6e9f1;
+  --color-border: #d7dbe6;
+  --color-border-strong: #bcc2d1;
+
+  --color-bg: var(--color-surface-1);
+  --color-bg-alt: var(--color-surface-0);
+  /* Duboka tamnozelena — za razliku od narandžaste, zelena se zatamni čisto
+     (bez "blatnjavog" efekta), pa "inverse" sekcije ostaju brendirane. */
+  --color-bg-inverse: #0b2e20;
+
+  --color-text-strong: var(--color-ink-900);
+  --color-text-body: var(--color-ink-700);
+  --color-text-muted: var(--color-ink-500);
+  --color-text-on-primary: #ffffff;
+  --color-text-on-inverse: #ffffff;
+  --color-text-quiet-on-inverse: #bfe3d0;
+
+  --color-danger: #a3232c;
+  --color-danger-quiet: #fbeaea;
+
+  /* fluidna tipografska skala — telo nikad ispod 17px (40+ čitaoci na telefonu) */
+  --text-display-2: clamp(2rem, 5.6vw, 3.25rem);
+  --text-h1: clamp(1.75rem, 4.4vw, 2.5rem);
+  --text-h2: clamp(1.5rem, 3.4vw, 1.9375rem);
+  --text-h3: clamp(1.25rem, 2.6vw, 1.5rem);
+  --text-body-lg: clamp(1.125rem, 2vw, 1.3125rem);
+  --text-body: 1.0625rem;
+  --text-body-sm: 1rem;
+  --text-caption: 0.9375rem;
+  --text-eyebrow: 0.875rem;
+
+  --leading-display: 1.06;
+  --leading-heading: 1.18;
+  --leading-snug: 1.35;
+  --leading-body: 1.6;
+  --leading-loose: 1.75;
+
+  --tracking-display: -0.02em;
+  --tracking-heading: -0.01em;
+  --tracking-eyebrow: 0.12em;
+
+  --radius-badge: 999px;
+  --radius-button: 999px;
+  --radius-card: 20px;
+  --radius-field: 14px;
+  --radius-image: 28px;
+
+  --shadow-xs: 0 1px 2px rgb(14 122 79 / 0.06);
+  --shadow-sm: 0 2px 6px rgb(14 122 79 / 0.07);
+  --shadow-md: 0 8px 20px -6px rgb(14 122 79 / 0.13);
+  --shadow-lg: 0 18px 44px -14px rgb(14 122 79 / 0.2);
+  --shadow-focus: 0 0 0 3px rgb(14 122 79 / 0.22);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text-body);
+    font-family: var(--font-tekst);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Tailwind v4 je u preflight-u ukinuo cursor:pointer na dugmadima, koji je
+     v3 podrazumevano imao — pa posle prelaska nijedno dugme na sajtu nije
+     izgledalo kliktabilno, uključujući "Poruči karticu". */
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  /* Modal.tsx (popup za dodavanje u korpu) — koristi --color-bg-inverse
+     nijansu, ista logika kao ostale tamne površine na sajtu. Fade + blagi
+     scale na otvaranje I zatvaranje — @starting-style hvata "od" stanje pri
+     otvaranju, a allow-discrete drži dialog nacrtanim dok traje izlazna
+     tranzicija umesto da se display:none postavi trenutno (native <dialog>
+     bi inače nestao skokovito na close()). Nepodržani browseri jednostavno
+     nemaju animaciju, popup i dalje normalno radi. */
+  dialog {
+    transition:
+      opacity 240ms ease,
+      transform 240ms ease,
+      overlay 240ms ease allow-discrete,
+      display 240ms ease allow-discrete;
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  dialog[open] {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @starting-style {
+    dialog[open] {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+  }
+
+  dialog::backdrop {
+    background: rgb(11 46 32 / 0.5);
+    backdrop-filter: blur(6px);
+    transition:
+      opacity 240ms ease,
+      overlay 240ms ease allow-discrete,
+      display 240ms ease allow-discrete;
+    opacity: 0;
+  }
+
+  dialog[open]::backdrop {
+    opacity: 1;
+  }
+
+  @starting-style {
+    dialog[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  /* KorpaDrawer.tsx — panel usidren desno "uleće" sa strane (translateX)
+     umesto fade+scale gore (koji je za centrirani fullscreen popup). Bez
+     opacity animacije ovde — samo klizanje, kao standardni "cart drawer". */
+  dialog.korpa-drawer {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+
+  dialog.korpa-drawer[open] {
+    transform: translateX(0);
+  }
+
+  @starting-style {
+    dialog.korpa-drawer[open] {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Google Places Autocomplete padajuća lista (DodajUKorpuPopup.tsx) — Google
+     je crta izvan React stabla (direktno u <body>), pa se boji isključivo
+     preko globalnih .pac-* klasa koje sam widget dodaje; nema drugog načina
+     da se ovo stilizuje. Usklađeno sa tamnozelenom/zlatnom temom popup-a. */
+  .pac-container {
+    margin-top: 4px;
+    border: 1px solid rgba(255, 197, 61, 0.35);
+    border-radius: var(--radius-field, 10px);
+    background: var(--color-bg-inverse);
+    box-shadow: 0 12px 32px -8px rgb(0 0 0 / 0.45);
+  }
+
+  .pac-item {
+    border-top-color: rgba(255, 255, 255, 0.08);
+    padding: 10px 14px;
+    font-family: var(--font-tekst);
+    color: rgb(191 227 208);
+  }
+
+  .pac-item:first-child {
+    border-top: none;
+  }
+
+  .pac-item:hover,
+  .pac-item-selected {
+    background: rgba(255, 197, 61, 0.12);
+  }
+
+  .pac-item-query {
+    color: #fff;
+  }
+
+  .pac-matched {
+    color: var(--color-gold);
+  }
+
+  .pac-icon {
+    filter: invert(1) brightness(1.4);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Hero 3D kartica — tiho "disanje" u mirovanju, dok je niko ne dodiruje. */
+@keyframes dp-kartica-disanje {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Demo dodira (Kako radi) — telefon prislanja karticu, forma za ocenu se pojavi. */
+@keyframes dp-tap {
+  0% {
+    transform: translateY(0);
+  }
+  16%,
+  86% {
+    transform: translateY(96px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+@keyframes dp-show {
+  0%,
+  15% {
+    opacity: 0;
+  }
+  20%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes dp-hide {
+  0%,
+  15% {
+    opacity: 1;
+  }
+  20%,
+  88% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes dp-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1.9);
+  }
+  55%,
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+/* DodajUKorpuPopup.tsx — fina pojava slike stalka pri promeni boje (slika se
+   remontira preko React key={boja}, pa se ova animacija sama okine svaki put). */
+@keyframes dp-slika-pojava {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

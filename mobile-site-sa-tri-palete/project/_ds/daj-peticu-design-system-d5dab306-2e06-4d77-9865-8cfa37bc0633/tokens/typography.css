@@ -1,0 +1,41 @@
+/* Type. Mobile-first, sized up for 40+ readers on a phone in daylight: body never below 17px,
+   buttons/labels never below 16px. Every size is fluid so long Serbian strings shrink gracefully
+   instead of overflowing. Headings use text-wrap:balance, paragraphs text-wrap:pretty — Serbian
+   runs ~15-25% longer than English, so no heading may rely on a fixed line count. */
+:root{
+--fs-display-1:clamp(2.5rem,7.5vw,4.5rem); /* @kind font */
+--fs-display-2:clamp(2rem,5.6vw,3.25rem); /* @kind font */
+--fs-h1:clamp(1.75rem,4.4vw,2.5rem); /* @kind font */
+--fs-h2:clamp(1.5rem,3.4vw,1.9375rem); /* @kind font */
+--fs-h3:clamp(1.25rem,2.6vw,1.5rem); /* @kind font */
+--fs-body-lg:clamp(1.125rem,2vw,1.3125rem); /* @kind font */
+--fs-body:1.0625rem; /* @kind font */
+--fs-body-sm:1rem; /* @kind font */
+--fs-caption:0.9375rem; /* @kind font */
+--fs-label:1rem; /* @kind font */
+--fs-button:1.0625rem; /* @kind font */
+--fs-button-lg:1.125rem; /* @kind font */
+--fs-eyebrow:0.875rem; /* @kind font */
+
+--lh-display:1.06; /* @kind other */
+--lh-heading:1.18; /* @kind other */
+--lh-snug:1.35; /* @kind other */
+--lh-body:1.6; /* @kind other */
+--lh-loose:1.75; /* @kind other */
+--tracking-display:-0.02em; /* @kind other */
+--tracking-heading:-0.01em; /* @kind other */
+--tracking-body:0; /* @kind other */
+--tracking-eyebrow:0.12em; /* @kind other */
+--fw-display:500; /* @kind other */
+--fw-display-strong:600; /* @kind other */
+--fw-body:400; /* @kind other */
+--fw-medium:500; /* @kind other */
+--fw-semibold:600; /* @kind other */
+--fw-bold:700; /* @kind other */
+
+/* role aliases */
+--text-display-font:var(--font-display);--text-heading-font:var(--font-display);--text-body-font:var(--font-sans);--text-ui-font:var(--font-sans);
+--measure-prose:62ch; /* @kind other */
+--measure-narrow:46ch; /* @kind other */
+--measure-card:34ch; /* @kind other */
+}
