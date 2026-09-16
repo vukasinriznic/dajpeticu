@@ -9,11 +9,16 @@ import { useKorpa } from "@/components/sajt/KorpaKontekst";
 import {
   cenaKarticaZaStavku,
   formatRSD,
+  jedinicnaCena,
   kolicinaSlovima,
   PRAG_BESPLATNE_DOSTAVE,
   PRAG_GRATIS_POKLONA,
 } from "@/lib/cene";
 import { validirajPorudzbinu, validirajUkupnuKolicinu } from "@/lib/validacijaPorudzbine";
+
+// Cena po jedinici bez popusta na količinu — isti anchor kao u
+// DodajUKorpuPopup.tsx, da se vidi ušteda i ovde u pregledu.
+const CENA_JEDNE = jedinicnaCena(1);
 
 type Polja = {
   email: string;
@@ -225,7 +230,14 @@ export function KorpaFormaNarudzbine({
               </span>
               {kolicinaSlovima(s.kolicina)} ({s.boja === "crna" ? "crni" : "beli"})
             </span>
-            <span className="font-normal">{formatRSD(cenaKarticaZaStavku(ukupnaKolicina, s.kolicina))}</span>
+            <span className="font-normal">
+              {CENA_JEDNE * s.kolicina > cenaKarticaZaStavku(ukupnaKolicina, s.kolicina) && (
+                <span className="mr-1.5 text-caption line-through opacity-70">
+                  {formatRSD(CENA_JEDNE * s.kolicina)}
+                </span>
+              )}
+              {formatRSD(cenaKarticaZaStavku(ukupnaKolicina, s.kolicina))}
+            </span>
           </div>
         ))}
         {/* Isti obrazac kao u KorpaDrawer.tsx — na 1 kartici se poštarina
