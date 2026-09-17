@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Dugme } from "@/components/core/Dugme";
 import { Unos } from "@/components/forms/Unos";
 import { Selekt } from "@/components/forms/Selekt";
-import { useKorpa } from "@/components/sajt/KorpaKontekst";
+import { useKorpa, type StavkaKorpe } from "@/components/sajt/KorpaKontekst";
 import {
   cenaKarticaZaStavku,
   formatRSD,
@@ -69,13 +69,22 @@ const PRAZNA_POLJA: Polja = {
 };
 
 // Tamnozelena/zlatna tema, po ugledu na DodajUKorpuPopup.tsx — jedina
-// upotreba ovog fajla je /placanje.
+// upotreba ovog fajla je /placanje. stavke/ukupnaKolicina/ukupnaCena stižu
+// kao props (ne direktno iz useKorpa()) — roditelj (placanje/page.tsx) drži
+// poslednji NEPRAZAN snimak korpe, da prikaz ne "trepne" praznim stanjem u
+// deliću sekunde dok traje redirekcija na početnu posle pražnjenja korpe.
 export function KorpaFormaNarudzbine({
+  stavke,
+  ukupnaKolicina,
+  ukupnaCena,
   onUspeh,
 }: {
+  stavke: StavkaKorpe[];
+  ukupnaKolicina: number;
+  ukupnaCena: number;
   onUspeh: (payload: { ukupnaCena: number; telefon: string }) => void;
 }) {
-  const { stavke, ukupnaKolicina, ukupnaCena, isprazniKorpu } = useKorpa();
+  const { isprazniKorpu } = useKorpa();
   const [polja, setPolja] = useState<Polja>(PRAZNA_POLJA);
   const [honeypot, setHoneypot] = useState("");
   const [greske, setGreske] = useState<Partial<Record<keyof Polja, string>>>({});

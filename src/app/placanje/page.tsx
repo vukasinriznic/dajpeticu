@@ -7,9 +7,11 @@ import { OcenaZvezdicama } from "@/components/core/OcenaZvezdicama";
 import { Podvuceno } from "@/components/core/Podvuceno";
 import { Sekcija } from "@/components/sajt/Sekcija";
 import { KorpaFormaNarudzbine } from "@/components/sajt/KorpaFormaNarudzbine";
-import { useKorpa } from "@/components/sajt/KorpaKontekst";
+import { useKorpa, type StavkaKorpe } from "@/components/sajt/KorpaKontekst";
 import { ZaglavljePlacanje } from "@/components/sajt/ZaglavljePlacanje";
 import { formatRSD } from "@/lib/cene";
+
+type SnimakKorpe = { stavke: StavkaKorpe[]; ukupnaKolicina: number; ukupnaCena: number };
 
 // Tamnozelena/zlatna tema — po ugledu na DodajUKorpuPopup.tsx, ista logika
 // (fiksna tema, ne prati boju stalka). Prikazuje SAMO formu za dostavu;
@@ -18,11 +20,22 @@ import { formatRSD } from "@/lib/cene";
 // (ZaglavljePlacanje), bez footera (Podnozje se ovde namerno ne renderuje).
 export default function PlacanjePage() {
   const router = useRouter();
-  const { stavke, hidrirano } = useKorpa();
+  const { stavke, hidrirano, ukupnaKolicina, ukupnaCena } = useKorpa();
   // Drži se OVDE (ne u KorpaFormaNarudzbine), jer uspešno slanje odmah prazni
   // korpu — da stranica ne bi preskočila na "korpa je prazna" pre nego što
   // korisnik vidi potvrdu, provera uspeha mora doći PRE provere praznine.
   const [poslato, setPoslato] = useState<{ ukupnaCena: number; telefon: string } | null>(null);
+
+  // Poslednje NEPRAZNO stanje korpe — kad korisnik isprazni korpu preko
+  // drawer-a dok je već na /placanje (a ne pre ulaska na stranicu), stavke
+  // padnu na 0 pre nego što router.replace("/") stigne da izvrši
+  // navigaciju, pa bi se forma na trenutak zamenila praznom sekcijom.
+  // Umesto da se prikaz osloni na "žive" (trenutne) vrednosti, drži se
+  // poslednji snimak i njega renderuje sve dok se ne ode sa stranice.
+  const [snimak, setSnimak] = useState<SnimakKorpe | null>(null);
+  useEffect(() => {
+    if (stavke.length > 0) setSnimak({ stavke, ukupnaKolicina, ukupnaCena });
+  }, [stavke, ukupnaKolicina, ukupnaCena]);
 
   // Prazna korpa = nema šta da se plati, stranica nije dostupna — umesto
   // poruke, direktno na početnu. Čeka se "hidrirano" (localStorage pročitan)
@@ -32,6 +45,8 @@ export default function PlacanjePage() {
   useEffect(() => {
     if (hidrirano && stavke.length === 0 && !poslato) router.replace("/");
   }, [hidrirano, stavke.length, poslato, router]);
+
+  const prikaz = stavke.length > 0 ? { stavke, ukupnaKolicina, ukupnaCena } : snimak;
 
   if (poslato) {
     return (
@@ -57,10 +72,11 @@ export default function PlacanjePage() {
   }
 
   // Nema forme za praznu korpu — useEffect iznad već šalje na početnu.
-  // Ovo se vidi samo u tom kratkom trenutku dok redirekcija ne izvrši (ili
-  // pre nego što se "hidrirano" postavi), pa je namerno prazna sekcija bez
-  // teksta, ne cela "korpa je prazna" poruka.
-  if (!hidrirano || stavke.length === 0) {
+  // Ovo se vidi samo pri direktnom ulasku na /placanje sa već praznom
+  // korpom (nema šta da se zamrzne) ili pre nego što se "hidrirano"
+  // postavi, pa je namerno prazna sekcija bez teksta, ne cela "korpa je
+  // prazna" poruka.
+  if (!hidrirano || !prikaz) {
     return (
       <>
         <ZaglavljePlacanje />
@@ -79,7 +95,12 @@ export default function PlacanjePage() {
           <h1 className="m-0 font-prikaz text-display-2 leading-heading font-normal text-white">
             <Podvuceno>Dostava</Podvuceno>
           </h1>
-          <KorpaFormaNarudzbine onUspeh={setPoslato} />
+          <KorpaFormaNarudzbine
+            stavke={prikaz.stavke}
+            ukupnaKolicina={prikaz.ukupnaKolicina}
+            ukupnaCena={prikaz.ukupnaCena}
+            onUspeh={setPoslato}
+          />
         </div>
       </Sekcija>
     </>
