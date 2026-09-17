@@ -42,6 +42,18 @@ function skiniPozivniBroj(vrednost: string): string {
   return vrednost;
 }
 
+// Mala inline zastava (ne PNG/emoji) — isti crtež u svakom browseru/OS-u,
+// za razliku od emoji fonta koji zna da izgleda različito.
+function ZastavaSrbije() {
+  return (
+    <svg width="20" height="14" viewBox="0 0 20 14" className="shrink-0 rounded-[2px]" aria-hidden="true">
+      <rect width="20" height="14" fill="#0C4076" />
+      <rect width="20" height="4.67" fill="#C6363C" />
+      <rect y="9.33" width="20" height="4.67" fill="#fff" />
+    </svg>
+  );
+}
+
 const PRAZNA_POLJA: Polja = {
   email: "",
   drzava: "Srbija",
@@ -68,20 +80,23 @@ export function KorpaFormaNarudzbine({
   const [opstaGreska, setOpstaGreska] = useState("");
   const [saljemo, setSaljemo] = useState(false);
 
-  const onPolje = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name } = e.target;
-    // Telefon polje već ima statičan "+381" prefiks ispred input-a — browser
-    // autofill (adresar, sačuvani podaci) ume da ubaci ceo broj SA
-    // pozivnim brojem, pa bi se +381 video dva puta. Skida se ovde, na
-    // ulazu, umesto u prikazu, da validacija/slanje uvek vide isti oblik.
-    const value = name === "telefon" ? skiniPozivniBroj(e.target.value) : e.target.value;
+  const azurirajPolje = (name: keyof Polja, value: string) => {
     setPolja((p) => ({ ...p, [name]: value }));
     setGreske((g) => {
       if (!(name in g)) return g;
       const kopija = { ...g };
-      delete kopija[name as keyof Polja];
+      delete kopija[name];
       return kopija;
     });
+  };
+
+  const onPolje = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    // Telefon polje već ima statičan "+381" prefiks ispred input-a — browser
+    // autofill (adresar, sačuvani podaci) ume da ubaci ceo broj SA
+    // pozivnim brojem, pa bi se +381 video dva puta. Skida se ovde, na
+    // ulazu, umesto u prikazu, da validacija/slanje uvek vide isti oblik.
+    azurirajPolje(name as keyof Polja, name === "telefon" ? skiniPozivniBroj(value) : value);
   };
 
   const posalji = async (e: FormEvent) => {
@@ -142,8 +157,8 @@ export function KorpaFormaNarudzbine({
         label="Država"
         name="drzava"
         value={polja.drzava}
-        onChange={onPolje}
-        options={[{ value: "Srbija", label: "Srbija" }]}
+        onChange={(v) => azurirajPolje("drzava", v)}
+        options={[{ value: "Srbija", label: "Srbija", ikonica: <ZastavaSrbije /> }]}
         tamno
       />
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">

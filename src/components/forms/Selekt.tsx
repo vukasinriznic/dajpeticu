@@ -1,9 +1,15 @@
 "use client";
 
-import { useId, useState, type ChangeEvent } from "react";
+import { ChevronDown, Check } from "lucide-react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
-// Isti izgled kao Unos.tsx (rounded-field, fokus prsten) — postoji da
-// "Država" u formi za dostavu ne odudara od ostalih polja.
+export type OpcijaSelekta = { value: string; label: string; ikonica?: ReactNode };
+
+// Isti izgled kao Unos.tsx (rounded-field, fokus prsten) — ali potpuno
+// sopstveni combobox umesto native <select>. Native padajući meni je OS
+// stilizovan (font/boje van naše kontrole), pa bi uvek odudarao od ostatka
+// sajta; sa jednom opcijom za sada ("Srbija") ovo je jeftino, a spremno za
+// više zemalja kasnije.
 export function Selekt({
   label,
   help,
@@ -20,17 +26,36 @@ export function Selekt({
   error?: string;
   name: string;
   value: string;
-  onChange: (e: ChangeEvent<HTMLSelectElement>) => void;
-  options: { value: string; label: string }[];
+  onChange: (vrednost: string) => void;
+  options: OpcijaSelekta[];
   className?: string;
   // Tamna varijanta — vidi Unos.tsx, isti obrazac (koristi se na /placanje).
   tamno?: boolean;
 }) {
-  const [fokus, setFokus] = useState(false);
+  const [otvoren, setOtvoren] = useState(false);
   const uid = useId();
+  const omotacRef = useRef<HTMLDivElement>(null);
+  const izabrana = options.find((o) => o.value === value);
+
+  useEffect(() => {
+    if (!otvoren) return;
+    const naKlik = (e: MouseEvent) => {
+      if (omotacRef.current && !omotacRef.current.contains(e.target as Node)) setOtvoren(false);
+    };
+    const naEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOtvoren(false);
+    };
+    document.addEventListener("mousedown", naKlik);
+    document.addEventListener("keydown", naEscape);
+    return () => {
+      document.removeEventListener("mousedown", naKlik);
+      document.removeEventListener("keydown", naEscape);
+    };
+  }, [otvoren]);
+
   const granica = error
     ? "border-danger"
-    : fokus
+    : otvoren
       ? tamno
         ? "border-[var(--color-gold)]"
         : "border-primary"
@@ -39,31 +64,68 @@ export function Selekt({
         : "border-border";
 
   return (
-    <div className={`flex flex-col gap-2 font-tekst ${className}`}>
-      <label htmlFor={uid} className={`text-body-sm font-medium ${tamno ? "text-white" : "text-text-body"}`}>
+    <div ref={omotacRef} className={`relative flex flex-col gap-2 font-tekst ${className}`}>
+      <label id={uid} className={`text-body-sm font-medium ${tamno ? "text-white" : "text-text-body"}`}>
         {label}
       </label>
-      <div
-        className={`flex items-center rounded-field border px-4 shadow-[inset_0_1px_2px_rgb(14_92_85_/_0.05)] transition-[border-color,box-shadow] duration-200 ${tamno ? "bg-[rgba(255,255,255,0.06)]" : "bg-surface-0"} ${granica} ${
-          fokus ? (tamno ? "shadow-[0_0_0_3px_rgba(255,197,61,0.28)]" : "shadow-focus") : ""
+      <button
+        type="button"
+        role="combobox"
+        aria-haspopup="listbox"
+        aria-expanded={otvoren}
+        aria-labelledby={uid}
+        name={name}
+        onClick={() => setOtvoren((o) => !o)}
+        className={`flex h-[calc(3.375rem-2px)] items-center gap-2 rounded-field border px-4 text-left shadow-[inset_0_1px_2px_rgb(14_92_85_/_0.05)] transition-[border-color,box-shadow] duration-200 ${tamno ? "bg-[rgba(255,255,255,0.06)]" : "bg-surface-0"} ${granica} ${
+          otvoren ? (tamno ? "shadow-[0_0_0_3px_rgba(255,197,61,0.28)]" : "shadow-focus") : ""
         }`}
       >
-        <select
-          id={uid}
-          name={name}
-          value={value}
-          onFocus={() => setFokus(true)}
-          onBlur={() => setFokus(false)}
-          onChange={onChange}
-          className={`h-[calc(3.375rem-2px)] min-w-0 flex-1 border-0 bg-transparent font-tekst text-body outline-none ${tamno ? "text-white [color-scheme:dark]" : "text-text-strong"}`}
+        {izabrana?.ikonica}
+        <span className={`flex-1 font-tekst text-body ${tamno ? "text-white" : "text-text-strong"}`}>
+          {izabrana?.label ?? ""}
+        </span>
+        <ChevronDown
+          size={18}
+          className={`shrink-0 transition-transform duration-200 ${otvoren ? "rotate-180" : ""} ${tamno ? "text-[rgba(191,227,208,0.75)]" : "text-text-muted"}`}
+        />
+      </button>
+      {otvoren && (
+        <ul
+          role="listbox"
+          aria-labelledby={uid}
+          className={`absolute top-full left-0 z-20 mt-2 w-full overflow-hidden rounded-field border shadow-lg ${
+            tamno
+              ? "border-[rgba(255,197,61,0.25)] bg-[var(--color-bg-inverse)]"
+              : "border-border bg-surface-0"
+          }`}
         >
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-      </div>
+          {options.map((o) => {
+            const oznacena = o.value === value;
+            return (
+              <li key={o.value} role="option" aria-selected={oznacena}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange(o.value);
+                    setOtvoren(false);
+                  }}
+                  className={`flex w-full items-center gap-2 px-4 py-3 text-left font-tekst text-body transition-colors duration-150 ${
+                    tamno
+                      ? `text-white hover:bg-[rgba(255,197,61,0.12)] ${oznacena ? "bg-[rgba(255,197,61,0.08)]" : ""}`
+                      : `text-text-strong hover:bg-primary-quiet ${oznacena ? "bg-primary-quiet" : ""}`
+                  }`}
+                >
+                  {o.ikonica}
+                  <span className="flex-1">{o.label}</span>
+                  {oznacena && (
+                    <Check size={16} className={tamno ? "text-[var(--color-gold)]" : "text-primary"} />
+                  )}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
       {(error || help) && (
         <span className={`text-caption ${error ? "text-danger" : tamno ? "text-[rgba(191,227,208,0.75)]" : "text-text-muted"}`}>
           {error || help}
