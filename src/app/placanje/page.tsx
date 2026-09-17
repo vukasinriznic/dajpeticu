@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Dugme } from "@/components/core/Dugme";
 import { OcenaZvezdicama } from "@/components/core/OcenaZvezdicama";
@@ -101,6 +102,25 @@ export default function PlacanjePage() {
             ukupnaCena={prikaz.ukupnaCena}
             onUspeh={setPoslato}
           />
+          {/* Stranica namerno nema Podnozje (fokus na formi) — ali stranica
+              koja uzima lične podatke ne sme da bude bez ijednog linka ka
+              uslovima/privatnosti, pa ide tanak red umesto celog footera.
+              Iste boje kao Podnozje.tsx (text-quiet-on-inverse je isti
+              #bfe3d0 kao rgba(191,227,208,...) koji se koristi svuda po
+              ovoj stranici). */}
+          <div className="flex flex-wrap items-center justify-center gap-x-2 border-t border-white/14 pt-6 text-caption text-text-quiet-on-inverse">
+            <Link href="/uslovi" className="transition-colors duration-200 hover:text-text-on-inverse">
+              Uslovi
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link href="/privatnost" className="transition-colors duration-200 hover:text-text-on-inverse">
+              Privatnost
+            </Link>
+            <span aria-hidden="true">·</span>
+            <Link href="/garancija" className="transition-colors duration-200 hover:text-text-on-inverse">
+              Garancija
+            </Link>
+          </div>
         </div>
       </Sekcija>
     </>
