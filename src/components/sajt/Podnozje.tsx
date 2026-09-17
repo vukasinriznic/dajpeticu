@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { Instagram, Mail, Phone } from "lucide-react";
 import { Logotip } from "@/components/core/Logotip";
@@ -23,6 +24,10 @@ export function Podnozje() {
           <p className="m-0 text-body-sm leading-body text-text-quiet-on-inverse">
             Radi i kad vi niste tu, tiho i bez podsećanja.
           </p>
+          <span className="flex items-center gap-2 text-caption text-text-quiet-on-inverse opacity-80">
+            <Image src="/logo-mark.png" alt="" width={16} height={14} unoptimized />
+            Site powered by Afera Digital
+          </span>
         </div>
         <div className="flex flex-col gap-3 text-body-sm">
           <strong className="font-normal">Kontakt</strong>
