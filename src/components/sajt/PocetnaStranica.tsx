@@ -314,7 +314,7 @@ export function PocetnaStranica() {
 
       {/* PITANJA */}
       <Sekcija id="pitanja" ton="light">
-        <UNaVidiku className="mx-auto w-full max-w-[760px]">
+        <div className="mx-auto w-full max-w-[760px]">
           <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-strong">
             <Podvuceno>Najčešća pitanja</Podvuceno>
           </h2>
@@ -347,7 +347,7 @@ export function PocetnaStranica() {
               </PitanjeOdgovor>
             </Akordeon>
           </div>
-        </UNaVidiku>
+        </div>
       </Sekcija>
     </>
   );
