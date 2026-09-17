@@ -39,7 +39,7 @@ export function KorpaStavka({
         </span>
         <div className="flex flex-col gap-1">
           <span className="font-tekst text-body font-medium text-white">
-            {stavka.boja === "crna" ? "Crni" : "Beli"} stalak, {stavka.nazivBiznisa}
+            {stavka.boja === "crna" ? "Crni" : "Beli"} stalak
           </span>
           <span className="font-tekst text-body-sm text-[rgba(191,227,208,0.75)]">
             {kolicinaSlovima(stavka.kolicina)} · {formatRSD(cena)}

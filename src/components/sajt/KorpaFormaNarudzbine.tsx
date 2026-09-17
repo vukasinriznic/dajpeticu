@@ -246,27 +246,36 @@ export function KorpaFormaNarudzbine({
 
       <div className="flex flex-col gap-2 rounded-field bg-[rgba(255,197,61,0.08)] p-5">
         {stavke.map((s) => (
-          <div key={s.id} className="flex items-center justify-between gap-4 font-tekst text-body text-white">
-            <span className="flex items-center gap-3">
-              <span className="relative h-12 w-8 shrink-0 overflow-hidden">
-                <Image
-                  src={s.boja === "crna" ? "/stalak_crni.png" : "/stalak_beli.png"}
-                  alt=""
-                  fill
-                  sizes="32px"
-                  quality={90}
-                  className="object-contain"
-                />
-              </span>
-              {kolicinaSlovima(s.kolicina)} ({s.boja === "crna" ? "crni" : "beli"})
-            </span>
-            <span className="font-normal">
-              {CENA_JEDNE * s.kolicina > cenaKarticaZaStavku(ukupnaKolicina, s.kolicina) && (
-                <span className="mr-1.5 text-caption line-through opacity-70">
-                  {formatRSD(CENA_JEDNE * s.kolicina)}
+          <div key={s.id} className="flex flex-col gap-1">
+            <div className="flex items-center justify-between gap-4 font-tekst text-body text-white">
+              <span className="flex items-center gap-3">
+                <span className="relative h-12 w-8 shrink-0 overflow-hidden">
+                  <Image
+                    src={s.boja === "crna" ? "/stalak_crni.png" : "/stalak_beli.png"}
+                    alt=""
+                    fill
+                    sizes="32px"
+                    quality={90}
+                    className="object-contain"
+                  />
                 </span>
-              )}
-              {formatRSD(cenaKarticaZaStavku(ukupnaKolicina, s.kolicina))}
+                {kolicinaSlovima(s.kolicina)} ({s.boja === "crna" ? "crni" : "beli"})
+              </span>
+              <span className="font-normal">
+                {CENA_JEDNE * s.kolicina > cenaKarticaZaStavku(ukupnaKolicina, s.kolicina) && (
+                  <span className="mr-1.5 text-caption line-through opacity-70">
+                    {formatRSD(CENA_JEDNE * s.kolicina)}
+                  </span>
+                )}
+                {formatRSD(cenaKarticaZaStavku(ukupnaKolicina, s.kolicina))}
+              </span>
+            </div>
+            {/* Naziv biznisa se ovde vezuje za konkretan stalak na koji se
+                odnosi (svaka stavka u korpi nosi svoj naziv) — u
+                KorpaDrawer.tsx/KorpaStavka.tsx se više ne prikazuje, samo
+                ovde gde ima prostora da bude jasno uz koji red ide. */}
+            <span className="pl-11 font-tekst text-body-sm text-[rgba(191,227,208,0.75)]">
+              Za: {s.nazivBiznisa}
             </span>
           </div>
         ))}
