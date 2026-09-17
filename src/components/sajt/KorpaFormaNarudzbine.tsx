@@ -275,9 +275,11 @@ export function KorpaFormaNarudzbine({
             {/* Naziv biznisa se ovde vezuje za konkretan stalak na koji se
                 odnosi (svaka stavka u korpi nosi svoj naziv) — u
                 KorpaDrawer.tsx/KorpaStavka.tsx se više ne prikazuje, samo
-                ovde gde ima prostora da bude jasno uz koji red ide. */}
-            <span className="pl-11 font-tekst text-body-sm text-[rgba(191,227,208,0.75)]">
-              Za: {s.nazivBiznisa}
+                ovde gde ima prostora da bude jasno uz koji red ide.
+                Bez levog razmaka — alignovano sa slikom stalka iznad, ne sa
+                tekstom pored nje. */}
+            <span className="font-tekst text-body-sm text-[rgba(191,227,208,0.75)]">
+              Za biznis: {s.nazivBiznisa}
             </span>
           </div>
         ))}
