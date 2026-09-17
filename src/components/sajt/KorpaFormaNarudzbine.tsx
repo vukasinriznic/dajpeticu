@@ -42,15 +42,13 @@ function skiniPozivniBroj(vrednost: string): string {
   return vrednost;
 }
 
-// Mala inline zastava (ne PNG/emoji) — isti crtež u svakom browseru/OS-u,
-// za razliku od emoji fonta koji zna da izgleda različito.
+// public/serbia_flag.png — kvadratna slika (64×64), pa se seče preko
+// object-cover u pravougaoni oblik zastave umesto da se razvuče.
 function ZastavaSrbije() {
   return (
-    <svg width="20" height="14" viewBox="0 0 20 14" className="shrink-0 rounded-[2px]" aria-hidden="true">
-      <rect width="20" height="14" fill="#0C4076" />
-      <rect width="20" height="4.67" fill="#C6363C" />
-      <rect y="9.33" width="20" height="4.67" fill="#fff" />
-    </svg>
+    <span className="relative h-3.5 w-5 shrink-0 overflow-hidden rounded-[2px]">
+      <Image src="/serbia_flag.png" alt="" fill sizes="20px" className="object-cover" />
+    </span>
   );
 }
 
