@@ -85,6 +85,11 @@ export const Unos = forwardRef<HTMLInputElement, Props>(function Unos(props, ref
             onFocus={() => setFokus(true)}
             onBlur={() => setFokus(false)}
             onChange={onChange}
+            // data-tamno — browser autofill (Chrome/Edge) crta sopstvenu belu
+            // pozadinu preko input-a, ignorišući bg-transparent; fix živi u
+            // globals.css (input:autofill), ovaj atribut mu bira taman/svetao
+            // par boja.
+            data-tamno={tamno || undefined}
             className={`h-[calc(3.375rem-2px)] min-w-0 flex-1 border-0 bg-transparent font-tekst text-body outline-none ${tamno ? "text-white placeholder:text-[rgba(255,255,255,0.4)]" : "text-text-strong placeholder:text-text-muted"}`}
           />
         )}

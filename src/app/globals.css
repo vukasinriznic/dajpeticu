@@ -128,6 +128,46 @@
     cursor: pointer;
   }
 
+  /* Browser autofill (Chrome/Edge) crta sopstvenu belu/žućkastu pozadinu
+     preko input-a čim ga popuni (adresar, sačuvani podaci) — bg-transparent
+     u Unos.tsx to ne može da nadjača jer je to interni UA stil, ne obična
+     boja. Inset box-shadow "boji" pozadinu bez menjanja layout-a, a
+     transition sa ogromnim trajanjem sprečava da se boja vidljivo "upali"
+     kad browser (re)primeni autofill stil. */
+  /* Odvojena pravila (ne zajednička selector-lista) — u strogom CSS-u
+     nepoznat pseudo-class u listi selektora obara CELO pravilo (van
+     :is()/:where()), pa bi :-webkit-autofill mogao da obori i :autofill u
+     engine-ima koji ne znaju vendor-prefiksovanu varijantu. */
+  input:autofill {
+    box-shadow: 0 0 0 1000px var(--color-surface-0) inset;
+    -webkit-text-fill-color: var(--color-text-strong);
+    caret-color: var(--color-text-strong);
+    transition:
+      background-color 999999s ease-in-out 0s,
+      box-shadow 999999s ease-in-out 0s;
+  }
+
+  input:-webkit-autofill {
+    box-shadow: 0 0 0 1000px var(--color-surface-0) inset;
+    -webkit-text-fill-color: var(--color-text-strong);
+    caret-color: var(--color-text-strong);
+    transition:
+      background-color 999999s ease-in-out 0s,
+      box-shadow 999999s ease-in-out 0s;
+  }
+
+  input[data-tamno]:autofill {
+    box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.06) inset;
+    -webkit-text-fill-color: #ffffff;
+    caret-color: #ffffff;
+  }
+
+  input[data-tamno]:-webkit-autofill {
+    box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.06) inset;
+    -webkit-text-fill-color: #ffffff;
+    caret-color: #ffffff;
+  }
+
   /* Modal.tsx (popup za dodavanje u korpu) — koristi --color-bg-inverse
      nijansu, ista logika kao ostale tamne površine na sajtu. Fade + blagi
      scale na otvaranje I zatvaranje — @starting-style hvata "od" stanje pri
