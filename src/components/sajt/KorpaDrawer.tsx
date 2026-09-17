@@ -7,7 +7,7 @@ import { Dugme } from "@/components/core/Dugme";
 import { Podvuceno } from "@/components/core/Podvuceno";
 import { KorpaStavka } from "@/components/sajt/KorpaStavka";
 import type { StavkaKorpe } from "@/components/sajt/KorpaKontekst";
-import { formatRSD, PRAG_BESPLATNE_DOSTAVE, PRAG_GRATIS_POKLONA } from "@/lib/cene";
+import { formatRSD, MAX_KOLICINA, PRAG_BESPLATNE_DOSTAVE, PRAG_GRATIS_POKLONA } from "@/lib/cene";
 
 // Isti tamnozeleni/zlatni jezik kao DodajUKorpuPopup.tsx — panel usidren
 // desno (Modal.tsx variant="drawer"), otvara se klikom na ikonicu korpe u
@@ -29,6 +29,11 @@ export function KorpaDrawer({
   onZatvori: () => void;
 }) {
   const router = useRouter();
+  // validirajUkupnuKolicinu() u KorpaFormaNarudzbine.tsx bi ovo ionako
+  // odbio tek na /placanje — upozorenje ovde sprečava da korisnik prvo
+  // sabere veliku korpu (i vidi "tačnu" cenu za sve stavke po najnižem
+  // tier-u) pa tek na sledećem koraku sazna da porudžbina ne prolazi.
+  const prekoracenje = ukupnaKolicina > MAX_KOLICINA;
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--color-bg-inverse)]">
@@ -125,10 +130,17 @@ export function KorpaDrawer({
                 {formatRSD(ukupnaCena)}
               </span>
             </div>
+            {prekoracenje && (
+              <p className="m-0 font-tekst text-body-sm text-[var(--color-danger)]">
+                Za sada primamo porudžbine do {MAX_KOLICINA} stalaka. Smanjite količinu ili nam se javite
+                direktno za veću porudžbinu.
+              </p>
+            )}
             <Dugme
               size="lg"
               full
               variant="gold"
+              disabled={prekoracenje}
               onClick={() => {
                 onZatvori();
                 router.push("/placanje");
