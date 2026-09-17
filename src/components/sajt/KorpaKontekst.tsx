@@ -25,6 +25,10 @@ export type StavkaKorpe = {
 
 type KorpaKontekstTip = {
   stavke: StavkaKorpe[];
+  // Da li je localStorage već pročitan — bez ovoga bi /placanje na trenutak
+  // video praznu korpu (SSR/pre-hidracije) i pogrešno preusmerio korisnika
+  // koji stvarno ima nešto u korpi.
+  hidrirano: boolean;
   azurirajStavku: (id: string, patch: Partial<Omit<StavkaKorpe, "id">>) => void;
   ukloniStavku: (id: string) => void;
   isprazniKorpu: () => void;
@@ -97,6 +101,7 @@ export function KorpaProvider({ children }: { children: ReactNode }) {
 
   const value: KorpaKontekstTip = {
     stavke,
+    hidrirano,
     azurirajStavku,
     ukloniStavku,
     isprazniKorpu,

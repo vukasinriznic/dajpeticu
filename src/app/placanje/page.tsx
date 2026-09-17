@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dugme } from "@/components/core/Dugme";
 import { OcenaZvezdicama } from "@/components/core/OcenaZvezdicama";
@@ -18,11 +18,20 @@ import { formatRSD } from "@/lib/cene";
 // (ZaglavljePlacanje), bez footera (Podnozje se ovde namerno ne renderuje).
 export default function PlacanjePage() {
   const router = useRouter();
-  const { stavke } = useKorpa();
+  const { stavke, hidrirano } = useKorpa();
   // Drži se OVDE (ne u KorpaFormaNarudzbine), jer uspešno slanje odmah prazni
   // korpu — da stranica ne bi preskočila na "korpa je prazna" pre nego što
   // korisnik vidi potvrdu, provera uspeha mora doći PRE provere praznine.
   const [poslato, setPoslato] = useState<{ ukupnaCena: number; telefon: string } | null>(null);
+
+  // Prazna korpa = nema šta da se plati, stranica nije dostupna — umesto
+  // poruke, direktno na početnu. Čeka se "hidrirano" (localStorage pročitan)
+  // da se pravi korisnik sa punom korpom ne izbaci na trenutak praznog
+  // stanja pre hidracije; "poslato" isključuje redirekciju posle uspešne
+  // porudžbine, kad se korpa namerno prazni da bi se prikazala potvrda.
+  useEffect(() => {
+    if (hidrirano && stavke.length === 0 && !poslato) router.replace("/");
+  }, [hidrirano, stavke.length, poslato, router]);
 
   if (poslato) {
     return (
@@ -47,22 +56,16 @@ export default function PlacanjePage() {
     );
   }
 
-  if (stavke.length === 0) {
+  // Nema forme za praznu korpu — useEffect iznad već šalje na početnu.
+  // Ovo se vidi samo u tom kratkom trenutku dok redirekcija ne izvrši (ili
+  // pre nego što se "hidrirano" postavi), pa je namerno prazna sekcija bez
+  // teksta, ne cela "korpa je prazna" poruka.
+  if (!hidrirano || stavke.length === 0) {
     return (
       <>
         <ZaglavljePlacanje />
         <Sekcija ton="inverse">
-          <div className="mx-auto flex max-w-[62ch] flex-col items-start gap-4">
-            <h1 className="m-0 font-prikaz text-display-2 leading-heading font-normal text-white">
-              Korpa je prazna
-            </h1>
-            <p className="m-0 font-tekst text-h3 leading-heading text-[rgba(191,227,208,0.85)]">
-              Dodajte stalak iz bilo kog dela sajta da biste nastavili.
-            </p>
-            <Dugme size="lg" variant="gold" onClick={() => router.push("/")}>
-              Nazad na početnu
-            </Dugme>
-          </div>
+          <div className="mx-auto max-w-[62ch]" />
         </Sekcija>
       </>
     );
