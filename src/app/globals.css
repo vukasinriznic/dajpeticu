@@ -372,3 +372,36 @@
     transform: scale(1);
   }
 }
+
+/* Hero naslov (PocetnaStranica.tsx) — svaki red teksta je isprva potpuno
+   "prekriven" (clip-path desno = 100%) i otkriva se sleva nadesno, kao
+   reflektor koji prelazi preko reda. Levi/gornji/donji inset NISU 0 —
+   -10% levo sprečava da se koso sečena leva ivica slova (npr. veliko J)
+   blago odseče u polaznom kadru; gornji/donji inset su generozno negativni
+   jer "pet zvezdica" red nosi Podvuceno.tsx podvlaku koja fizički strči
+   ISPOD sopstvenog reda (bottom: -0.26em) — bez ovoga bi je inset(...0...)
+   (koji bi inače tačno pratio visinu reda) trajno odsekao, jer clip-path
+   inset ne prati overflow decu, samo geometriju sopstvene kutije. */
+@keyframes dp-otkrivanje-sleva {
+  from {
+    clip-path: inset(-0.3em 100% -0.7em -10%);
+  }
+  to {
+    clip-path: inset(-0.3em 0% -0.7em -10%);
+  }
+}
+
+/* Hero 3D kartica (desno od naslova) — pri učitavanju kreće dosta umanjena i
+   naraste do pune veličine; veći skok (0.55) i duže trajanje od
+   dp-slika-pojava iznad, koja je za sitnu promenu boje unutar popup-a, ne za
+   ulazak celog vizuala pri load-u. */
+@keyframes dp-uvecaj-pri-loadu {
+  from {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

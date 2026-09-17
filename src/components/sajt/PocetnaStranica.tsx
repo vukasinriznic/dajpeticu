@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Dugme, DUGME_ISTAKNUTO } from "@/components/core/Dugme";
 import { OcenaZvezdicama } from "@/components/core/OcenaZvezdicama";
@@ -26,6 +26,17 @@ function idiNa(id: string) {
 
 export function PocetnaStranica() {
   const { otvoriModal } = useKorpa();
+
+  // Podvlaka ispod "pet zvezdica" se NE otkriva zajedno sa ostatkom naslova
+  // — čeka da se ceo hero "sleže" (red teksta se otkrije, podnaslov/dugme/
+  // zvezdice ubace), pa se tek onda sama povuče sleva nadesno, kao da je
+  // neko dopisuje rukom pošto je tekst već tu. ~1050ms pokriva najduže
+  // hero kašnjenje ispod (zvezdice na 240ms + njihovih 700ms trajanja).
+  const [podvucenoIscrtano, setPodvucenoIscrtano] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setPodvucenoIscrtano(true), 1050);
+    return () => clearTimeout(t);
+  }, []);
 
   // Pozadina se pomera sporije od sadržaja pri skrolu (klasičan parallax).
   // Direktna DOM manipulacija (ne useState) namerno — React re-render po
@@ -117,17 +128,24 @@ export function PocetnaStranica() {
         />
         <div className="relative mx-auto grid w-full max-w-[var(--container)] grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <div className="flex flex-col items-start gap-5">
+            {/* Svaki red se otkriva sleva nadesno (dp-otkrivanje-sleva) —
+                eksplicitna odluka da naslov, iako je LCP element, dobije
+                upečatljiv ulazak; trajanja su kratka (700ms) da hit na
+                percepciju brzine učitavanja ostane mali. Podvlaka ispod
+                "pet zvezdica" se namerno NE otkriva u isto vreme — vidi
+                podvucenoIscrtano gore, povlači se tek pošto se ceo hero
+                sleže. */}
             <h1 className="m-0 font-prikaz text-[clamp(3rem,7.5vw,6.5rem)] leading-display font-semibold tracking-display text-text-strong">
-              Jedan tap
+              <span className="inline-block animate-[dp-otkrivanje-sleva_700ms_cubic-bezier(.2,.7,.3,1)_both]">
+                Jedan tap
+              </span>
               <br />
-              <span className="text-primary">
-                <Podvuceno>pet zvezdica</Podvuceno>
+              <span className="inline-block animate-[dp-otkrivanje-sleva_700ms_cubic-bezier(.2,.7,.3,1)_150ms_both] text-primary">
+                <Podvuceno odlozenoIscrtavanje iscrtaj={podvucenoIscrtano}>
+                  pet zvezdica
+                </Podvuceno>
               </span>
             </h1>
-            {/* h1 namerno NIJE umotan — to je LCP element (najveći sadržaj u
-                prvom kadru), pa mora biti odmah vidljiv; kašnjenje njegovog
-                prikaza radi animacije bi pogoršalo percepciju brzine
-                učitavanja. Ostatak hero-a ulazi stepenasto ispod njega. */}
             <UNaVidiku>
               <p
                 className="m-0 max-w-[46ch] font-prikaz text-h3 leading-heading font-medium text-text-strong"
@@ -152,7 +170,7 @@ export function PocetnaStranica() {
               </span>
             </UNaVidiku>
           </div>
-          <div className="hidden place-items-center py-6 lg:grid">
+          <div className="hidden place-items-center py-6 lg:grid animate-[dp-uvecaj-pri-loadu_900ms_cubic-bezier(.2,.7,.3,1)_both]">
             <Kartica3D sirina={524} className="mt-3" />
           </div>
         </div>
