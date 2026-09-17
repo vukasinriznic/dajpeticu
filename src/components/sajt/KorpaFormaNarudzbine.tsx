@@ -44,10 +44,14 @@ function skiniPozivniBroj(vrednost: string): string {
 
 // public/serbia_flag.png — kvadratna slika (64×64), pa se seče preko
 // object-cover u pravougaoni oblik zastave umesto da se razvuče.
+// unoptimized — Next-ov image optimizer ume da izgladi (quality:75, plus
+// re-enkodovanje u webp) baš na ovakvoj sitnoj ikonici sa tankim linijama
+// (kruna, krst), pa slika deluje mutno; izvor je već mali (64×64), nema
+// šta da se uštedi optimizacijom, samo se gubi oštrina.
 function ZastavaSrbije() {
   return (
     <span className="relative h-3.5 w-5 shrink-0 overflow-hidden rounded-[2px]">
-      <Image src="/serbia_flag.png" alt="" fill sizes="20px" className="object-cover" />
+      <Image src="/serbia_flag.png" alt="" fill sizes="20px" unoptimized className="object-cover" />
     </span>
   );
 }
