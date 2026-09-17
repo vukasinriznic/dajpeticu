@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { posaljiObavestenjeVlasniku } from "@/lib/resend";
+import { posaljiObavestenjeVlasniku, posaljiPotvrduKupcu } from "@/lib/resend";
 import { ukupnoKorpa } from "@/lib/cene";
 import {
   validirajPorudzbinu,
@@ -102,7 +102,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ greske: { opsta: "Greška na serveru, pokušajte ponovo." } }, { status: 500 });
   }
 
-  await posaljiObavestenjeVlasniku({ ...polja, stavke, ukupnaCena });
+  // Oba mejla se šalju paralelno — svaki hvata svoju grešku interno (vidi
+  // resend.ts), pa jedan koji ne uspe ne utiče na drugi ni na uspeh ovog
+  // odgovora (baza je već upisana iznad, to je izvor istine).
+  await Promise.all([
+    posaljiObavestenjeVlasniku({ ...polja, stavke, ukupnaCena }),
+    posaljiPotvrduKupcu({ ...polja, stavke, ukupnaCena }),
+  ]);
 
   return NextResponse.json({ id: data.id, ukupnaCena });
 }

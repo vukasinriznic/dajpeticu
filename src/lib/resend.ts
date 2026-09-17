@@ -43,3 +43,33 @@ export async function posaljiObavestenjeVlasniku(porudzbina: Porudzbina & { ukup
     console.error("Slanje mejla o porudžbini nije uspelo:", greska);
   }
 }
+
+// Potvrda kupcu — odvojena od gornjeg obaveštenja vlasniku (drugi primalac,
+// drugačiji ton: kupcu se ne šalje njegov sopstveni telefon/email nazad,
+// samo pregled onoga što je poručio). NAPOMENA: dok se dajpeticu.rs ne
+// verifikuje u Resend-u, "onboarding@resend.dev" pošiljalac po Resend-ovim
+// pravilima sme da šalje SAMO na email vlasnika naloga — mejl kupcu će
+// tiho propasti (uhvaćeno ispod, samo logovano) za bilo koju drugu adresu
+// dok verifikacija ne bude gotova.
+export async function posaljiPotvrduKupcu(porudzbina: Porudzbina & { ukupnaCena: number }) {
+  const html = `
+    <h2>Hvala na porudžbini, ${porudzbina.ime}!</h2>
+    <p>Primili smo vašu porudžbinu. Zovemo vas na ${porudzbina.telefon} da potvrdimo adresu i link vaše
+    Google strane.</p>
+    <ul>${stavkeHtml(porudzbina.stavke)}</ul>
+    <p><strong>Ukupno: ${formatRSD(porudzbina.ukupnaCena)}</strong> — plaćate pouzećem.</p>
+    <p>Dostava na: ${porudzbina.adresa}, ${porudzbina.postanskiBroj} ${porudzbina.grad}, ${porudzbina.drzava}</p>
+    <p>Pitanja? Javite nam se na ${site.email}.</p>
+  `;
+
+  try {
+    await resend.emails.send({
+      from: POSILJALAC,
+      to: porudzbina.email,
+      subject: "Vaša porudžbina je primljena — Daj Peticu",
+      html,
+    });
+  } catch (greska) {
+    console.error("Slanje potvrde kupcu nije uspelo:", greska);
+  }
+}
