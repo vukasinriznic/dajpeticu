@@ -187,7 +187,7 @@ export function KorpaFormaNarudzbine({
         value={polja.pib}
         error={greske.pib}
         onChange={onPolje}
-        help="Nije obavezno — samo ako naručujete za firmu."
+        help="Obavezno ako plaćate kao firma."
         tamno
       />
       <Unos
