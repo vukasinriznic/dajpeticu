@@ -24,10 +24,6 @@ export function Podnozje() {
           <p className="m-0 text-body-sm leading-body text-text-quiet-on-inverse">
             Radi i kad vi niste tu, tiho i bez podsećanja.
           </p>
-          <span className="flex items-center gap-2 text-caption text-text-quiet-on-inverse opacity-80">
-            <Image src="/logo-mark.png" alt="" width={16} height={14} unoptimized />
-            Site powered by Afera Digital
-          </span>
         </div>
         <div className="flex flex-col gap-3 text-body-sm">
           <strong className="font-normal">Kontakt</strong>
@@ -75,6 +71,15 @@ export function Podnozje() {
         >
           Garancija
         </Link>
+        <a
+          href="https://www.aferadigital.rs/"
+          target="_blank"
+          rel="noreferrer"
+          className="ml-auto flex items-center gap-2 text-text-quiet-on-inverse no-underline transition-colors duration-200 hover:text-text-on-inverse"
+        >
+          <Image src="/logo-mark.png" alt="" width={16} height={14} unoptimized />
+          Site powered by Afera Digital
+        </a>
       </div>
     </footer>
   );
