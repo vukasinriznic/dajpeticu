@@ -1,3 +1,4 @@
+import { UNaVidiku } from "@/components/core/UNaVidiku";
 import { CenovnaKartica } from "@/components/marketing/CenovnaKartica";
 import { cenaKartica, formatRSD, jedinicnaCena, kolicinaSlovima } from "@/lib/cene";
 
@@ -28,18 +29,19 @@ const CENA_JEDNE = jedinicnaCena(1);
 export function Cenovnik({ onOdaberi }: { onOdaberi: (kolicina: number) => void }) {
   return (
     <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {PAKETI.map((p) => (
-        <CenovnaKartica
-          key={p.kolicina}
-          naziv={p.naziv}
-          cena={formatRSD(cenaKartica(p.kolicina)).replace(" RSD", "")}
-          napomena={`${formatRSD(jedinicnaCena(p.kolicina))} po stalku`}
-          stavke={[...p.stavke]}
-          znacka={`Ušteda ${formatRSD((CENA_JEDNE - jedinicnaCena(p.kolicina)) * p.kolicina)}`}
-          istaknuta={"istaknuta" in p ? p.istaknuta : false}
-          cta={`Izaberi ${kolicinaSlovima(p.kolicina)}`}
-          onOdaberi={() => onOdaberi(p.kolicina)}
-        />
+      {PAKETI.map((p, i) => (
+        <UNaVidiku key={p.kolicina} rastegni kasnjenje={i * 100}>
+          <CenovnaKartica
+            naziv={p.naziv}
+            cena={formatRSD(cenaKartica(p.kolicina)).replace(" RSD", "")}
+            napomena={`${formatRSD(jedinicnaCena(p.kolicina))} po stalku`}
+            stavke={[...p.stavke]}
+            znacka={`Ušteda ${formatRSD((CENA_JEDNE - jedinicnaCena(p.kolicina)) * p.kolicina)}`}
+            istaknuta={"istaknuta" in p ? p.istaknuta : false}
+            cta={`Izaberi ${kolicinaSlovima(p.kolicina)}`}
+            onOdaberi={() => onOdaberi(p.kolicina)}
+          />
+        </UNaVidiku>
       ))}
     </div>
   );

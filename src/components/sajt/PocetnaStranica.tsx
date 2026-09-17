@@ -9,6 +9,7 @@ import { KorakStavka } from "@/components/marketing/KorakStavka";
 import { Utisak } from "@/components/marketing/Utisak";
 import { Akordeon, PitanjeOdgovor } from "@/components/marketing/PitanjeOdgovor";
 import { Sekcija } from "@/components/sajt/Sekcija";
+import { UNaVidiku } from "@/components/core/UNaVidiku";
 import { Kartica3D } from "@/components/sajt/Kartica3D";
 import { DemoDodira } from "@/components/sajt/DemoDodira";
 import { KakoRadiScroll } from "@/components/sajt/KakoRadiScroll";
@@ -123,13 +124,19 @@ export function PocetnaStranica() {
                 <Podvuceno>pet zvezdica</Podvuceno>
               </span>
             </h1>
-            <p
-              className="m-0 max-w-[46ch] font-prikaz text-h3 leading-heading font-medium text-text-strong"
-              style={{ transform: "translateY(2px)" }}
-            >
-              Konkurencija nije bolja od vas. Samo ima više recenzija.
-            </p>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
+            {/* h1 namerno NIJE umotan — to je LCP element (najveći sadržaj u
+                prvom kadru), pa mora biti odmah vidljiv; kašnjenje njegovog
+                prikaza radi animacije bi pogoršalo percepciju brzine
+                učitavanja. Ostatak hero-a ulazi stepenasto ispod njega. */}
+            <UNaVidiku>
+              <p
+                className="m-0 max-w-[46ch] font-prikaz text-h3 leading-heading font-medium text-text-strong"
+                style={{ transform: "translateY(2px)" }}
+              >
+                Konkurencija nije bolja od vas. Samo ima više recenzija.
+              </p>
+            </UNaVidiku>
+            <UNaVidiku kasnjenje={120} className="mt-4 flex flex-wrap items-center gap-3">
               <Dugme
                 size="lg"
                 className={DUGME_ISTAKNUTO}
@@ -137,13 +144,13 @@ export function PocetnaStranica() {
               >
                 Poruči stalak
               </Dugme>
-            </div>
-            <div className="flex items-center gap-3">
+            </UNaVidiku>
+            <UNaVidiku kasnjenje={240} className="flex items-center gap-3">
               <OcenaZvezdicama velicina={22} />
               <span className="font-tekst text-body-sm text-text-muted">
                 Poruči za 1 minut, stiže poštom. Plaćate pouzećem.
               </span>
-            </div>
+            </UNaVidiku>
           </div>
           <div className="hidden place-items-center py-6 lg:grid">
             <Kartica3D sirina={524} className="mt-3" />
@@ -154,7 +161,7 @@ export function PocetnaStranica() {
       {/* CARD */}
       <Sekcija id="card" ton="alt" className="nav-tamno !bg-[#0B2E20]">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-          <div className="flex max-w-[62ch] flex-col items-start gap-8">
+          <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-8">
             <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-on-inverse">
               <Podvuceno>Recenzije rastu same od sebe</Podvuceno>
             </h2>
@@ -170,8 +177,8 @@ export function PocetnaStranica() {
             >
               Poruči stalak
             </Dugme>
-          </div>
-          <div className="relative flex justify-center">
+          </UNaVidiku>
+          <UNaVidiku kasnjenje={150} className="relative flex justify-center">
             {/* Brend-tonirani glow iza kartice — ista logika kao radijalni
                 sloj u hero-u, ovde u zlatnoj nijansi da poveže sa "Poruči
                 karticu" dugmetom i zvezdicama. */}
@@ -184,7 +191,7 @@ export function PocetnaStranica() {
               }}
             />
             <Kartica3D sirina={524} interaktivna={false} />
-          </div>
+          </UNaVidiku>
         </div>
       </Sekcija>
 
@@ -194,27 +201,35 @@ export function PocetnaStranica() {
             nepredvidivo ponaša na mobilnim browserima, a efekat suvišan na
             malom ekranu). Naslov je ovde jer za desktop ide unutar
             KakoRadiScroll (levo, iznad koraka, u istoj koloni sa slikom). */}
-        <div className="flex max-w-[62ch] flex-col items-start gap-4 lg:hidden">
+        <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-4 lg:hidden">
           <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-strong">
             <Podvuceno>Kako radi</Podvuceno>
           </h2>
           <p className="m-0 font-tekst text-h3 leading-heading text-text-body">
             Mi ga podesimo. Vi ga stavite na željeno mesto.
           </p>
-        </div>
+        </UNaVidiku>
         <div className="grid grid-cols-1 gap-12 lg:hidden">
           <div className="flex flex-col gap-8">
-            <KorakStavka broj={1} naslov="Postavite stalak">
-              Tamo gde pogled mušterije prirodno pada dok čeka, na pultu, stolu ili kod kase.
-            </KorakStavka>
-            <KorakStavka broj={2} naslov="Mušterija tapne ili skenira">
-              Odmah se otvara vaša Google strana za ocenu, bez pretrage i čekanja.
-            </KorakStavka>
-            <KorakStavka broj={3} naslov="Recenzija je objavljena">
-              Čestitamo, upravo ste povećali šanse da vas pronađe nova mušterija.
-            </KorakStavka>
+            <UNaVidiku>
+              <KorakStavka broj={1} naslov="Postavite stalak">
+                Tamo gde pogled mušterije prirodno pada dok čeka, na pultu, stolu ili kod kase.
+              </KorakStavka>
+            </UNaVidiku>
+            <UNaVidiku kasnjenje={100}>
+              <KorakStavka broj={2} naslov="Mušterija tapne ili skenira">
+                Odmah se otvara vaša Google strana za ocenu, bez pretrage i čekanja.
+              </KorakStavka>
+            </UNaVidiku>
+            <UNaVidiku kasnjenje={200}>
+              <KorakStavka broj={3} naslov="Recenzija je objavljena">
+                Čestitamo, upravo ste povećali šanse da vas pronađe nova mušterija.
+              </KorakStavka>
+            </UNaVidiku>
           </div>
-          <DemoDodira />
+          <UNaVidiku kasnjenje={150}>
+            <DemoDodira />
+          </UNaVidiku>
         </div>
         {/* Desktop: sekcija se "zaključa" i koraci se ređaju kako se skroluje. */}
         <KakoRadiScroll />
@@ -229,53 +244,59 @@ export function PocetnaStranica() {
 
       {/* ISKUSTVA */}
       <Sekcija id="iskustva" ton="alt">
-        <div className="flex max-w-[62ch] flex-col items-start gap-4">
+        <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-4">
           <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-strong">
             <Podvuceno>Šta kažu vlasnici</Podvuceno>
           </h2>
           <p className="m-0 font-tekst text-h3 leading-heading text-text-body">
             Pridružite se biznisima koji već sakupljaju petice.
           </p>
-        </div>
+        </UNaVidiku>
         <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <Utisak
-            citat="Stavio sam stalak na pult u ponedeljak, do petka smo imali više novih ocena nego za prethodna 2 meseca."
-            ime="Marko Jović"
-            posao="Frizerski salon"
-            grad="Kragujevac"
-          />
-          <Utisak
-            ton="inverse"
-            citat="Na prvu mi je delovalo skupo staviti stalak na svaki sto. Ispostavilo se da je to bila najisplativija odluka, recenzije stižu neprekidno. Preporuka!"
-            ime="Tijana Ilić"
-            posao="Kafić"
-            grad="Novi Sad"
-          />
-          <Utisak
-            citat="Kod nas osoblje ne mora ništa da objašnjava, a recenzije rastu... pohvale."
-            ime="Dušan Petrović"
-            posao="Restoran"
-            grad="Niš"
-          />
+          <UNaVidiku rastegni>
+            <Utisak
+              citat="Stavio sam stalak na pult u ponedeljak, do petka smo imali više novih ocena nego za prethodna 2 meseca."
+              ime="Marko Jović"
+              posao="Frizerski salon"
+              grad="Kragujevac"
+            />
+          </UNaVidiku>
+          <UNaVidiku rastegni kasnjenje={100}>
+            <Utisak
+              ton="inverse"
+              citat="Na prvu mi je delovalo skupo staviti stalak na svaki sto. Ispostavilo se da je to bila najisplativija odluka, recenzije stižu neprekidno. Preporuka!"
+              ime="Tijana Ilić"
+              posao="Kafić"
+              grad="Novi Sad"
+            />
+          </UNaVidiku>
+          <UNaVidiku rastegni kasnjenje={200}>
+            <Utisak
+              citat="Kod nas osoblje ne mora ništa da objašnjava, a recenzije rastu... pohvale."
+              ime="Dušan Petrović"
+              posao="Restoran"
+              grad="Niš"
+            />
+          </UNaVidiku>
         </div>
       </Sekcija>
 
       {/* CIJENE */}
       <Sekcija id="cijene" ton="inverse" className="nav-tamno">
-        <div className="flex max-w-[62ch] flex-col items-start gap-4">
+        <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-4">
           <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-on-inverse">
             <Podvuceno>Bez pretplate. Bez mesečnih troškova.</Podvuceno>
           </h2>
           <p className="m-0 font-tekst text-h3 leading-heading text-text-quiet-on-inverse">
             Više stalaka znači više prilika da vas mušterija oceni, i nižu cenu po stalku.
           </p>
-        </div>
+        </UNaVidiku>
         <Cenovnik onOdaberi={(n) => otvoriModal(n)} />
       </Sekcija>
 
       {/* PITANJA */}
       <Sekcija id="pitanja" ton="light">
-        <div className="mx-auto w-full max-w-[760px]">
+        <UNaVidiku className="mx-auto w-full max-w-[760px]">
           <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-strong">
             <Podvuceno>Najčešća pitanja</Podvuceno>
           </h2>
@@ -308,7 +329,7 @@ export function PocetnaStranica() {
               </PitanjeOdgovor>
             </Akordeon>
           </div>
-        </div>
+        </UNaVidiku>
       </Sekcija>
     </>
   );
