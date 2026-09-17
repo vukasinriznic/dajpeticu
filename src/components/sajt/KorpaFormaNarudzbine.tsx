@@ -32,6 +32,16 @@ type Polja = {
   telefon: string;
 };
 
+// Skida "+381" ili "00381" sa početka (razmaci/crtice se ignorišu pri
+// poređenju) — ono što ostane je tačno ono što treba da stoji posle
+// statičnog "+381" prefiksa u polju.
+function skiniPozivniBroj(vrednost: string): string {
+  const ociscen = vrednost.replace(/[\s-]/g, "");
+  if (ociscen.startsWith("+381")) return ociscen.slice(4);
+  if (ociscen.startsWith("00381")) return ociscen.slice(5);
+  return vrednost;
+}
+
 const PRAZNA_POLJA: Polja = {
   email: "",
   drzava: "Srbija",
@@ -59,7 +69,12 @@ export function KorpaFormaNarudzbine({
   const [saljemo, setSaljemo] = useState(false);
 
   const onPolje = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const { name } = e.target;
+    // Telefon polje već ima statičan "+381" prefiks ispred input-a — browser
+    // autofill (adresar, sačuvani podaci) ume da ubaci ceo broj SA
+    // pozivnim brojem, pa bi se +381 video dva puta. Skida se ovde, na
+    // ulazu, umesto u prikazu, da validacija/slanje uvek vide isti oblik.
+    const value = name === "telefon" ? skiniPozivniBroj(e.target.value) : e.target.value;
     setPolja((p) => ({ ...p, [name]: value }));
     setGreske((g) => {
       if (!(name in g)) return g;
