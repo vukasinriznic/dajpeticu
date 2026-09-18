@@ -27,13 +27,13 @@ const VISINA_KARTICE = 100 - OKVIR.gore - OKVIR.dole;
 // dok je niko ne dodiruje (sve isključeno kad interaktivna=false ili kad
 // posetilac traži manje animacija). Hover reaguje samo unutar OKVIR-a
 // (stvarne kartice), ne cele slike. Fotografija je prava,
-// odštampana kartica (public/stalak_beli.png); nema zadnje strane pa nema
+// odštampana kartica (public/images/stalak_beli.webp); nema zadnje strane pa nema
 // flip-a kao ranije.
 export function Kartica3D({
   sirina = 320,
   interaktivna = true,
   className = "",
-  slika = "/stalak_beli.png",
+  slika = "/images/stalak_beli.webp",
   razmerSlike = RAZMER_SLIKE_PODRAZUMEVANO,
 }: {
   sirina?: number;

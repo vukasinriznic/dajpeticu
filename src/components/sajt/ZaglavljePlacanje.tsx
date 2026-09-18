@@ -41,7 +41,7 @@ export function ZaglavljePlacanje() {
           aria-label={ukupnaKolicina > 0 ? `Korpa, ${ukupnaKolicina} stalaka` : "Korpa"}
           className="relative grid h-11 w-11 place-items-center border-0 bg-none transition-transform duration-200 hover:scale-110"
         >
-          <Image src="/shopping-cart.png" alt="" width={22} height={22} className="invert" />
+          <Image src="/images/shopping-cart.png" alt="" width={22} height={22} className="invert" />
           {ukupnaKolicina > 0 && (
             <span className="absolute -top-0.5 -right-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[var(--color-gold)] px-1 font-tekst text-[10px] font-semibold text-[var(--color-bg-inverse)]">
               {ukupnaKolicina}

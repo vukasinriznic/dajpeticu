@@ -62,11 +62,11 @@ export function KorpaDrawer({
             className="h-12 w-12 shrink-0"
             style={{
               backgroundColor: "var(--color-gold)",
-              WebkitMaskImage: "url(/shopping-cart.png)",
+              WebkitMaskImage: "url(/images/shopping-cart.png)",
               WebkitMaskSize: "contain",
               WebkitMaskPosition: "center",
               WebkitMaskRepeat: "no-repeat",
-              maskImage: "url(/shopping-cart.png)",
+              maskImage: "url(/images/shopping-cart.png)",
               maskSize: "contain",
               maskPosition: "center",
               maskRepeat: "no-repeat",
@@ -106,14 +106,14 @@ export function KorpaDrawer({
               <div className="flex flex-col gap-1.5">
                 <div className="flex items-center gap-2">
                   <span className="flex w-7 shrink-0 items-center justify-center">
-                    <Image src="/shipping_box.png" alt="" width={18} height={18} />
+                    <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
                   </span>
                   <span className="font-tekst text-body-sm font-medium text-white">Besplatna poštarina</span>
                 </div>
                 {ukupnaKolicina >= PRAG_GRATIS_POKLONA && (
                   <div className="flex items-center gap-2">
                     <span className="flex w-7 shrink-0 items-center justify-center">
-                      <Image src="/gift_icon.png" alt="" width={18} height={18} />
+                      <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
                     </span>
                     <span className="font-tekst text-body-sm font-medium text-white">Gratis Google kartica</span>
                   </div>

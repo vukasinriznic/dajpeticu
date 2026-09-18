@@ -42,7 +42,7 @@ function skiniPozivniBroj(vrednost: string): string {
   return vrednost;
 }
 
-// public/serbia_flag.png — kvadratna slika (64×64), pa se seče preko
+// public/images/serbia_flag.png — kvadratna slika (64×64), pa se seče preko
 // object-cover u pravougaoni oblik zastave umesto da se razvuče.
 // unoptimized — Next-ov image optimizer ume da izgladi (quality:75, plus
 // re-enkodovanje u webp) baš na ovakvoj sitnoj ikonici sa tankim linijama
@@ -51,7 +51,7 @@ function skiniPozivniBroj(vrednost: string): string {
 function ZastavaSrbije() {
   return (
     <span className="relative h-3.5 w-5 shrink-0 overflow-hidden rounded-[2px]">
-      <Image src="/serbia_flag.png" alt="" fill sizes="20px" unoptimized className="object-cover" />
+      <Image src="/images/serbia_flag.png" alt="" fill sizes="20px" unoptimized className="object-cover" />
     </span>
   );
 }
@@ -262,7 +262,7 @@ export function KorpaFormaNarudzbine({
               <span className="flex items-center gap-3">
                 <span className="relative h-12 w-8 shrink-0 overflow-hidden">
                   <Image
-                    src={s.boja === "crna" ? "/stalak_crni.png" : "/stalak_beli.png"}
+                    src={s.boja === "crna" ? "/images/stalak_crni.webp" : "/images/stalak_beli.webp"}
                     alt=""
                     fill
                     sizes="32px"
@@ -299,14 +299,14 @@ export function KorpaFormaNarudzbine({
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-2">
               <span className="flex w-7 shrink-0 items-center justify-center">
-                <Image src="/shipping_box.png" alt="" width={18} height={18} />
+                <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
               </span>
               <span className="font-tekst text-body font-medium text-white">Besplatna poštarina</span>
             </div>
             {ukupnaKolicina >= PRAG_GRATIS_POKLONA && (
               <div className="flex items-center gap-2">
                 <span className="flex w-7 shrink-0 items-center justify-center">
-                  <Image src="/gift_icon.png" alt="" width={18} height={18} />
+                  <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
                 </span>
                 <span className="font-tekst text-body font-medium text-white">Gratis Google kartica</span>
               </div>

@@ -21,7 +21,7 @@ export function OcenaZvezdicama({
       {Array.from({ length: max }, (_, i) => (
         <img
           key={i}
-          src="/pointed-star.png"
+          src="/images/pointed-star.png"
           alt=""
           aria-hidden="true"
           width={velicina}

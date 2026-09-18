@@ -86,7 +86,7 @@ export function PocetnaStranica() {
           className="absolute inset-x-0 -top-[220px] -bottom-[220px] will-change-transform"
         >
           <Image
-            src="/hero_new.jpg"
+            src="/images/hero_new.jpg"
             alt=""
             fill
             priority

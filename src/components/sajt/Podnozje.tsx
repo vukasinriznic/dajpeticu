@@ -77,7 +77,7 @@ export function Podnozje() {
           rel="noreferrer"
           className="ml-auto flex items-center gap-2 text-text-quiet-on-inverse no-underline transition-colors duration-200 hover:text-text-on-inverse"
         >
-          <Image src="/logo-mark.png" alt="" width={16} height={14} unoptimized />
+          <Image src="/images/logo-mark.png" alt="" width={16} height={14} unoptimized />
           Site powered by Afera Digital
         </a>
       </div>

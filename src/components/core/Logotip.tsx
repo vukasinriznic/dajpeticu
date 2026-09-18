@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-// Samo zvezda-i-5 ikonica (public/logo_zelena.svg), bez "Daj" teksta — uvek
+// Samo zvezda-i-5 ikonica (public/images/logo_zelena.svg), bez "Daj" teksta — uvek
 // zelena varijanta, i na tamnoj pozadini, jer bela (public/logo_bela.svg)
 // slabo kontrastira na tamnozelenom footeru/header-u.
 export function Logotip({
@@ -18,7 +18,7 @@ export function Logotip({
     // postoji.
     <Link href="/" aria-label="Daj Peticu" className={`inline-flex items-center no-underline ${className}`}>
       {/* eslint-disable-next-line @next/next/no-img-element -- fiksan asset, next/image nepotrebno na ovoj veličini */}
-      <img src="/logo_zelena.svg" alt="" width={visina} height={visina} style={{ height: visina, width: visina }} />
+      <img src="/images/logo_zelena.svg" alt="" width={visina} height={visina} style={{ height: visina, width: visina }} />
     </Link>
   );
 }

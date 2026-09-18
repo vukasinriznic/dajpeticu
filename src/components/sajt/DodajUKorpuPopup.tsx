@@ -188,7 +188,7 @@ export function DodajUKorpuPopup({
         <div className="relative h-[77%] max-h-[704px]" style={{ aspectRatio: "848 / 1401" }}>
           <Image
             key={boja}
-            src={boja === "crna" ? "/stalak_crni.png" : "/stalak_beli.png"}
+            src={boja === "crna" ? "/images/stalak_crni.webp" : "/images/stalak_beli.webp"}
             alt=""
             fill
             sizes="500px"
@@ -239,7 +239,7 @@ export function DodajUKorpuPopup({
               >
                 <span aria-hidden="true" className="relative h-12 w-8 shrink-0 overflow-hidden">
                   <Image
-                    src={b.vrednost === "crna" ? "/stalak_crni.png" : "/stalak_beli.png"}
+                    src={b.vrednost === "crna" ? "/images/stalak_crni.webp" : "/images/stalak_beli.webp"}
                     alt=""
                     fill
                     sizes="32px"
@@ -321,7 +321,7 @@ export function DodajUKorpuPopup({
           {kolicina < PRAG_BESPLATNE_DOSTAVE ? (
             <div className="flex items-center gap-2 px-1">
               <span className="flex w-7 shrink-0 items-center justify-center">
-                <Image src="/shipping_box.png" alt="" width={18} height={18} />
+                <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
               </span>
               <span className={`font-tekst text-caption ${tamno ? "text-white" : "text-text-muted"}`}>
                 {`Dodaj još ${PRAG_BESPLATNE_DOSTAVE - kolicina} za besplatnu dostavu.`}
@@ -332,7 +332,7 @@ export function DodajUKorpuPopup({
               {kolicina < PRAG_GRATIS_POKLONA && (
                 <div className="flex items-center gap-2">
                   <span className="flex w-7 shrink-0 items-center justify-center">
-                    <Image src="/gift_icon.png" alt="" width={18} height={18} />
+                    <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
                   </span>
                   <span className={`font-tekst text-caption ${tamno ? "text-white" : "text-text-muted"}`}>
                     Dodaj još jednu za gratis Google karticu.
@@ -341,7 +341,7 @@ export function DodajUKorpuPopup({
               )}
               <div className="flex items-center gap-2">
                 <span className="flex w-7 shrink-0 items-center justify-center">
-                  <Image src="/shipping_box.png" alt="" width={22} height={22} />
+                  <Image src="/images/shipping_box.png" alt="" width={22} height={22} />
                 </span>
                 <span className={`font-tekst text-body-sm font-medium ${tamno ? "text-white" : "text-text-body"}`}>
                   Besplatna dostava
@@ -350,7 +350,7 @@ export function DodajUKorpuPopup({
               {kolicina >= PRAG_GRATIS_POKLONA && (
                 <div className="flex items-center gap-2">
                   <span className="flex w-7 shrink-0 items-center justify-center">
-                    <Image src="/gift_icon.png" alt="" width={22} height={22} />
+                    <Image src="/images/gift_icon.png" alt="" width={22} height={22} />
                   </span>
                   <span className={`font-tekst text-body-sm font-medium ${tamno ? "text-white" : "text-text-body"}`}>
                     Gratis Google kartica

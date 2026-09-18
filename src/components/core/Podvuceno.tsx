@@ -26,7 +26,7 @@ export function Podvuceno({
       <span className="relative z-10">{children}</span>
       {/* eslint-disable-next-line @next/next/no-img-element -- dekorativna linija, ne treba next/image optimizacija */}
       <img
-        src="/best_underline_lines.svg"
+        src="/images/best_underline_lines.svg"
         alt=""
         aria-hidden="true"
         className={`pointer-events-none absolute left-0 z-0 h-[0.32em] w-full ${

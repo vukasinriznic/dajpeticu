@@ -29,7 +29,7 @@ export function KorpaStavka({
             brzo vizuelno podseti koja je boja stalka u pitanju. */}
         <span className="relative h-12 w-8 shrink-0 overflow-hidden">
           <Image
-            src={stavka.boja === "crna" ? "/stalak_crni.png" : "/stalak_beli.png"}
+            src={stavka.boja === "crna" ? "/images/stalak_crni.webp" : "/images/stalak_beli.webp"}
             alt=""
             fill
             sizes="32px"

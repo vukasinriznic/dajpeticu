@@ -23,10 +23,10 @@ import { Podvuceno } from "@/components/core/Podvuceno";
 // idealizovano), pa sloj 1 mora dovoljno da je premaši sa svih strana da
 // ne bi curilo u uglovima gde su ta odstupanja najveća (dole i levo).
 const SLOJEVI = [
-  { slika: "/kartica/sloj_1.png", opis: "Prednja strana sa Google oznakom i QR kodom", skala: 0.96 },
-  { slika: "/kartica/sloj_2.png", opis: "Zaštitni sloj sa ležištem za čip", skala: 0.93 },
-  { slika: "/kartica/sloj_3.png", opis: "Bakarna antena i NFC čip", skala: 0.925 },
-  { slika: "/kartica/sloj_4.png", opis: "Zadnja osnova stalka", skala: 0.92 },
+  { slika: "/images/kartica/sloj_1.webp", opis: "Prednja strana sa Google oznakom i QR kodom", skala: 0.96 },
+  { slika: "/images/kartica/sloj_2.webp", opis: "Zaštitni sloj sa ležištem za čip", skala: 0.93 },
+  { slika: "/images/kartica/sloj_3.webp", opis: "Bakarna antena i NFC čip", skala: 0.925 },
+  { slika: "/images/kartica/sloj_4.webp", opis: "Zadnja osnova stalka", skala: 0.92 },
 ];
 
 // Kartica se rastavlja po Z osi (dubini), a cela grupa se pritom naginje

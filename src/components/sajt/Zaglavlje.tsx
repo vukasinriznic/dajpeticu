@@ -137,7 +137,7 @@ export function Zaglavlje() {
                 currentColor koji SVG ikonice dobijaju besplatno, jer se
                 header prebacuje između svetle i tamne pozadine pri skrolu. */}
             <Image
-              src="/shopping-cart.png"
+              src="/images/shopping-cart.png"
               alt=""
               width={22}
               height={22}

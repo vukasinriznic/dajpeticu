@@ -55,7 +55,7 @@ export default function PlacanjePage() {
     // bi sugerisao da ima još nešto da se radi.
     return (
       <section className="flex min-h-screen flex-col items-center justify-center gap-4 bg-bg-inverse px-5 text-center">
-        <Image src="/checked.png" alt="" width={72} height={72} />
+        <Image src="/images/checked.png" alt="" width={72} height={72} />
         <h1 className="m-0 font-prikaz text-h1 leading-heading font-normal text-white">
           Primili smo porudžbinu.
         </h1>
