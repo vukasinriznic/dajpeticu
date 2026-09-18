@@ -6,6 +6,7 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Garancija",
+  description: "90 dana zamena bez pitanja za Daj Peticu NFC stalak — bez traženja objašnjenja ili dokaza kupovine.",
   alternates: { canonical: "/garancija" },
 };
 

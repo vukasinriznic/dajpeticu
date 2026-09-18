@@ -5,6 +5,7 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Politika privatnosti",
+  description: "Koje podatke Daj Peticu prikuplja pri porudžbini NFC stalka, zašto, i kako ih čuvamo.",
   alternates: { canonical: "/privatnost" },
 };
 

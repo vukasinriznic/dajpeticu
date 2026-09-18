@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 // ovo checkout korak (sadržaj zavisi od trenutne korpe, nema svoju vrednost
 // za pretragu, a ume i da preusmeri na "/" kad je korpa prazna).
 export const metadata: Metadata = {
+  title: "Dostava i plaćanje",
   robots: { index: false, follow: false },
 };
 

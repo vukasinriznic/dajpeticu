@@ -6,6 +6,7 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Uslovi korišćenja",
+  description: "Uslovi korišćenja sajta i kupovine Daj Peticu NFC stalka — porudžbina, dostava, plaćanje pouzećem i pravo na odustanak.",
   alternates: { canonical: "/uslovi" },
 };
 
