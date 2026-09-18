@@ -41,11 +41,15 @@ export function PocetnaStranica() {
   // Slika stalka na mobilnom (ispod podnaslova) — sirina se meri iz
   // stvarno dostupnog prostora, isti ref+resize obrazac kao
   // KarticaSlojevi.tsx/DemoDodira.tsx, umesto fiksnog broja koji bi na
-  // uskim telefonima štrčao van ekrana. Podrazumevano 339 (19.09.2026.,
-  // bilo 280 pa 308) — još +10% na zahtev korisnika (drugi put istog
-  // dana); wrapper ispod ima isti plafon (387px, bilo 320px pa 352px).
+  // uskim telefonima štrčao van ekrana. Plafon (wrapper max-w ispod)
+  // usklađen na 524px (19.09.2026., eksplicitno traženo — "ista veličina
+  // kao slika u CARD sekciji", koja koristi Kartica3D sirina={524} i
+  // oslanja se na flexbox shrink umesto JS merenja). Obe sad računaju
+  // IDENTIČNU formulu — min(dostupna širina, 524) — samo različitim
+  // mehanizmom (JS ovde, CSS flex-shrink tamo), pa se poklapaju piksel
+  // za piksel na svakoj širini, ne samo približno na uskim telefonima.
   const mobilnaSlikaRef = useRef<HTMLDivElement>(null);
-  const [sirinaMobilneSlike, setSirinaMobilneSlike] = useState(339);
+  const [sirinaMobilneSlike, setSirinaMobilneSlike] = useState(335);
   useEffect(() => {
     const izmeri = () => {
       if (mobilnaSlikaRef.current) setSirinaMobilneSlike(mobilnaSlikaRef.current.offsetWidth);
@@ -103,7 +107,14 @@ export function PocetnaStranica() {
       {/* HERO */}
       <section
         id="top"
-        className="relative grid min-h-screen content-start lg:content-center overflow-hidden bg-surface-0 px-5 pt-28 pb-8 lg:py-8"
+        // Donji padding izjednačen sa ostalim sekcijama (19.09.2026.,
+        // eksplicitno traženo) — Sekcija.tsx koristi
+        // py-[clamp(56px,9vw,120px)] za sve ostale sekcije; hero nije
+        // Sekcija (ima sopstveni min-h-screen/pt-28 raspored), pa je pb-8
+        // (32px) fiksno odudarao. Isti clamp sad i ovde na mobilnom, samo
+        // za dno (vrh ostaje pt-28 zbog fixed header-a). Desktop nepromenjen
+        // (lg:py-8 i dalje pobeđuje na lg+, kao i pre).
+        className="relative grid min-h-screen content-start lg:content-center overflow-hidden bg-surface-0 px-5 pt-28 pb-[clamp(56px,9vw,120px)] lg:py-8"
       >
         {/* next/image umesto CSS background-image — automatski AVIF/WebP,
             responsive veličine i prioritetno učitavanje (LCP). Izvorni fajl je
@@ -252,7 +263,7 @@ export function PocetnaStranica() {
                   centar). poravnanje prop na Kartica3D uklonjen (default je
                   "center", vidi Kartica3D.tsx). mx-auto centrira omotač
                   samog, justify-center centrira fotografiju unutar njega. */}
-              <div ref={mobilnaSlikaRef} className="mx-auto flex w-full max-w-[387px] justify-center pt-2">
+              <div ref={mobilnaSlikaRef} className="mx-auto flex w-full max-w-[524px] justify-center pt-2">
                 <Kartica3D sirina={sirinaMobilneSlike} />
               </div>
             </UNaVidiku>
@@ -283,21 +294,15 @@ export function PocetnaStranica() {
                 18.09.2026. — na mobilnom je tekst upadao u isti red kao
                 zvezde). Desktop nepromenjen (flex-row, jedan red).
 
-                Zvezde uklonjene i tekst centriran na mobilnom (19.09.2026.,
-                isti dan) — OcenaZvezdicama dobija "!hidden lg:!inline-flex"
-                (na mobilnom je potpuno van prikaza, ne samo vizuelno
-                sakrivena — display:none). "!" je OBAVEZAN ovde (isti
-                obrazac kao Zaglavlje.tsx-ovo "!hidden md:!inline-flex" na
-                desktop CTA dugmetu) — komponenta sama već nosi hardkodovano
-                "inline-flex" u bazni className (vidi OcenaZvezdicama.tsx),
-                pa običan "hidden" bez "!" gubi od njega zbog Tailwind v4
-                redosleda generisanja pravila (ne prati redosled klasa u
-                JSX-u) — bez "!" zvezde ostaju vidljive na mobilnom uprkos
-                "hidden" klasi. Tekst dobija "w-full text-center" na
-                mobilnom, lg:w-auto lg:text-left vraća desktop na originalno
-                ponašanje. */}
+                Zvezde vraćene, ali centrirane na mobilnom (19.09.2026.,
+                korisnik se predomislio — prvo uklonjene, pa vraćene istog
+                dana). Roditelj je flex-col items-center na mobilnom, pa
+                zvezde (nisu w-full) prirodno sede centrirane iznad teksta
+                bez ikakvog dodatnog poravnanja. Tekst dobija "w-full
+                text-center" na mobilnom, lg:w-auto lg:text-left vraća
+                desktop na originalno ponašanje (jedan red, levo). */}
             <UNaVidiku kasnjenje={240} className="flex w-full flex-col items-center gap-2 lg:w-auto lg:flex-row lg:items-center lg:gap-3">
-              <OcenaZvezdicama velicina={22} className="!hidden lg:!inline-flex" />
+              <OcenaZvezdicama velicina={22} />
               <span className="w-full text-center font-tekst text-body-sm text-text-muted lg:w-auto lg:text-left">
                 Poruči za 1 minut, stiže poštom. Plaćate pouzećem.
               </span>
