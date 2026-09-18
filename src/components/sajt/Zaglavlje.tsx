@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
 import { Logotip } from "@/components/core/Logotip";
 import { Dugme } from "@/components/core/Dugme";
 import { useKorpa } from "@/components/sajt/KorpaKontekst";
@@ -75,6 +74,36 @@ const LINIJA_NAVA = 45;
 export function Zaglavlje() {
   const { otvoriModal, otvoriKorpu, ukupnaKolicina } = useKorpa();
   const [otvoren, setOtvoren] = useState(false);
+  // Mobilni meni se ne prikazuje/skriva trenutno (uslovni render) — panel je
+  // UVEK u DOM-u, samo mu se animira visina (0 → izmerena → "auto") i opacity,
+  // isti obrazac kao vukasinriznic.me (izmereno direktno na tom sajtu: pri
+  // otvaranju height ide sa 0px na izmerenu vrednost u px, a tek KAD animacija
+  // završi prelazi na "auto" — string "auto" se ne može animirati, pa se
+  // koristi kao završno stanje da meni ostane ispravne visine i posle
+  // eventualne promene sadržaja/veličine ekrana).
+  const sadrzajRef = useRef<HTMLDivElement>(null);
+  const [visinaSadrzaja, setVisinaSadrzaja] = useState(0);
+  const [visinaAuto, setVisinaAuto] = useState(false);
+
+  useEffect(() => {
+    if (otvoren) {
+      const izmeri = () => {
+        if (sadrzajRef.current) setVisinaSadrzaja(sadrzajRef.current.scrollHeight);
+      };
+      izmeri();
+      setVisinaAuto(false);
+      window.addEventListener("resize", izmeri);
+      // Posle trajanja tranzicije (300ms + malo rezerve) prebaci na "auto" —
+      // isto kao referentni sajt, da panel ostane tačne visine i ako se
+      // sadržaj/ekran posle toga promeni.
+      const t = setTimeout(() => setVisinaAuto(true), 320);
+      return () => {
+        window.removeEventListener("resize", izmeri);
+        clearTimeout(t);
+      };
+    }
+    setVisinaAuto(false);
+  }, [otvoren]);
   // Nav je fixed preko hero-a — providan dok je na vrhu, dobija stakleni
   // blur čim se skroluje (isti obrazac kao ancora-ai.vercel.app: samo
   // backdrop-filter se menja, nema obojene pozadine ni senke).
@@ -155,39 +184,85 @@ export function Zaglavlje() {
               </span>
             )}
           </button>
-          <Dugme size="xs" variant={tamnaPozadina ? "gold" : "primary"} onClick={() => otvoriModal()}>
+          {/* Na mobilnom "Poruči" živi na dnu otvorenog menija (ispod) —
+              ovde se sakriva da se ne dupira pored hamburger dugmeta. */}
+          <Dugme
+            size="xs"
+            variant={tamnaPozadina ? "gold" : "primary"}
+            onClick={() => otvoriModal()}
+            className="!hidden md:!inline-flex"
+          >
             Poruči
           </Dugme>
+          {/* Ručno crtan hamburger (3 linije), ne lucide ikonica — treba da
+              se sam preobliči u X (isti obrazac kao vukasinriznic.me,
+              izmereno direktno na tom sajtu): gornja/donja linija rotiraju
+              45°/-45° i pomere se 7px ka sredini, srednja nestane (opacity
+              I width na 0, ne samo opacity — inače ostane "mrlja" u sredini
+              X-a). transform-origin: center (isto kao "origin-center" tamo). */}
           <button
             type="button"
             aria-label="Meni"
             onClick={() => setOtvoren((o) => !o)}
-            className="grid h-12 w-12 place-items-center border-0 bg-none transition-colors duration-300 md:hidden"
+            className="relative flex h-11 w-11 flex-col items-end justify-center gap-[5px] md:hidden"
           >
-            {otvoren ? (
-              <X size={26} className={tamnaPozadina ? "text-text-on-inverse" : "text-text-strong"} />
-            ) : (
-              <Menu size={26} className={tamnaPozadina ? "text-text-on-inverse" : "text-text-strong"} />
-            )}
+            <span
+              className={`block h-[2px] w-6 origin-center rounded-full transition-[transform,background-color] duration-300 ${
+                tamnaPozadina ? "bg-text-on-inverse" : "bg-text-strong"
+              }`}
+              style={otvoren ? { transform: "translateY(7px) rotate(45deg)" } : undefined}
+            />
+            <span
+              className={`block h-[2px] rounded-full transition-[width,opacity,background-color] duration-300 ${
+                tamnaPozadina ? "bg-text-on-inverse" : "bg-text-strong"
+              }`}
+              style={otvoren ? { width: 0, opacity: 0 } : { width: 24 }}
+            />
+            <span
+              className={`block h-[2px] w-6 origin-center rounded-full transition-[transform,background-color] duration-300 ${
+                tamnaPozadina ? "bg-text-on-inverse" : "bg-text-strong"
+              }`}
+              style={otvoren ? { transform: "translateY(-7px) rotate(-45deg)" } : undefined}
+            />
           </button>
         </div>
       </div>
-      {otvoren && (
-        <div className="flex flex-col gap-1 border-t border-border-soft bg-surface-0 px-5 py-3 md:hidden">
+      {/* Panel je UVEK u DOM-u (ne uslovni render) da overflow-hidden + visina
+          u px mogu da se animiraju — isti pristup kao vukasinriznic.me.
+          border-b po stavci + last:border-0, veći dodirni razmak (py-[14px])
+          nego desktop NavLink, jer je ovo lista za prst, ne hover-lista. */}
+      <div
+        className="overflow-hidden bg-surface-0 transition-[height,opacity] duration-300 ease-out md:hidden"
+        style={{ height: visinaAuto ? "auto" : visinaSadrzaja, opacity: otvoren ? 1 : 0 }}
+      >
+        <div ref={sadrzajRef} className="flex flex-col border-t border-border-soft px-5">
           {NAV.map(([id, naziv]) => (
-            <NavLink
+            <button
               key={id}
-              full
+              type="button"
               onClick={() => {
                 setOtvoren(false);
                 idiNa(id);
               }}
+              className="border-b border-border-soft py-[14px] text-left font-tekst text-body font-medium text-text-strong last:border-0"
             >
               {naziv}
-            </NavLink>
+            </button>
           ))}
+          <div className="py-4">
+            <Dugme
+              full
+              variant="primary"
+              onClick={() => {
+                setOtvoren(false);
+                otvoriModal();
+              }}
+            >
+              Poruči
+            </Dugme>
+          </div>
         </div>
-      )}
+      </div>
     </header>
   );
 }
