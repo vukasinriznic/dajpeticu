@@ -41,11 +41,11 @@ export function PocetnaStranica() {
   // Slika stalka na mobilnom (ispod podnaslova) — sirina se meri iz
   // stvarno dostupnog prostora, isti ref+resize obrazac kao
   // KarticaSlojevi.tsx/DemoDodira.tsx, umesto fiksnog broja koji bi na
-  // uskim telefonima štrčao van ekrana. Podrazumevano 308 (19.09.2026.,
-  // bilo 280) — 10% veće na zahtev korisnika; wrapper ispod ima isti +10%
-  // na svoj max-w (352px, bilo 320px) da mera prati novi plafon.
+  // uskim telefonima štrčao van ekrana. Podrazumevano 339 (19.09.2026.,
+  // bilo 280 pa 308) — još +10% na zahtev korisnika (drugi put istog
+  // dana); wrapper ispod ima isti plafon (387px, bilo 320px pa 352px).
   const mobilnaSlikaRef = useRef<HTMLDivElement>(null);
-  const [sirinaMobilneSlike, setSirinaMobilneSlike] = useState(308);
+  const [sirinaMobilneSlike, setSirinaMobilneSlike] = useState(339);
   useEffect(() => {
     const izmeri = () => {
       if (mobilnaSlikaRef.current) setSirinaMobilneSlike(mobilnaSlikaRef.current.offsetWidth);
@@ -247,17 +247,13 @@ export function PocetnaStranica() {
                 ref+resize obrazac kao KarticaSlojevi.tsx/DemoDodira.tsx) —
                 fiksnih 320px bi na uskim telefonima štrčalo van ekrana. */}
             <UNaVidiku kasnjenje={60} className="w-full lg:hidden">
-              {/* Levo poravnato (19.09.2026., eksplicitno traženo) — bilo
-                  centrirano (mx-auto justify-center), jedini element u hero
-                  koloni koji je odudarao od levog poravnanja naslova/
-                  podnaslova/dugmeta/zvezdica. poravnanje="left" na
-                  Kartica3D je DRUGI deo istog zahteva — sama fotografija
-                  kartice je uža od svog kvadratnog omotača i podrazumevano
-                  centrirana UNUTAR njega (vidi Kartica3D.tsx), pa je bez
-                  ovoga i dalje ostajala vizuelno pomerena udesno u odnosu
-                  na tekst iznad, iako je omotač već bio uz levu ivicu. */}
-              <div ref={mobilnaSlikaRef} className="flex w-full max-w-[352px] justify-start pt-2">
-                <Kartica3D sirina={sirinaMobilneSlike} poravnanje="left" />
+              {/* VRAĆENO na centrirano (19.09.2026., isti dan — korisnik
+                  prvo tražio levo poravnanje, pa se predomislio nazad na
+                  centar). poravnanje prop na Kartica3D uklonjen (default je
+                  "center", vidi Kartica3D.tsx). mx-auto centrira omotač
+                  samog, justify-center centrira fotografiju unutar njega. */}
+              <div ref={mobilnaSlikaRef} className="mx-auto flex w-full max-w-[387px] justify-center pt-2">
+                <Kartica3D sirina={sirinaMobilneSlike} />
               </div>
             </UNaVidiku>
             {/* mt-4 prebačen na lg:-only (19.09.2026., traženo smanjenje
@@ -267,8 +263,14 @@ export function PocetnaStranica() {
                 mobilnom razmak samo bazni gap-5 (20px). Desktop zadržava
                 originalni mt-4 (dugme tu nema sliku iznad sebe — mobilna
                 slika je lg:hidden — pa mu ta dodatna margina i dalje treba
-                da ne "zalepi" dugme direktno uz podnaslov). */}
-            <UNaVidiku kasnjenje={120} className="flex flex-wrap items-center gap-3 lg:mt-4">
+                da ne "zalepi" dugme direktno uz podnaslov).
+
+                w-full justify-center (mobilno, isti dan) — dugme centrirano
+                na sredinu ekrana, jedini element koji odudara od inače
+                levo poravnate hero kolone (items-start na roditelju).
+                lg:w-auto lg:justify-start vraća desktop na originalno
+                ponašanje (dugme prati levi rub kolone kao i ostatak). */}
+            <UNaVidiku kasnjenje={120} className="flex w-full flex-wrap items-center justify-center gap-3 lg:w-auto lg:justify-start lg:mt-4">
               <Dugme
                 size="lg"
                 className={DUGME_ISTAKNUTO}
@@ -279,10 +281,24 @@ export function PocetnaStranica() {
             </UNaVidiku>
             {/* Mobilno: zvezde i tekst u odvojenim redovima (traženo
                 18.09.2026. — na mobilnom je tekst upadao u isti red kao
-                zvezde). Desktop nepromenjen (flex-row, jedan red). */}
-            <UNaVidiku kasnjenje={240} className="flex flex-col items-start gap-2 lg:flex-row lg:items-center lg:gap-3">
-              <OcenaZvezdicama velicina={22} />
-              <span className="font-tekst text-body-sm text-text-muted">
+                zvezde). Desktop nepromenjen (flex-row, jedan red).
+
+                Zvezde uklonjene i tekst centriran na mobilnom (19.09.2026.,
+                isti dan) — OcenaZvezdicama dobija "!hidden lg:!inline-flex"
+                (na mobilnom je potpuno van prikaza, ne samo vizuelno
+                sakrivena — display:none). "!" je OBAVEZAN ovde (isti
+                obrazac kao Zaglavlje.tsx-ovo "!hidden md:!inline-flex" na
+                desktop CTA dugmetu) — komponenta sama već nosi hardkodovano
+                "inline-flex" u bazni className (vidi OcenaZvezdicama.tsx),
+                pa običan "hidden" bez "!" gubi od njega zbog Tailwind v4
+                redosleda generisanja pravila (ne prati redosled klasa u
+                JSX-u) — bez "!" zvezde ostaju vidljive na mobilnom uprkos
+                "hidden" klasi. Tekst dobija "w-full text-center" na
+                mobilnom, lg:w-auto lg:text-left vraća desktop na originalno
+                ponašanje. */}
+            <UNaVidiku kasnjenje={240} className="flex w-full flex-col items-center gap-2 lg:w-auto lg:flex-row lg:items-center lg:gap-3">
+              <OcenaZvezdicama velicina={22} className="!hidden lg:!inline-flex" />
+              <span className="w-full text-center font-tekst text-body-sm text-text-muted lg:w-auto lg:text-left">
                 Poruči za 1 minut, stiže poštom. Plaćate pouzećem.
               </span>
             </UNaVidiku>
