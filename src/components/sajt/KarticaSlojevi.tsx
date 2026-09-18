@@ -246,9 +246,23 @@ function Oznake({
 function StatickiPrikaz({
   maxSirina,
   forsiranaSirina,
+  obrnutRedosled = false,
+  prviSlojSkala,
 }: {
   maxSirina?: number;
   forsiranaSirina?: number;
+  // Redosled slika/liste (19.09.2026., eksplicitno traženo — "prvo koraci
+  // pa ispod slike slojeva" NA MOBILNOM). Podrazumevano false čuva
+  // originalni redosled (slika pa lista) za desktop reduced-motion poziv.
+  obrnutRedosled?: boolean;
+  // Prvi (prednji, najbliži kameri) sloj se najviše "primakne" pod
+  // perspektivom, pa je i najosetljiviji na sečenje uz ivicu wrapper-a
+  // (potvrđeno screenshot-om 19.09.2026. — i posle spuštanja opšteg
+  // uvećanja na 1.65×, prednji sloj je i dalje bio blago isečen).
+  // prviSlojSkala (opciono) množi SAMO njegov sopstveni skala faktor,
+  // nezavisno od ostala tri sloja — bez uticaja na desktop, koji ovaj
+  // prop nikad ne prosleđuje.
+  prviSlojSkala?: number;
 }) {
   const kutijaRef = useRef<HTMLDivElement>(null);
   const [sirina, setSirina] = useState(0);
@@ -263,37 +277,55 @@ function StatickiPrikaz({
     return () => window.removeEventListener("resize", izmeri);
   }, []);
 
-  return (
-    <div className="flex flex-col gap-10">
-      <div
-        className={forsiranaSirina !== undefined ? "relative left-1/2 w-full -translate-x-1/2" : "mx-auto w-full"}
-        style={
-          forsiranaSirina !== undefined
-            ? { perspective: `${PERSPEKTIVA}px`, width: forsiranaSirina }
-            : { perspective: `${PERSPEKTIVA}px`, maxWidth: maxSirina }
-        }
-      >
-        <div ref={kutijaRef} className="relative aspect-square" style={stilGrupe(1)}>
-          {CRTANJE.map(({ sloj, i }) => (
-            <div key={sloj.slika} className="absolute inset-0" style={stilSloja(sloj, i, 1, sirina)}>
+  const slika = (
+    <div
+      className={forsiranaSirina !== undefined ? "relative left-1/2 w-full -translate-x-1/2" : "mx-auto w-full"}
+      style={
+        forsiranaSirina !== undefined
+          ? { perspective: `${PERSPEKTIVA}px`, width: forsiranaSirina }
+          : { perspective: `${PERSPEKTIVA}px`, maxWidth: maxSirina }
+      }
+    >
+      <div ref={kutijaRef} className="relative aspect-square" style={stilGrupe(1)}>
+        {CRTANJE.map(({ sloj, i }) => {
+          const efektivniSloj = i === 0 && prviSlojSkala !== undefined ? { ...sloj, skala: prviSlojSkala } : sloj;
+          return (
+            <div key={sloj.slika} className="absolute inset-0" style={stilSloja(efektivniSloj, i, 1, sirina)}>
               <Image src={sloj.slika} alt={sloj.opis} fill sizes="640px" quality={90} className="object-contain" />
             </div>
-          ))}
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  const lista = (
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      {OZNAKE.map((o, i) => (
+        <div key={o.naslov} className="flex flex-col gap-2.5">
+          <span className="font-prikaz text-h3 leading-heading font-normal text-text-on-inverse">
+            <span className="mr-2 text-[var(--color-gold)]">{i + 1}</span>
+            <Podvuceno>{o.naslov}</Podvuceno>
+          </span>
+          <p className="m-0 font-tekst text-body-sm leading-body text-text-quiet-on-inverse">{o.tekst}</p>
         </div>
-      </div>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        {OZNAKE.map((o, i) => (
-          <div key={o.naslov} className="flex flex-col gap-2.5">
-            <span className="font-prikaz text-h3 leading-heading font-normal text-text-on-inverse">
-              <span className="mr-2 text-[var(--color-gold)]">{i + 1}</span>
-              <Podvuceno>{o.naslov}</Podvuceno>
-            </span>
-            <p className="m-0 font-tekst text-body-sm leading-body text-text-quiet-on-inverse">
-              {o.tekst}
-            </p>
-          </div>
-        ))}
-      </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col gap-10">
+      {obrnutRedosled ? (
+        <>
+          {lista}
+          {slika}
+        </>
+      ) : (
+        <>
+          {slika}
+          {lista}
+        </>
+      )}
     </div>
   );
 }
@@ -424,9 +456,19 @@ export function KarticaSlojevi() {
 // Faktor uvećanja kutije preko stvarno dostupne širine (19.09.2026.) —
 // videlo se uživo (screenshot) da samo "puna širina kutije" (prethodni
 // pokušaj) NIJE dovoljno, jer je vidljiva razdvojena kartica i dalje
-// mnogo uža od kvadrata; 1.8× je empirijski proveren (uživo, zoom) da
-// vidljiva kartica dosegne skoro celu širinu kolone.
+// mnogo uža od kvadrata. Binarno pretraženo između 1.3× (bezbedno) i
+// 1.8× (vidljivo sečenje) — 1.65× je bio najveći bez sečenja NA OSTALA
+// TRI sloja, ali je prednji (najbliži, najviše uvećan perspektivom) i
+// dalje bio blago isečen (drugi krug istog dana) — otud PRVI_SLOJ_SKALA
+// ispod, koji ga dodatno stanjuje NEZAVISNO od ovog opšteg faktora.
 const UVECANJE_SLOJEVA = 1.65;
+
+// Prednji sloj (sloj_1, "Prednja strana") je pod perspektivom uvek najviše
+// uvećan i najbliži ivici wrapper-a od sva 4 — sopstveni, manji skala
+// faktor (originalni je 0.96) mu daje malo više vazduha bez potrebe da se
+// UVECANJE_SLOJEVA iznad spusti (što bi nepotrebno smanjilo i ostala 3
+// sloja, koja se već lepo uklapaju).
+const PRVI_SLOJ_SKALA = 0.82;
 
 export function KarticaSlojeviStatic() {
   const omotacRef = useRef<HTMLDivElement>(null);
@@ -442,7 +484,13 @@ export function KarticaSlojeviStatic() {
 
   return (
     <div ref={omotacRef} className="overflow-hidden lg:hidden">
-      <StatickiPrikaz forsiranaSirina={Math.round(sirinaOmotaca * UVECANJE_SLOJEVA)} />
+      {/* obrnutRedosled: koraci prvo, slika ispod (19.09.2026., eksplicitno
+          traženo). */}
+      <StatickiPrikaz
+        forsiranaSirina={Math.round(sirinaOmotaca * UVECANJE_SLOJEVA)}
+        prviSlojSkala={PRVI_SLOJ_SKALA}
+        obrnutRedosled
+      />
     </div>
   );
 }

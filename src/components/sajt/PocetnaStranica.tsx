@@ -279,14 +279,13 @@ export function PocetnaStranica() {
                   levo poravnat (druga rečenica počinje na istom rubu kao
                   prva, ne centrirana ispod nje).
 
-                  Mobilni pod 24px (bio 20px, eksplicitno traženo
-                  19.09.2026.) — fiksna vrednost, ne clamp, jer je 24px VEĆE
-                  od desktop maksimuma (22.4px/1.4rem) — isti "obrnut"
-                  slučaj kao "RSD" u CenovnaKartica.tsx ranije ove sesije,
-                  jedan clamp ne može izraziti oboje. lg: vraća originalni
-                  clamp nepromenjen. */}
+                  Mobilni pod 22px (bio 24px pa 20px pre toga, eksplicitno
+                  traženo 19.09.2026.) — fiksna vrednost, ne clamp, ostaje
+                  ispod desktop maksimuma (22.4px/1.4rem) ali dovoljno blizu
+                  da razlika bude zanemarljiva. lg: vraća originalni clamp
+                  nepromenjen. */}
               <p
-                className="m-0 max-w-[46ch] font-prikaz text-[24px] leading-heading font-medium text-text-strong whitespace-nowrap lg:text-[clamp(1.25rem,2.6vw,1.4rem)]"
+                className="m-0 max-w-[46ch] font-prikaz text-[22px] leading-heading font-medium text-text-strong whitespace-nowrap lg:text-[clamp(1.25rem,2.6vw,1.4rem)]"
                 style={{ transform: "translateY(2px)" }}
               >
                 Konkurencija nije bolja od vas.
