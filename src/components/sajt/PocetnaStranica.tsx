@@ -142,7 +142,16 @@ export function PocetnaStranica() {
           }}
         />
         <div className="relative mx-auto grid w-full max-w-[var(--container)] grid-cols-1 items-center gap-12 lg:grid-cols-2">
-          <div className="flex flex-col items-start gap-5">
+          {/* min-w-0 je OBAVEZAN ovde (19.09.2026.) — grid track "1fr" je
+              zapravo minmax(auto,1fr): ako dete ima sadržaj čiji min-content
+              premašuje 1fr udeo (npr. whitespace-nowrap tekst koji je širi
+              od kolone na telefonu sa uvećanim sistemskim fontom), CEO grid
+              (i time cela stranica) se raširi preko viewport-a — to je
+              izazvalo horizontalni skrol na mobilnom. min-w-0 vraća grid na
+              normalno ponašanje: kolona nikad ne premaši svoj 1fr udeo, a
+              eventualni preširok sadržaj se samo vizuelno seče unutar nje
+              (sekcija već ima overflow-hidden). */}
+          <div className="flex min-w-0 flex-col items-start gap-5">
             {/* Svaki red se otkriva sleva nadesno (dp-otkrivanje-sleva) —
                 eksplicitna odluka da naslov, iako je LCP element, dobije
                 upečatljiv ulazak; trajanja su kratka (700ms) da hit na
@@ -168,24 +177,29 @@ export function PocetnaStranica() {
                   SAMO mobilni zahtev (lg:hidden <br/>; skriveni razmak
                   "hidden lg:inline" sprečava da se rečenice slepe kad je
                   <br/> uklonjen sa lg+). Desktop max spušten sa 1.5rem na
-                  1.4rem i dodat whitespace-nowrap (18.09.2026.) — ova
+                  1.4rem i dodat lg:whitespace-nowrap (18.09.2026.) — ova
                   konkretna rečenica na 24px ne staje u jedan red u koloni
                   hero teksta (koja je pola širine kontejnera minus gap) sve
                   do ~1600px širine ekrana; 22.4px staje već od ~1280px
                   nadalje, što pokriva realne desktop rezolucije, razlika u
-                  odnosu na 24px je vizuelno zanemarljiva. whitespace-nowrap
-                  je BEZ lg: prefiksa (važi i na mobilnom) — na jednom
-                  stvarnom telefonu je "Konkurencija nije bolja od vas."
-                  samo prelomilo SEBE u dva reda (verovatno sistemski font
-                  scale uvećava tekst preko onoga što smo mogli da
-                  reprodukujemo u test okruženju), pošto p nema fiksnu
-                  širinu (shrink-to-fit u flex koloni) nowrap je ovde
-                  bezbedan — red će samo narasti do prirodne širine
-                  rečenice umesto da je prelomi, <br/> i dalje pravi
-                  nameravani prelom IZMEĐU rečenica jer whitespace:nowrap
-                  ne utiče na eksplicitne <br/> elemente. */}
+                  odnosu na 24px je vizuelno zanemarljiva.
+
+                  POKUŠANO pa VRAĆENO (19.09.2026.): whitespace-nowrap i na
+                  mobilnom, da se spreči da "Konkurencija nije bolja od vas."
+                  prelomi samu sebe (viđeno na stvarnom telefonu korisnika,
+                  verovatno sistemski font scale). Izazvalo je pravi
+                  horizontalni skrol cele stranice — CSS Grid "1fr" kolona je
+                  zapravo minmax(auto,1fr), pa je nowrap-ov uvećan min-content
+                  širinu paragrafa naterao CEO grid da se raširi preko
+                  viewport-a (grid "blowout"), ne samo da vizuelno štrči.
+                  Dodat je min-w-0 na roditeljsku kolonu (gore) kao trajna
+                  zaštita od ovog obrasca, ali nowrap je vraćen na lg:-only —
+                  između povremenog (redak, samo na uvećanom sistemskom
+                  fontu) prelamanja ove rečenice u 2 reda na mobilnom i
+                  garantovanog odsustva horizontalnog skrola, ovo drugo je
+                  neupitno važnije. */}
               <p
-                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.125rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong whitespace-nowrap"
+                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.125rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong lg:whitespace-nowrap"
                 style={{ transform: "translateY(2px)" }}
               >
                 Konkurencija nije bolja od vas.
@@ -235,7 +249,7 @@ export function PocetnaStranica() {
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-8">
             <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-on-inverse">
-              <Podvuceno>Recenzije rastu same od sebe</Podvuceno>
+              <Podvuceno prelomNaMobilnom>Recenzije rastu same od sebe</Podvuceno>
             </h2>
             <p className="m-0 font-tekst text-h3 leading-heading text-text-quiet-on-inverse">
               Stalak radi za vas i kad niste tu. Svaki dolazak mušterije je prilika da vas neko
@@ -357,7 +371,7 @@ export function PocetnaStranica() {
       <Sekcija id="cijene" ton="inverse" className="nav-tamno">
         <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-4">
           <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-on-inverse">
-            <Podvuceno>Bez pretplate. Bez mesečnih troškova.</Podvuceno>
+            <Podvuceno prelomNaMobilnom>Bez pretplate. Bez mesečnih troškova.</Podvuceno>
           </h2>
           <p className="m-0 font-tekst text-h3 leading-heading text-text-quiet-on-inverse">
             Više stalaka znači više prilika da vas mušterija oceni, i nižu cenu po stalku.

@@ -120,16 +120,38 @@ export function Zaglavlje() {
   // svetle početne na stranicu koja odmah počinje tamnom sekcijom).
   const putanja = usePathname();
 
+  // rAF-throttle + keširan querySelectorAll (19.09.2026.) — ranije se
+  // querySelectorAll+getBoundingClientRect (prinudni sinhroni layout) i DVA
+  // setState-a izvršavalo na SVAKI native scroll event, bez throttle-a, isti
+  // trenutak kad hero parallax (PocetnaStranica.tsx) radi svoj rAF posao —
+  // dva netusklađena scroll handler-a, jedan od njih layout-thrashing, bio
+  // je pravi uzrok sečkanja pri skrolu na mobilnom (korisnik prijavio). Isti
+  // rAF+"preskoči ako se ne menja" obrazac kao hero parallax.
   useEffect(() => {
+    const tamneSekcije = document.querySelectorAll<HTMLElement>(".nav-tamno");
+    let uToku = false;
+    let poslednjeSkrolovano = -1;
+    let poslednjeTamno = -1;
     const naSkrol = () => {
-      setSkrolovano(window.scrollY > PRAG_SKROLA);
-      const tamneSekcije = document.querySelectorAll<HTMLElement>(".nav-tamno");
-      let jeTamno = false;
-      tamneSekcije.forEach((el) => {
-        const r = el.getBoundingClientRect();
-        if (r.top <= LINIJA_NAVA && r.bottom >= LINIJA_NAVA) jeTamno = true;
+      if (uToku) return;
+      uToku = true;
+      requestAnimationFrame(() => {
+        const skrolovanoSad = window.scrollY > PRAG_SKROLA ? 1 : 0;
+        if (skrolovanoSad !== poslednjeSkrolovano) {
+          setSkrolovano(skrolovanoSad === 1);
+          poslednjeSkrolovano = skrolovanoSad;
+        }
+        let jeTamno = 0;
+        tamneSekcije.forEach((el) => {
+          const r = el.getBoundingClientRect();
+          if (r.top <= LINIJA_NAVA && r.bottom >= LINIJA_NAVA) jeTamno = 1;
+        });
+        if (jeTamno !== poslednjeTamno) {
+          setTamnaPozadina(jeTamno === 1);
+          poslednjeTamno = jeTamno;
+        }
+        uToku = false;
       });
-      setTamnaPozadina(jeTamno);
     };
     naSkrol();
     window.addEventListener("scroll", naSkrol, { passive: true });

@@ -6,6 +6,7 @@ export function Podvuceno({
   children,
   odlozenoIscrtavanje = false,
   iscrtaj = false,
+  prelomNaMobilnom = false,
 }: {
   children: ReactNode;
   // true — linija kreće potpuno nevidljiva (clip-path) i NE otkriva se sama;
@@ -15,9 +16,22 @@ export function Podvuceno({
   // svi ostali pozivi Podvuceno-a po sajtu ostaju nepromenjeni.
   odlozenoIscrtavanje?: boolean;
   iscrtaj?: boolean;
+  // Podrazumevano whitespace-nowrap važi svuda — dobro za kratke fraze
+  // (2-4 reči) gde podvlaka treba da ostane pod celim tekstom bez preloma.
+  // Za PUNE rečenice korišćene kao h2 naslov ("Recenzije rastu same od
+  // sebe", "Bez pretplate. Bez mesečnih troškova.") nowrap na mobilnom
+  // fizički gura tekst preko ekrana (izmereno 19.09.2026.: 141px i 276px
+  // preko 360px ekrana) i pravi horizontalni skrol cele stranice — najgori
+  // mogući mobilni bag. prelomNaMobilnom=true dozvoljava normalan prelom
+  // ispod lg; podvlaka (absolute, w-full) tad prati širinu NAJŠIRE
+  // prelomljene linije umesto cele rečenice — nije pixel-perfect kao
+  // jednoredna verzija, ali sprečava skrol, što je neuporedivo važnije.
+  prelomNaMobilnom?: boolean;
 }) {
   return (
-    <span className="relative inline-block whitespace-nowrap">
+    <span
+      className={`relative inline-block ${prelomNaMobilnom ? "whitespace-normal lg:whitespace-nowrap" : "whitespace-nowrap"}`}
+    >
       {/* Bez ovog omotača, slovo sa donjom kukom (npr. "j" u "Recenzije") bi
           bilo ISPOD linije u DOM redosledu, pa bi u CSS redosledu crtanja
           apsolutno pozicionisan <img> (koji uvek crta POSLE običnog teksta u
