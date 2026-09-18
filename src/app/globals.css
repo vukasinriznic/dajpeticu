@@ -63,15 +63,22 @@
   --color-danger: #a3232c;
   --color-danger-quiet: #fbeaea;
 
-  /* fluidna tipografska skala — telo nikad ispod 17px (40+ čitaoci na telefonu) */
-  --text-display-2: clamp(2rem, 5.6vw, 3.25rem);
+  /* fluidna tipografska skala — telo nikad ispod 17px (40+ čitaoci na telefonu).
+     Mobilni pod (min u clamp-u) prilagođen 18.09.2026. po eksplicitnim
+     instrukcijama korisnika, numerisano po ulozi (vidi razgovor):
+     #2 display-2 → 36px, #5 body-sm → 14px, #6 caption → 14px. body-sm i
+     caption ranije NISU bili fluidni (fiksni rem svuda) — sad su clamp() sa
+     istim max kao pre (16px/15px), da desktop ostane nepromenjen, samo
+     mobilni pod spušten. Ostale grupe (#3 h3, #4 body) čekaju sledeće
+     instrukcije, namerno netaknute. */
+  --text-display-2: clamp(2.25rem, 5.6vw, 3.25rem);
   --text-h1: clamp(1.75rem, 4.4vw, 2.5rem);
   --text-h2: clamp(1.5rem, 3.4vw, 1.9375rem);
   --text-h3: clamp(1.25rem, 2.6vw, 1.5rem);
   --text-body-lg: clamp(1.125rem, 2vw, 1.3125rem);
   --text-body: 1.0625rem;
-  --text-body-sm: 1rem;
-  --text-caption: 0.9375rem;
+  --text-body-sm: clamp(0.875rem, 2vw, 1rem);
+  --text-caption: clamp(0.875rem, 1.9vw, 0.9375rem);
   --text-eyebrow: 0.875rem;
 
   --leading-display: 1.06;

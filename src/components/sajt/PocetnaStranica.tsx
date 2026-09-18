@@ -135,7 +135,7 @@ export function PocetnaStranica() {
                 "pet zvezdica" se namerno NE otkriva u isto vreme — vidi
                 podvucenoIscrtano gore, povlači se tek pošto se ceo hero
                 sleže. */}
-            <h1 className="m-0 font-prikaz text-[clamp(3rem,7.5vw,6.5rem)] leading-display font-semibold tracking-display text-text-strong">
+            <h1 className="m-0 font-prikaz text-[clamp(3.5rem,7.5vw,6.5rem)] leading-display font-semibold tracking-display text-text-strong">
               <span className="inline-block animate-[dp-otkrivanje-sleva_700ms_cubic-bezier(.2,.7,.3,1)_both]">
                 Jedan tap
               </span>
