@@ -189,7 +189,7 @@ export function DodajUKorpuPopup({
           <Image
             key={boja}
             src={boja === "crna" ? "/images/stalak_crni.webp" : "/images/stalak_beli.webp"}
-            alt=""
+            alt={boja === "crna" ? "Crni Daj Peticu NFC stalak" : "Beli Daj Peticu NFC stalak"}
             fill
             sizes="500px"
             quality={90}
