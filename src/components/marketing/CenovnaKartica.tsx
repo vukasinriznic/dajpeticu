@@ -27,11 +27,12 @@ export function CenovnaKartica({
   return (
     <Kartica
       pad="lg"
-      // Padding 32px→16px na mobilnom (eksplicitno traženo 19.09.2026.),
-      // desktop nepromenjen (lg:!p-8 vraća pad="lg" vrednost). "!" obavezan
-      // da pobedi Kartica.tsx-ov bazni p-8 iz PADOVI.lg (isti Tailwind v4
-      // redosled-generisanja obrazac kao svuda ove sesije).
-      className={`!p-4 lg:!p-8 flex flex-col gap-5 !duration-500 !ease-out -translate-y-1.5 !shadow-[0_0_0_2px_var(--color-gold),0_12px_32px_-8px_rgba(255,197,61,0.55)] lg:translate-y-0 lg:!shadow-none lg:hover:-translate-y-1.5 lg:hover:!shadow-[0_0_0_2px_var(--color-gold),0_12px_32px_-8px_rgba(255,197,61,0.55)] ${
+      // Padding 32px→24px na mobilnom (bilo 16px, korisnik se predomislio
+      // 19.09.2026.), desktop nepromenjen (lg:!p-8 vraća pad="lg"
+      // vrednost). "!" obavezan da pobedi Kartica.tsx-ov bazni p-8 iz
+      // PADOVI.lg (isti Tailwind v4 redosled-generisanja obrazac kao
+      // svuda ove sesije).
+      className={`!p-6 lg:!p-8 flex flex-col gap-5 !duration-500 !ease-out -translate-y-1.5 !shadow-[0_0_0_2px_var(--color-gold),0_12px_32px_-8px_rgba(255,197,61,0.55)] lg:translate-y-0 lg:!shadow-none lg:hover:-translate-y-1.5 lg:hover:!shadow-[0_0_0_2px_var(--color-gold),0_12px_32px_-8px_rgba(255,197,61,0.55)] ${
         istaknuta ? "border-2 border-[var(--color-gold)] shadow-lg" : ""
       }`}
     >

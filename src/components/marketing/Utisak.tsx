@@ -22,7 +22,10 @@ export function Utisak({
     <Kartica
       ton={ton}
       pad="lg"
-      className={`relative flex flex-col gap-4 overflow-hidden ${
+      // Padding 32px→24px na mobilnom (eksplicitno traženo 19.09.2026., isto
+      // kao CenovnaKartica.tsx), desktop nepromenjen. "!" obavezan (isti
+      // Tailwind v4 razlog).
+      className={`relative flex flex-col gap-4 overflow-hidden !p-6 lg:!p-8 ${
         inverse ? "" : "!border-border-strong !shadow-md"
       }`}
     >
