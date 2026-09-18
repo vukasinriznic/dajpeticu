@@ -40,14 +40,10 @@ export function PocetnaStranica() {
 
   // Slika stalka na mobilnom (ispod podnaslova) — sirina se meri iz
   // stvarno dostupnog prostora, isti ref+resize obrazac kao
-  // KarticaSlojevi.tsx/DemoDodira.tsx, umesto fiksnog broja koji bi na
-  // uskim telefonima štrčao van ekrana. Plafon (wrapper max-w ispod)
-  // usklađen na 524px (19.09.2026., eksplicitno traženo — "ista veličina
-  // kao slika u CARD sekciji", koja koristi Kartica3D sirina={524} i
-  // oslanja se na flexbox shrink umesto JS merenja). Obe sad računaju
-  // IDENTIČNU formulu — min(dostupna širina, 524) — samo različitim
-  // mehanizmom (JS ovde, CSS flex-shrink tamo), pa se poklapaju piksel
-  // za piksel na svakoj širini, ne samo približno na uskim telefonima.
+  // KarticaSlojevi.tsx/DemoDodira.tsx. Plafon (max-w na wrapper-u ispod)
+  // UKLONJEN (19.09.2026., eksplicitno traženo — "full width kontejnera")
+  // — slika sad puni CELU raspoloživu širinu hero kolone (istu koju
+  // koriste naslov/podnaslov/dugme), ne više ograničena na 524px.
   const mobilnaSlikaRef = useRef<HTMLDivElement>(null);
   const [sirinaMobilneSlike, setSirinaMobilneSlike] = useState(335);
   useEffect(() => {
@@ -191,11 +187,12 @@ export function PocetnaStranica() {
               normalno ponašanje: kolona nikad ne premaši svoj 1fr udeo, a
               eventualni preširok sadržaj se samo vizuelno seče unutar nje
               (sekcija već ima overflow-hidden). */}
-          {/* items-center lg:items-start (19.09.2026.) — naslov i podnaslov
-              centrirani na mobilnom, po istom obrascu kao slika/dugme/
-              zvezde/tekst ispod (sve već centrirano); desktop nepromenjen
-              (items-start, levo poravnato). */}
-          <div className="flex min-w-0 flex-col items-center gap-5 lg:items-start">
+          {/* VRAĆENO na items-start (19.09.2026., isti dan) — ceo eksperiment
+              sa centriranjem na mobilnom (naslov/podnaslov/slika/dugme/
+              zvezde/tekst) je otkazan, korisnik se odlučio za levo
+              poravnanje. Ostatak izmena ispod u istom bloku prati isti
+              povratak. */}
+          <div className="flex min-w-0 flex-col items-start gap-5">
             {/* Svaki red se otkriva sleva nadesno (dp-otkrivanje-sleva) —
                 eksplicitna odluka da naslov, iako je LCP element, dobije
                 upečatljiv ulazak; trajanja su kratka (700ms) da hit na
@@ -273,13 +270,12 @@ export function PocetnaStranica() {
                 ref+resize obrazac kao KarticaSlojevi.tsx/DemoDodira.tsx) —
                 fiksnih 320px bi na uskim telefonima štrčalo van ekrana. */}
             <UNaVidiku kasnjenje={60} className="w-full lg:hidden">
-              {/* VRAĆENO na centrirano (19.09.2026., isti dan — korisnik
-                  prvo tražio levo poravnanje, pa se predomislio nazad na
-                  centar). poravnanje prop na Kartica3D uklonjen (default je
-                  "center", vidi Kartica3D.tsx). mx-auto centrira omotač
-                  samog, justify-center centrira fotografiju unutar njega. */}
-              <div ref={mobilnaSlikaRef} className="mx-auto flex w-full max-w-[524px] justify-center pt-2">
-                <Kartica3D sirina={sirinaMobilneSlike} />
+              {/* VRAĆENO na levo poravnato, BEZ max-w plafona (19.09.2026.,
+                  isti dan) — treći obrt istog dana: levo → centrirano →
+                  opet levo, ovog puta i puna širina kolone (max-w uklonjen,
+                  poravnanje="left" vraćen na Kartica3D). */}
+              <div ref={mobilnaSlikaRef} className="flex w-full justify-start pt-2">
+                <Kartica3D sirina={sirinaMobilneSlike} poravnanje="left" />
               </div>
             </UNaVidiku>
             {/* mt-4 prebačen na lg:-only (19.09.2026., traženo smanjenje
@@ -291,12 +287,10 @@ export function PocetnaStranica() {
                 slika je lg:hidden — pa mu ta dodatna margina i dalje treba
                 da ne "zalepi" dugme direktno uz podnaslov).
 
-                w-full justify-center (mobilno, isti dan) — dugme centrirano
-                na sredinu ekrana, jedini element koji odudara od inače
-                levo poravnate hero kolone (items-start na roditelju).
-                lg:w-auto lg:justify-start vraća desktop na originalno
-                ponašanje (dugme prati levi rub kolone kao i ostatak). */}
-            <UNaVidiku kasnjenje={120} className="flex w-full flex-wrap items-center justify-center gap-3 lg:w-auto lg:justify-start lg:mt-4">
+                Centriranje (w-full justify-center) UKLONJENO (19.09.2026.,
+                isti dan) — dugme vraćeno na levo poravnato na mobilnom,
+                isto kao ostatak kolone. */}
+            <UNaVidiku kasnjenje={120} className="flex flex-wrap items-center gap-3 lg:mt-4">
               <Dugme
                 size="lg"
                 className={DUGME_ISTAKNUTO}
@@ -308,17 +302,11 @@ export function PocetnaStranica() {
             {/* Mobilno: zvezde i tekst u odvojenim redovima (traženo
                 18.09.2026. — na mobilnom je tekst upadao u isti red kao
                 zvezde). Desktop nepromenjen (flex-row, jedan red).
-
-                Zvezde vraćene, ali centrirane na mobilnom (19.09.2026.,
-                korisnik se predomislio — prvo uklonjene, pa vraćene istog
-                dana). Roditelj je flex-col items-center na mobilnom, pa
-                zvezde (nisu w-full) prirodno sede centrirane iznad teksta
-                bez ikakvog dodatnog poravnanja. Tekst dobija "w-full
-                text-center" na mobilnom, lg:w-auto lg:text-left vraća
-                desktop na originalno ponašanje (jedan red, levo). */}
-            <UNaVidiku kasnjenje={240} className="flex w-full flex-col items-center gap-2 lg:w-auto lg:flex-row lg:items-center lg:gap-3">
+                Centriranje probano pa OTKAZANO (19.09.2026., isti dan) —
+                vraćeno na levo poravnato, isto kao ostatak kolone. */}
+            <UNaVidiku kasnjenje={240} className="flex flex-col items-start gap-2 lg:flex-row lg:items-center lg:gap-3">
               <OcenaZvezdicama velicina={22} />
-              <span className="w-full text-center font-tekst text-body-sm text-text-muted lg:w-auto lg:text-left">
+              <span className="font-tekst text-body-sm text-text-muted">
                 Poruči za 1 minut, stiže poštom. Plaćate pouzećem.
               </span>
             </UNaVidiku>
