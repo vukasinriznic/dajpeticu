@@ -6,21 +6,24 @@ import { Podvuceno } from "@/components/core/Podvuceno";
 
 type Korak = { naslov: string; opis: string; slika: string };
 
-const KORACI: Korak[] = [
+// Izvezeno (19.09.2026.) — mobilna verzija (PocetnaStranica.tsx) sad prikazuje
+// istu sliku ispod svakog koraka umesto stare "Probajte i sami" demo kartice,
+// pa oba mesta dele JEDAN izvor istine za putanje slika.
+export const KORACI: Korak[] = [
   {
     naslov: "Postavite stalak",
     opis: "Tamo gde pogled mušterije prirodno pada dok čeka, na pultu, stolu ili kod kase.",
-    slika: "/korak1.png",
+    slika: "/images/korak1.jpg",
   },
   {
     naslov: "Mušterija tapne ili skenira",
     opis: "Odmah se otvara vaša Google strana za ocenu, bez pretrage i čekanja.",
-    slika: "/korak2.png",
+    slika: "/images/korak2.jpg",
   },
   {
     naslov: "Recenzija je objavljena",
     opis: "Čestitamo, upravo ste povećali šanse da vas pronađe nova mušterija.",
-    slika: "/korak3.png",
+    slika: "/images/korak3.jpg",
   },
 ];
 

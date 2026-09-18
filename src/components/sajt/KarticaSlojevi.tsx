@@ -230,9 +230,62 @@ function Oznake({
   );
 }
 
+// Pojednostavljena verzija Oznaka za StatickiPrikaz (19.09.2026., mobilno) —
+// samo linija + broj koraka, BEZ naslova/opisa (ti već stoje u listi ispod
+// slike). Za razliku od desktop Oznaka (koje žive u širokom ramu sa dosta
+// prostora sa strane), mobilna kutija zauzima skoro celu raspoloživu širinu
+// — nema mesta za punu oznaku, pa broj samo blago "viri" preko ivice slike
+// (linija kratka, značka upola preklopljena preko ivice).
+const DUZINA_LINIJE_STATIK = 10;
+const PRECNIK_ZNACKE_STATIK = 26;
+
+function OznakeStatik({ sirina }: { sirina: number }) {
+  if (!sirina) return null;
+  return (
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+      {OZNAKE.map((o, i) => {
+        const { y, poluSirina } = geometrijaSloja(i, 1, sirina);
+        const levo = o.strana === "levo";
+        const ivica = levo
+          ? { right: `calc(50% + ${poluSirina}px)` }
+          : { left: `calc(50% + ${poluSirina}px)` };
+        const znacka = levo
+          ? { right: `calc(50% + ${poluSirina + DUZINA_LINIJE_STATIK - PRECNIK_ZNACKE_STATIK / 2}px)` }
+          : { left: `calc(50% + ${poluSirina + DUZINA_LINIJE_STATIK - PRECNIK_ZNACKE_STATIK / 2}px)` };
+        return (
+          <div key={o.naslov}>
+            <div
+              className="absolute h-px bg-white/30"
+              style={{ ...ivica, top: "50%", width: DUZINA_LINIJE_STATIK, transform: `translateY(${y}px)` }}
+            />
+            <div
+              className="absolute flex items-center justify-center rounded-full border font-prikaz text-[13px] font-normal"
+              style={{
+                ...znacka,
+                top: "50%",
+                width: PRECNIK_ZNACKE_STATIK,
+                height: PRECNIK_ZNACKE_STATIK,
+                transform: `translateY(calc(-50% + ${y}px))`,
+                backgroundColor: "var(--color-bg-inverse)",
+                borderColor: "var(--color-gold)",
+                color: "var(--color-gold)",
+              }}
+            >
+              {i + 1}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // Rastavljena kartica bez zaključavanja ekrana — koristi je i mobilni i
-// desktop kad korisnik traži manje kretanja.
-function StatickiPrikaz({ maxSirina }: { maxSirina: number }) {
+// desktop kad korisnik traži manje kretanja. saLinijama=true (samo mobilni
+// poziv, KarticaSlojeviStatic ispod) dodaje OznakeStatik pored slike —
+// desktop reduced-motion poziv (StatickiPrikaz maxSirina=520 u
+// KarticaSlojevi()) ostaje nepromenjen (saLinijama podrazumevano false).
+function StatickiPrikaz({ maxSirina, saLinijama = false }: { maxSirina: number; saLinijama?: boolean }) {
   const kutijaRef = useRef<HTMLDivElement>(null);
   const [sirina, setSirina] = useState(0);
 
@@ -255,6 +308,7 @@ function StatickiPrikaz({ maxSirina }: { maxSirina: number }) {
               <Image src={sloj.slika} alt={sloj.opis} fill sizes="640px" quality={90} className="object-contain" />
             </div>
           ))}
+          {saLinijama && <OznakeStatik sirina={sirina} />}
         </div>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -390,12 +444,15 @@ export function KarticaSlojevi() {
 
 // Mobilno: bez zaključavanja ekrana (100vh je nepredvidiv na mobilnim
 // browserima, isti razlog kao kod KakoRadiScroll) — kartica se prikazuje već
-// rastavljena, kao obična statična ilustracija. Oznake sa linijama nemaju
-// gde da stanu na uskom ekranu, pa isti sadržaj ide kao lista ispod.
+// rastavljena, kao obična statična ilustracija. Puna Oznaka (naslov+opis)
+// nema gde da stane na uskom ekranu, pa taj sadržaj ide kao lista ispod;
+// OznakeStatik (samo linija+broj, 19.09.2026., eksplicitno traženo) i dalje
+// vizuelno povezuje sliku sa brojevima u toj listi. maxSirina 420→480
+// (blago uvećanje, takođe traženo).
 export function KarticaSlojeviStatic() {
   return (
     <div className="lg:hidden">
-      <StatickiPrikaz maxSirina={420} />
+      <StatickiPrikaz maxSirina={480} saLinijama />
     </div>
   );
 }

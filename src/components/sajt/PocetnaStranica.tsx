@@ -11,8 +11,7 @@ import { Akordeon, PitanjeOdgovor } from "@/components/marketing/PitanjeOdgovor"
 import { Sekcija } from "@/components/sajt/Sekcija";
 import { UNaVidiku } from "@/components/core/UNaVidiku";
 import { Kartica3D } from "@/components/sajt/Kartica3D";
-import { DemoDodira } from "@/components/sajt/DemoDodira";
-import { KakoRadiScroll } from "@/components/sajt/KakoRadiScroll";
+import { KakoRadiScroll, KORACI } from "@/components/sajt/KakoRadiScroll";
 import { KarticaSlojevi, KarticaSlojeviStatic } from "@/components/sajt/KarticaSlojevi";
 import { Cenovnik } from "@/components/sajt/Cenovnik";
 import { useKorpa } from "@/components/sajt/KorpaKontekst";
@@ -377,8 +376,14 @@ export function PocetnaStranica() {
 
       {/* CARD */}
       <Sekcija id="card" ton="alt" className="nav-tamno !bg-[#0B2E20]">
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
-          <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-8">
+        {/* Mobilni razmaci usklađeni (19.09.2026., eksplicitno traženo):
+            gap-12→gap-5 (isti kao hero-ov flex gap-5, isti "pt-2" trik na
+            slikinom wrapper-u ispod znači da se razmaci sad tačno poklapaju
+            — podnaslov→slika ~28px, slika→dugme ~20px, isto kao hero); h2→p
+            gap-8→gap-4, isto kao "Kako radi" sekcija. Desktop nepromenjen
+            (lg: vraća originalne vrednosti). */}
+        <div className="grid grid-cols-1 items-center gap-5 lg:grid-cols-2 lg:gap-12">
+          <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-4 lg:gap-8">
             <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-on-inverse">
               {/* Podvlaka ispravljena na mobilnom (19.09.2026., screenshot
                   potvrdio bag) — kad je CELA rečenica bila u jednom
@@ -501,27 +506,30 @@ export function PocetnaStranica() {
             Mi ga podesimo. Vi ga stavite na željeno mesto.
           </p>
         </UNaVidiku>
-        <div className="grid grid-cols-1 gap-12 lg:hidden">
-          <div className="flex flex-col gap-8">
-            <UNaVidiku>
-              <KorakStavka broj={1} naslov="Postavite stalak">
-                Tamo gde pogled mušterije prirodno pada dok čeka, na pultu, stolu ili kod kase.
+        {/* "Probajte i sami" (DemoDodira) UKLONJENO sa sajta (19.09.2026.,
+            eksplicitno traženo) — komponenta i njena datoteka su obrisane,
+            nije korišćena nigde drugde. Umesto nje, ispod SVAKOG koraka ide
+            njegova sopstvena slika (ista koju koristi i desktop verzija,
+            KORACI izvezen iz KakoRadiScroll.tsx — jedan izvor istine za
+            putanje), pune širine kolone. */}
+        <div className="flex flex-col gap-10 lg:hidden">
+          {KORACI.map((korak, i) => (
+            <UNaVidiku key={korak.naslov} kasnjenje={i * 100} className="flex flex-col gap-6">
+              <KorakStavka broj={i + 1} naslov={korak.naslov}>
+                {korak.opis}
               </KorakStavka>
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-image bg-surface-2">
+                <Image
+                  src={korak.slika}
+                  alt={korak.naslov}
+                  fill
+                  sizes="100vw"
+                  quality={90}
+                  className="object-cover"
+                />
+              </div>
             </UNaVidiku>
-            <UNaVidiku kasnjenje={100}>
-              <KorakStavka broj={2} naslov="Mušterija tapne ili skenira">
-                Odmah se otvara vaša Google strana za ocenu, bez pretrage i čekanja.
-              </KorakStavka>
-            </UNaVidiku>
-            <UNaVidiku kasnjenje={200}>
-              <KorakStavka broj={3} naslov="Recenzija je objavljena">
-                Čestitamo, upravo ste povećali šanse da vas pronađe nova mušterija.
-              </KorakStavka>
-            </UNaVidiku>
-          </div>
-          <UNaVidiku kasnjenje={150}>
-            <DemoDodira />
-          </UNaVidiku>
+          ))}
         </div>
         {/* Desktop: sekcija se "zaključa" i koraci se ređaju kako se skroluje. */}
         <KakoRadiScroll />
@@ -577,7 +585,19 @@ export function PocetnaStranica() {
       <Sekcija id="cijene" ton="inverse" className="nav-tamno">
         <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-4">
           <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-on-inverse">
-            <Podvuceno prelomNaMobilnom>Bez pretplate. Bez mesečnih troškova.</Podvuceno>
+            {/* Isti obrazac kao CARD naslov (19.09.2026.) — eksplicitan
+                prelom TAČNO posle "Bez" na mobilnom ("Bez pretplate. Bez" /
+                "mesečnih troškova."), i podvlaka SAMO na "mesečnih
+                troškova." u njenoj sopstvenoj širini. Desktop nepromenjen
+                (cela rečenica u jednom Podvuceno-u, uvek jedan red). */}
+            <span className="hidden lg:inline">
+              <Podvuceno>Bez pretplate. Bez mesečnih troškova.</Podvuceno>
+            </span>
+            <span className="lg:hidden">
+              Bez pretplate. Bez
+              <br />
+              <Podvuceno>mesečnih troškova.</Podvuceno>
+            </span>
           </h2>
           <p className="m-0 font-tekst text-h3 leading-heading text-text-quiet-on-inverse">
             Više stalaka znači više prilika da vas mušterija oceni, i nižu cenu po stalku.

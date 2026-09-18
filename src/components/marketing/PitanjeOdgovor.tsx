@@ -62,7 +62,9 @@ export function PitanjeOdgovor({ pitanje, children }: { pitanje: string; childre
         }`}
       >
         <div className="overflow-hidden">
-          <p className="m-0 mb-5 max-w-[62ch] text-pretty font-tekst text-body leading-body text-text-body">
+          {/* 16px na mobilnom (bilo 17px, text-body), desktop nepromenjen —
+              eksplicitno traženo 19.09.2026. */}
+          <p className="m-0 mb-5 max-w-[62ch] text-pretty font-tekst text-[16px] leading-body text-text-body lg:text-body">
             {children}
           </p>
         </div>

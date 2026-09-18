@@ -18,7 +18,11 @@ export function KorakStavka({
         <h3 className="m-0 font-prikaz text-h3 leading-heading font-normal text-text-strong">
           {naslov}
         </h3>
-        <p className="m-0 font-tekst text-body leading-body text-text-body">{children}</p>
+        {/* 14px eksplicitno (19.09.2026., traženo) — ova komponenta se
+            koristi SAMO u mobilnom stack prikazu (PocetnaStranica.tsx,
+            unutar lg:hidden), desktop ima svoju sopstvenu inline verziju u
+            KakoRadiScroll.tsx sa text-body — nema potrebe za lg: granom. */}
+        <p className="m-0 font-tekst text-[14px] leading-body text-text-body">{children}</p>
       </div>
     </div>
   );

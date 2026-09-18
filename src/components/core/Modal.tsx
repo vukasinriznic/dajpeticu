@@ -72,7 +72,14 @@ export function Modal({
       // ostatku sajta.
       className={
         (variant === "drawer"
-          ? "korpa-drawer fixed inset-y-0 left-auto right-0 m-0 h-screen max-h-screen w-full sm:w-[37vw] sm:min-w-[460px] max-w-none overflow-y-auto rounded-none border-0 border-l border-l-[var(--color-gold)] bg-white p-0 [color-scheme:dark]"
+          ? // h-[100dvh] na mobilnom (19.09.2026., eksplicitno traženo) — h-screen
+            // (100vh) je na mobilnim browserima poznato nepouzdan (ne prati
+            // sklapanje/širenje adresne trake, ostavlja prazan prostor ili
+            // izaziva skrol); dvh je dinamički i stvarno prati vidljivi
+            // ekran. sm: vraća originalni h-screen za desktop (gde je
+            // ionako identičan, adresna traka se ne pomera). Zlatni levi
+            // border UKLONJEN na mobilnom (border-l-0), vraćen na sm+.
+            "korpa-drawer fixed inset-y-0 left-auto right-0 m-0 h-[100dvh] max-h-screen w-full border-l-0 sm:h-screen sm:w-[37vw] sm:min-w-[460px] sm:border-l sm:border-l-[var(--color-gold)] max-w-none overflow-y-auto rounded-none border-0 bg-white p-0 [color-scheme:dark]"
           : "fixed inset-0 m-0 h-screen max-h-screen w-screen max-w-none overflow-y-auto rounded-none border-0 bg-white p-0 [color-scheme:dark]") +
         (zatvaranje ? " zatvara-se" : "")
       }

@@ -8,6 +8,7 @@ import { OcenaZvezdicama } from "@/components/core/OcenaZvezdicama";
 import { Podvuceno } from "@/components/core/Podvuceno";
 import { Znacka } from "@/components/core/Znacka";
 import { Unos } from "@/components/forms/Unos";
+import { Kartica3D } from "@/components/sajt/Kartica3D";
 import {
   cenaKartica,
   formatRSD,
@@ -61,6 +62,36 @@ export function DodajUKorpuPopup({
   const [greske, setGreske] = useState<Partial<Record<"kolicina" | "nazivBiznisa", string>>>({});
   const nazivInputRef = useRef<HTMLInputElement>(null);
   const autocompleteZakacenRef = useRef(false);
+
+  // Mobilna slika stalka (19.09.2026., eksplicitno traženo — "velicine kao
+  // u card sekciji") — isti obrazac (izmeri dostupnu širinu, pa računaj
+  // kvadratni Kartica3D omotač UNAZAD preko 848/1401 razmera vidljive
+  // kartice, ×0.8) kao PocetnaStranica.tsx-ov sirinaMobilneKartice; ne može
+  // se deliti direktno (drugi fajl/komponenta), ali je formula identična pa
+  // rezultat izgleda isto na sličnoj širini kolone.
+  const RAZMER_KARTICE_U_KVADRATU = 848 / 1401;
+  const mobilnaSlikaRef = useRef<HTMLDivElement>(null);
+  const [sirinaMobilneSlike, setSirinaMobilneSlike] = useState(335);
+  // ResizeObserver, ne efekat+resize-listener (za razliku od hero/CARD, koji
+  // su uvek u normalnom toku stranice) — popup ostaje montiran u DOM-u i
+  // dok je <dialog> zatvoren (Modal.tsx samo zove showModal()/close() u
+  // SVOM efektu), a zatvoren <dialog> ne renderuje svoju decu (offsetWidth
+  // je 0). Efekat koji samo zavisi od "otvoren" i meri JEDNOM odmah i dalje
+  // je pogrešno tempiran — React izvršava efekat DETETA (ovaj) PRE efekta
+  // RODITELJA (Modal.tsx-ov showModal() poziv), pa bi merenje uhvatilo
+  // dialog dok je još zatvoren (potvrđeno uživo: 0px). ResizeObserver ne
+  // zavisi od redosleda efekata — sam se okine čim element STVARNO dobije
+  // nenultu veličinu (kad showModal() stvarno izvrši), i dalje prati resize.
+  useEffect(() => {
+    if (!otvoren || !mobilnaSlikaRef.current) return;
+    const el = mobilnaSlikaRef.current;
+    const izmeri = () => setSirinaMobilneSlike(el.offsetWidth);
+    izmeri();
+    const posmatrac = new ResizeObserver(izmeri);
+    posmatrac.observe(el);
+    return () => posmatrac.disconnect();
+  }, [otvoren]);
+  const sirinaMobilneKartice = Math.round((sirinaMobilneSlike / RAZMER_KARTICE_U_KVADRATU) * 0.8);
 
   // Popup ostaje montiran (Modal samo pokazuje/sakriva <dialog>), pa se
   // interno stanje mora ručno resetovati svaki put kad se ponovo otvori —
@@ -209,11 +240,29 @@ export function DodajUKorpuPopup({
           <Podvuceno>Poruči stalak</Podvuceno>
         </h2>
 
-        <div className="flex items-center gap-2.5">
-          <OcenaZvezdicama velicina={18} />
+        {/* Stack umesto reda, isti stil kao hero sekcija na mobilnom
+            (19.09.2026., eksplicitno traženo) — zvezdice iznad, tekst
+            ispod, levo poravnato. md: vraća originalni red-pored-reda
+            raspored za desktop popup prikaz (nepromenjen). */}
+        <div className="flex flex-col items-start gap-2 md:flex-row md:items-center md:gap-2.5">
+          <OcenaZvezdicama velicina={22} />
           <span className={`font-tekst text-body-sm ${tamno ? TEKST_TAMNO : "text-text-muted"}`}>
             Poruči za 1 minut, stiže poštom. Plaćate pouzećem.
           </span>
+        </div>
+
+        {/* Slika stalka na mobilnom (19.09.2026., eksplicitno traženo —
+            "velicine kao u card sekciji", menja se sa izabranom bojom).
+            Desktop već ima svoju sopstvenu (sticky, levu kolonu) sliku —
+            ova je md:hidden da se ne duplira. */}
+        <div ref={mobilnaSlikaRef} className="w-full overflow-hidden md:hidden">
+          <Kartica3D
+            key={boja}
+            sirina={sirinaMobilneKartice}
+            slika={boja === "crna" ? "/images/stalak_crni.webp" : "/images/stalak_beli.webp"}
+            className="relative left-1/2 -translate-x-1/2"
+            interaktivna={false}
+          />
         </div>
 
         <div className="flex flex-col gap-2">

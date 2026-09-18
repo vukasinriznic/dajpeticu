@@ -88,7 +88,15 @@ export default function PlacanjePage() {
   return (
     <>
       <ZaglavljePlacanje />
-      <Sekcija ton="inverse">
+      {/* !pt-28 na mobilnom (19.09.2026., eksplicitno traženo — "padding
+          kao u hero sekciji") — Sekcija.tsx-ov deljeni py-[clamp(56px,...)]
+          (56px pod) ne razdvaja dovoljno naslov od fiksnog ZaglavljePlacanje
+          header-a (iste visine kao glavni Zaglavlje.tsx, ~82px) na uskim
+          ekranima, isti razlog zbog kog je hero dobio pt-28 ranije ove
+          sesije. "!" obavezan da pobedi Sekcija.tsx-ov bazni py- (Tailwind
+          v4 redosled generisanja, isti obrazac kao svuda ove sesije).
+          lg: vraća originalnu deljenu vrednost. */}
+      <Sekcija ton="inverse" className="!pt-28 lg:!pt-[clamp(56px,9vw,120px)]">
         <div className="mx-auto flex w-full max-w-[640px] flex-col gap-8">
           <h1 className="m-0 font-prikaz text-display-2 leading-heading font-normal text-white">
             <Podvuceno>Dostava</Podvuceno>

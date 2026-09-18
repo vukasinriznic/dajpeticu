@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Logotip } from "@/components/core/Logotip";
@@ -74,36 +74,6 @@ const LINIJA_NAVA = 45;
 export function Zaglavlje() {
   const { otvoriModal, otvoriKorpu, ukupnaKolicina } = useKorpa();
   const [otvoren, setOtvoren] = useState(false);
-  // Mobilni meni se ne prikazuje/skriva trenutno (uslovni render) — panel je
-  // UVEK u DOM-u, samo mu se animira visina (0 → izmerena → "auto") i opacity,
-  // isti obrazac kao vukasinriznic.me (izmereno direktno na tom sajtu: pri
-  // otvaranju height ide sa 0px na izmerenu vrednost u px, a tek KAD animacija
-  // završi prelazi na "auto" — string "auto" se ne može animirati, pa se
-  // koristi kao završno stanje da meni ostane ispravne visine i posle
-  // eventualne promene sadržaja/veličine ekrana).
-  const sadrzajRef = useRef<HTMLDivElement>(null);
-  const [visinaSadrzaja, setVisinaSadrzaja] = useState(0);
-  const [visinaAuto, setVisinaAuto] = useState(false);
-
-  useEffect(() => {
-    if (otvoren) {
-      const izmeri = () => {
-        if (sadrzajRef.current) setVisinaSadrzaja(sadrzajRef.current.scrollHeight);
-      };
-      izmeri();
-      setVisinaAuto(false);
-      window.addEventListener("resize", izmeri);
-      // Posle trajanja tranzicije (300ms + malo rezerve) prebaci na "auto" —
-      // isto kao referentni sajt, da panel ostane tačne visine i ako se
-      // sadržaj/ekran posle toga promeni.
-      const t = setTimeout(() => setVisinaAuto(true), 320);
-      return () => {
-        window.removeEventListener("resize", izmeri);
-        clearTimeout(t);
-      };
-    }
-    setVisinaAuto(false);
-  }, [otvoren]);
   // Nav je fixed preko hero-a — providan dok je na vrhu, dobija stakleni
   // blur čim se skroluje (isti obrazac kao ancora-ai.vercel.app: samo
   // backdrop-filter se menja, nema obojene pozadine ni senke).
@@ -183,7 +153,10 @@ export function Zaglavlje() {
             </NavLink>
           ))}
         </nav>
-        <div className="col-start-3 flex items-center justify-end gap-6 justify-self-end">
+        {/* gap-3 na mobilnom (bilo gap-6 svuda) — korpa i meni ikonica su
+            eksplicitno primaknute 19.09.2026.; md: vraća originalni razmak
+            (desktop ima i "Poruči" dugme između njih, treba mu više vazduha). */}
+        <div className="col-start-3 flex items-center justify-end gap-3 justify-self-end md:gap-6">
           <button
             type="button"
             onClick={otvoriKorpu}
@@ -249,15 +222,36 @@ export function Zaglavlje() {
           </button>
         </div>
       </div>
-      {/* Panel je UVEK u DOM-u (ne uslovni render) da overflow-hidden + visina
-          u px mogu da se animiraju — isti pristup kao vukasinriznic.me.
-          border-b po stavci + last:border-0, veći dodirni razmak (py-[14px])
-          nego desktop NavLink, jer je ovo lista za prst, ne hover-lista. */}
+      {/* Panel — restrukturiran 19.09.2026. (potpuni obrt na "zavesa"
+          animaciju, eksplicitno traženo umesto height-reveal-a):
+          - position:absolute, top-full — sedi TAČNO ispod header-a,
+            bez potrebe da znamo header-ovu visinu u px (menja se sama
+            ako se header ikad promeni).
+          - transform: translateY(-100%) → 0, ne height — panel je UVEK
+            svoje pune (sadržajem određene) visine, samo je sklonjen
+            "uvučen" iznad vidljivog dela (kao zavesa namotana u šinu) kad
+            je zatvoren, i "spušta se" transform-om kad se otvori. Ovo je i
+            tehnički ispravnije od animiranja height-a (GPU-kompozitovano,
+            bez ponovnog layout-a na svakom frejmu) i vizuelno tačno ono
+            što je traženo ("da se podize i spusta kao zavesa").
+          - overflow-hidden na roditelju (spoljašnji <header>, već
+            position:fixed) nije potreban — panel translatovan -100% je
+            van vidljivog dela sam po sebi (jednostavno "iza" header-a),
+            ne mora dodatno da se seče.
+          - Pozadina/linije menjaju boju prema tamnaPozadina (isto stanje
+            koje već boji logo/linkove/CTA) — svetla pozadina: bela
+            pozadina panela, linije #bfe3d0 (ista nijansa kao CARD
+            podnaslov), krajnja linija u boji "primary" dugmeta; tamna
+            pozadina: panel tamnozelen (--color-bg-inverse), linije i
+            krajnja linija zlatne. Linija IZNAD prvog linka (border-t)
+            je UKLONJENA (eksplicitno traženo). */}
       <div
-        className="overflow-hidden bg-surface-0 transition-[height,opacity] duration-300 ease-out md:hidden"
-        style={{ height: visinaAuto ? "auto" : visinaSadrzaja, opacity: otvoren ? 1 : 0 }}
+        className={`absolute inset-x-0 top-full transition-transform duration-[350ms] ease-[cubic-bezier(.32,.72,0,1)] md:hidden ${
+          tamnaPozadina ? "bg-[var(--color-bg-inverse)]" : "bg-surface-0"
+        }`}
+        style={{ transform: `translateY(${otvoren ? "0" : "-100%"})` }}
       >
-        <div ref={sadrzajRef} className="flex flex-col border-t border-border-soft px-5">
+        <div className="flex flex-col px-5">
           {NAV.map(([id, naziv]) => (
             <button
               key={id}
@@ -266,15 +260,24 @@ export function Zaglavlje() {
                 setOtvoren(false);
                 idiNa(id);
               }}
-              className="border-b border-border-soft py-[14px] text-left font-tekst text-body font-medium text-text-strong last:border-0"
+              className={`border-b py-[14px] text-left font-tekst text-body font-medium last:border-0 ${
+                tamnaPozadina ? "border-[var(--color-gold)] text-text-on-inverse" : "border-[#bfe3d0] text-text-strong"
+              }`}
             >
               {naziv}
             </button>
           ))}
+          {/* Krajnja linija (19.09.2026., eksplicitno traženo) — odvojena od
+              per-link border-b iznad (koji na poslednjem linku ima
+              last:border-0), boja u tonu dugmeta ispod (primary/gold). */}
+          <div
+            className="h-px w-full"
+            style={{ backgroundColor: tamnaPozadina ? "var(--color-gold)" : "var(--color-primary)" }}
+          />
           <div className="py-4">
             <Dugme
               full
-              variant="primary"
+              variant={tamnaPozadina ? "gold" : "primary"}
               onClick={() => {
                 setOtvoren(false);
                 otvoriModal();
