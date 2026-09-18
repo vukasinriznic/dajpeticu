@@ -265,7 +265,7 @@ export function KorpaFormaNarudzbine({
                     src={s.boja === "crna" ? "/images/stalak_crni.webp" : "/images/stalak_beli.webp"}
                     alt=""
                     fill
-                    sizes="32px"
+                    sizes="96px"
                     quality={90}
                     className="object-contain"
                   />
