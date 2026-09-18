@@ -300,9 +300,18 @@ export function PocetnaStranica() {
                   dete jednostavno prelije van svoje kutije, što ovde
                   sekcija (overflow-hidden) tiho seče. */}
               <div ref={mobilnaSlikaRef} className="w-full pt-2">
+                {/* ×0.8 (19.09.2026., "smanji karticu za 20%") posle
+                    obrnutog izračuna pune širine — i dalje sabijeno na
+                    levu ivicu (poravnanje="left"), samo 20% uže od pune
+                    širine kolone. interaktivna={false} (isti zahtev,
+                    "iskljuci hover efekat na mobile") — gasi tilt/sjaj na
+                    pomeraj prsta i "disanje" animaciju u mirovanju; desktop
+                    (drugi Kartica3D pozivi ispod, lg:grid/CARD sekcija)
+                    ostaje interaktivan, nepromenjen. */}
                 <Kartica3D
-                  sirina={Math.round(sirinaMobilneSlike / RAZMER_KARTICE_U_KVADRATU)}
+                  sirina={Math.round((sirinaMobilneSlike / RAZMER_KARTICE_U_KVADRATU) * 0.8)}
                   poravnanje="left"
+                  interaktivna={false}
                 />
               </div>
             </UNaVidiku>
