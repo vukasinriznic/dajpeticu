@@ -18,7 +18,9 @@ export function Podnozje() {
   const { otvoriModal } = useKorpa();
   return (
     <footer className="bg-bg-inverse px-5 pt-16 pb-10 text-text-on-inverse">
-      <div className="mx-auto flex max-w-[var(--container)] flex-wrap justify-between gap-12">
+      {/* Column gap 48px→32px na mobilnom (eksplicitno traženo 19.09.2026.),
+          desktop nepromenjen. */}
+      <div className="mx-auto flex max-w-[var(--container)] flex-wrap justify-between gap-8 lg:gap-12">
         <div className="flex max-w-[34ch] flex-col gap-4">
           <Logotip kontekst="footer" />
           <p className="m-0 text-body-sm leading-body text-text-quiet-on-inverse">

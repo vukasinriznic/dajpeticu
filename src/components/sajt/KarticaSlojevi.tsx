@@ -247,7 +247,6 @@ function StatickiPrikaz({
   maxSirina,
   forsiranaSirina,
   obrnutRedosled = false,
-  prviSlojSkala,
 }: {
   maxSirina?: number;
   forsiranaSirina?: number;
@@ -255,14 +254,6 @@ function StatickiPrikaz({
   // pa ispod slike slojeva" NA MOBILNOM). Podrazumevano false čuva
   // originalni redosled (slika pa lista) za desktop reduced-motion poziv.
   obrnutRedosled?: boolean;
-  // Prvi (prednji, najbliži kameri) sloj se najviše "primakne" pod
-  // perspektivom, pa je i najosetljiviji na sečenje uz ivicu wrapper-a
-  // (potvrđeno screenshot-om 19.09.2026. — i posle spuštanja opšteg
-  // uvećanja na 1.65×, prednji sloj je i dalje bio blago isečen).
-  // prviSlojSkala (opciono) množi SAMO njegov sopstveni skala faktor,
-  // nezavisno od ostala tri sloja — bez uticaja na desktop, koji ovaj
-  // prop nikad ne prosleđuje.
-  prviSlojSkala?: number;
 }) {
   const kutijaRef = useRef<HTMLDivElement>(null);
   const [sirina, setSirina] = useState(0);
@@ -287,14 +278,11 @@ function StatickiPrikaz({
       }
     >
       <div ref={kutijaRef} className="relative aspect-square" style={stilGrupe(1)}>
-        {CRTANJE.map(({ sloj, i }) => {
-          const efektivniSloj = i === 0 && prviSlojSkala !== undefined ? { ...sloj, skala: prviSlojSkala } : sloj;
-          return (
-            <div key={sloj.slika} className="absolute inset-0" style={stilSloja(efektivniSloj, i, 1, sirina)}>
-              <Image src={sloj.slika} alt={sloj.opis} fill sizes="640px" quality={90} className="object-contain" />
-            </div>
-          );
-        })}
+        {CRTANJE.map(({ sloj, i }) => (
+          <div key={sloj.slika} className="absolute inset-0" style={stilSloja(sloj, i, 1, sirina)}>
+            <Image src={sloj.slika} alt={sloj.opis} fill sizes="640px" quality={90} className="object-contain" />
+          </div>
+        ))}
       </div>
     </div>
   );
