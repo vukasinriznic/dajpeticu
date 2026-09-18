@@ -24,6 +24,13 @@ function idiNa(id: string) {
   window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: "smooth" });
 }
 
+// Kartica3D.tsx-ov podrazumevani RAZMER_SLIKE_PODRAZUMEVANO (848/1401) —
+// vidljiva kartica unutar Kartica3D-ovog kvadratnog omotača je uvek ovog
+// razmera šira:visina. Koristi se za obrnut izračun u mobilnom hero-u
+// ispod (koliko širok mora biti KVADRAT da bi VIDLJIVA kartica bila
+// tačno određene širine).
+const RAZMER_KARTICE_U_KVADRATU = 848 / 1401;
+
 export function PocetnaStranica() {
   const { otvoriModal } = useKorpa();
 
@@ -40,10 +47,19 @@ export function PocetnaStranica() {
 
   // Slika stalka na mobilnom (ispod podnaslova) — sirina se meri iz
   // stvarno dostupnog prostora, isti ref+resize obrazac kao
-  // KarticaSlojevi.tsx/DemoDodira.tsx. Plafon (max-w na wrapper-u ispod)
-  // UKLONJEN (19.09.2026., eksplicitno traženo — "full width kontejnera")
-  // — slika sad puni CELU raspoloživu širinu hero kolone (istu koju
-  // koriste naslov/podnaslov/dugme), ne više ograničena na 524px.
+  // KarticaSlojevi.tsx/DemoDodira.tsx.
+  //
+  // Kartica3D-ov "sirina" prop je širina KVADRATNOG omotača, ne stvarne
+  // (uže, uspravne) kartice — Kartica3D.tsx centrira/levo-poravnava
+  // fotografiju unutar tog kvadrata po sopstvenom razmeru
+  // (RAZMER_SLIKE_PODRAZUMEVANO = 848/1401 ≈ 0.605), pa je vidljiva
+  // kartica uvek uža od kvadrata. Ranije smo prosleđivali izmerenu širinu
+  // direktno, pa je vidljiva kartica zauzimala samo ~60% širine kolone
+  // (potvrđeno screenshot-om 19.09.2026. — "zauzima polovinu širine
+  // ekrana"). Da bi SAMA VIDLJIVA kartica ispunila punu širinu kolone
+  // (eksplicitno traženo, visina sme da poraste), kvadrat se sad računa
+  // unazad: kvadratSirina = dostupnaSirina / 0.605 (RAZMER_KARTICE_U_KVADRATU
+  // gore, deljeno ispod pri prosleđivanju u Kartica3D).
   const mobilnaSlikaRef = useRef<HTMLDivElement>(null);
   const [sirinaMobilneSlike, setSirinaMobilneSlike] = useState(335);
   useEffect(() => {
@@ -270,12 +286,24 @@ export function PocetnaStranica() {
                 ref+resize obrazac kao KarticaSlojevi.tsx/DemoDodira.tsx) —
                 fiksnih 320px bi na uskim telefonima štrčalo van ekrana. */}
             <UNaVidiku kasnjenje={60} className="w-full lg:hidden">
-              {/* VRAĆENO na levo poravnato, BEZ max-w plafona (19.09.2026.,
-                  isti dan) — treći obrt istog dana: levo → centrirano →
-                  opet levo, ovog puta i puna širina kolone (max-w uklonjen,
-                  poravnanje="left" vraćen na Kartica3D). */}
-              <div ref={mobilnaSlikaRef} className="flex w-full justify-start pt-2">
-                <Kartica3D sirina={sirinaMobilneSlike} poravnanje="left" />
+              {/* Vidljiva kartica sad puni CELU širinu kolone, ne samo
+                  kvadratni omotač (19.09.2026., eksplicitno traženo —
+                  "nema veze sto ce se povecati height"). Kvadrat (Kartica3D
+                  sirina prop) je zato ŠIRI od wrapper-a — obrnut izračun
+                  gore (mobilnaSlikaRef efekat). "flex justify-start"
+                  UKLONJEN namerno: kvadrat je sad namerno širi od svog
+                  wrapper-a i overflow-uje udesno (nevidljivo, providno —
+                  vidljiva kartica je levo poravnata unutar kvadrata) — u
+                  flex kontekstu bi flexbox POKUŠAO da skupi dete nazad na
+                  širinu wrapper-a (flex-shrink:1 podrazumevano), poništavajući
+                  ceo izračun; običan blok wrapper (bez flex) to ne radi,
+                  dete jednostavno prelije van svoje kutije, što ovde
+                  sekcija (overflow-hidden) tiho seče. */}
+              <div ref={mobilnaSlikaRef} className="w-full pt-2">
+                <Kartica3D
+                  sirina={Math.round(sirinaMobilneSlike / RAZMER_KARTICE_U_KVADRATU)}
+                  poravnanje="left"
+                />
               </div>
             </UNaVidiku>
             {/* mt-4 prebačen na lg:-only (19.09.2026., traženo smanjenje
