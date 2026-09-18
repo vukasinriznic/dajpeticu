@@ -51,31 +51,34 @@ export function Podnozje() {
           </Dugme>
         </div>
       </div>
-      {/* Mobilno: svaka stavka u sopstvenom redu (19.09.2026., eksplicitno
-          traženo — "·" separatori i "Site powered by" u istom zbijenom redu
-          su delovali stešnjeno na uskom ekranu). flex-col + bez separatora
-          na mobilnom; lg: vraća originalni jednoredni flex-wrap sa "·" i
-          ml-auto na poslednjoj stavci. */}
+      {/* Mobilno: © / linkovi / "Site powered by" svaki u svom redu
+          (19.09.2026.), ali sama tri pravna linka (Uslovi/Privatnost/
+          Garancija) grupisana u JEDAN red sa "·" separatorima (naknadno
+          traženo — prvobitno su i ona bila razdvojena, ispalo je previše
+          usitnjeno). lg: vraća originalni jednoredni flex-wrap sa ml-auto
+          na poslednjoj stavci, nepromenjeno. */}
       <div className="mx-auto mt-10 flex max-w-[var(--container)] flex-col items-start gap-2 border-t border-white/14 pt-5 text-caption text-text-quiet-on-inverse lg:flex-row lg:flex-wrap lg:items-center lg:gap-x-2">
         <span>© {new Date().getFullYear()} Daj Peticu</span>
         <span aria-hidden="true" className="hidden lg:inline">·</span>
-        <Link href="/uslovi" className="text-text-quiet-on-inverse transition-colors duration-200 hover:text-text-on-inverse">
-          Uslovi
-        </Link>
-        <span aria-hidden="true" className="hidden lg:inline">·</span>
-        <Link
-          href="/privatnost"
-          className="text-text-quiet-on-inverse transition-colors duration-200 hover:text-text-on-inverse"
-        >
-          Privatnost
-        </Link>
-        <span aria-hidden="true" className="hidden lg:inline">·</span>
-        <Link
-          href="/garancija"
-          className="text-text-quiet-on-inverse transition-colors duration-200 hover:text-text-on-inverse"
-        >
-          Garancija
-        </Link>
+        <div className="flex items-center gap-x-2">
+          <Link href="/uslovi" className="text-text-quiet-on-inverse transition-colors duration-200 hover:text-text-on-inverse">
+            Uslovi
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link
+            href="/privatnost"
+            className="text-text-quiet-on-inverse transition-colors duration-200 hover:text-text-on-inverse"
+          >
+            Privatnost
+          </Link>
+          <span aria-hidden="true">·</span>
+          <Link
+            href="/garancija"
+            className="text-text-quiet-on-inverse transition-colors duration-200 hover:text-text-on-inverse"
+          >
+            Garancija
+          </Link>
+        </div>
         <a
           href="https://www.aferadigital.rs/"
           target="_blank"
