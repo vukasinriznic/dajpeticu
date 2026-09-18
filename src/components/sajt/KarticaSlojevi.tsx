@@ -231,11 +231,25 @@ function Oznake({
 }
 
 // Rastavljena kartica bez zaključavanja ekrana — koristi je i mobilni i
-// desktop kad korisnik traži manje kretanja. maxSirina je opciono — kad se
-// izostavi (mobilni poziv, KarticaSlojeviStatic ispod), slika ide na punu
-// širinu kolone (19.09.2026., eksplicitno traženo — "full width naseg
-// containera"; brojevi sa strane isprobani pa OTKAZANI istom porukom).
-function StatickiPrikaz({ maxSirina }: { maxSirina?: number }) {
+// desktop kad korisnik traži manje kretanja. maxSirina je opciono (desktop
+// reduced-motion poziv, kapira kutiju). forsiranaSirina je novo
+// (19.09.2026.) — mobilni poziv i dalje nije dovoljno "full width" ni bez
+// maxSirina kapa, jer je VIDLJIVA (razdvojena, nagnuta) kartica uvek uža
+// od svog kvadratnog omotača (isti "kvadrat vs vidljiva kartica" obrazac
+// kao Kartica3D ranije ove sesije) — svaka slika sloja je snimljena/
+// homografijom svedena na kvadratno platno na kom sama kartica zauzima
+// samo deo širine, plus dodatno "skuplja" perspektiva/nagib 3D poze.
+// forsiranaSirina eksplicitno postavlja "width" (ne "max-width" kao
+// maxSirina) na VEĆU vrednost od stvarno dostupnog prostora, centriranu
+// preko "left-1/2 -translate-x-1/2" trika (isti kao svuda ove sesije) —
+// roditelj (KarticaSlojeviStatic) seče providan overflow.
+function StatickiPrikaz({
+  maxSirina,
+  forsiranaSirina,
+}: {
+  maxSirina?: number;
+  forsiranaSirina?: number;
+}) {
   const kutijaRef = useRef<HTMLDivElement>(null);
   const [sirina, setSirina] = useState(0);
 
@@ -251,7 +265,14 @@ function StatickiPrikaz({ maxSirina }: { maxSirina?: number }) {
 
   return (
     <div className="flex flex-col gap-10">
-      <div className="mx-auto w-full" style={{ perspective: `${PERSPEKTIVA}px`, maxWidth: maxSirina }}>
+      <div
+        className={forsiranaSirina !== undefined ? "relative left-1/2 w-full -translate-x-1/2" : "mx-auto w-full"}
+        style={
+          forsiranaSirina !== undefined
+            ? { perspective: `${PERSPEKTIVA}px`, width: forsiranaSirina }
+            : { perspective: `${PERSPEKTIVA}px`, maxWidth: maxSirina }
+        }
+      >
         <div ref={kutijaRef} className="relative aspect-square" style={stilGrupe(1)}>
           {CRTANJE.map(({ sloj, i }) => (
             <div key={sloj.slika} className="absolute inset-0" style={stilSloja(sloj, i, 1, sirina)}>
@@ -400,10 +421,28 @@ export function KarticaSlojevi() {
 // bez teksta), pa se predomislio: bez brojeva, slika na PUNU širinu
 // kolone (maxSirina izostavljen — bez njega StatickiPrikaz-ov "w-full"
 // se ničim ne ograničava).
+// Faktor uvećanja kutije preko stvarno dostupne širine (19.09.2026.) —
+// videlo se uživo (screenshot) da samo "puna širina kutije" (prethodni
+// pokušaj) NIJE dovoljno, jer je vidljiva razdvojena kartica i dalje
+// mnogo uža od kvadrata; 1.8× je empirijski proveren (uživo, zoom) da
+// vidljiva kartica dosegne skoro celu širinu kolone.
+const UVECANJE_SLOJEVA = 1.8;
+
 export function KarticaSlojeviStatic() {
+  const omotacRef = useRef<HTMLDivElement>(null);
+  const [sirinaOmotaca, setSirinaOmotaca] = useState(335);
+  useEffect(() => {
+    const izmeri = () => {
+      if (omotacRef.current) setSirinaOmotaca(omotacRef.current.offsetWidth);
+    };
+    izmeri();
+    window.addEventListener("resize", izmeri);
+    return () => window.removeEventListener("resize", izmeri);
+  }, []);
+
   return (
-    <div className="lg:hidden">
-      <StatickiPrikaz />
+    <div ref={omotacRef} className="overflow-hidden lg:hidden">
+      <StatickiPrikaz forsiranaSirina={Math.round(sirinaOmotaca * UVECANJE_SLOJEVA)} />
     </div>
   );
 }
