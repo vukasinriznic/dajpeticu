@@ -377,18 +377,6 @@ export function PocetnaStranica() {
 
       {/* CARD */}
       <Sekcija id="card" ton="alt" className="nav-tamno !bg-[#0B2E20]">
-        {/* Redosled na mobilnom promenjen (19.09.2026., "dugme poruci
-            stalak zelimo da bude ispod slike stalka") — dugme je izvučeno
-            iz prvog bloka u SOPSTVENI grid item, treći po redu u DOM-u.
-            Elementi sa display:none se PONOVO ne broje u grid raspored
-            (isti mehanizam kao min-w-0 napomena za hero) — na mobilnom
-            desktop-only slika (hidden ispod lg:) potpuno nestaje iz toka,
-            pa mobilni grid-cols-1 vidi tačno [tekst, mobilna slika, dugme]
-            i slaže ih tim redom, bez ikakvog "order" trika. Na desktopu
-            mobilna slika (lg:hidden) nestaje iz toka, pa auto-placement
-            (row-major) vidi [tekst, desktop slika, dugme] u 2 kolone:
-            tekst→kolona1/red1, slika→kolona2/red1, dugme→kolona1/red2 —
-            tačno originalni raspored (dugme ispod teksta, pored slike). */}
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-8">
             <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-on-inverse">
@@ -414,6 +402,32 @@ export function PocetnaStranica() {
               Stalak radi za vas i kad niste tu. Svaki dolazak mušterije je prilika da vas neko
               novi pronađe na Google-u.
             </p>
+            {/* Dugme SAKRIVENO na mobilnom (19.09.2026., "dugme poruci
+                stalak zelimo da bude ispod slike stalka") — prva probana
+                verzija je izvukla dugme u sopstveni grid red preko cele
+                sekcije, ali je to poremetilo desktop: items-center na
+                spoljašnjem grid-u centrira SVAKI red prema NAJVIŠEM
+                elementu u njemu, pa je tekst (kraći od slike) postao
+                vertikalno centriran usred visokog reda umesto da sedi uz
+                dugme ispod sebe — razmak tekst→dugme je skočio sa 40px na
+                skoro 190px. Vraćeno: dugme ostaje TU GDE JE UVEK BILO
+                (unutar iste flex kolone kao naslov/tekst, desktop potpuno
+                nepromenjen, izmereno identičnih 40px razmaka), samo
+                sakriveno na mobilnom ("!hidden lg:!inline-flex" — "!" je
+                obavezan jer Dugme.tsx već hardkoduje "inline-flex" u svom
+                baznom className, isti obrazac kao Zaglavlje.tsx-ov desktop
+                CTA). Mobilni duplikat je ispod, POSLE slike u DOM redosledu
+                — isti "duplirano dugme za drugi breakpoint" obrazac kao
+                Zaglavlje.tsx-ov meni ("Poruči" dole u mobilnom meniju je
+                takođe duplikat desktop CTA dugmeta, ne isti element). */}
+            <Dugme
+              variant="gold"
+              size="lg"
+              className={`!hidden mt-2 lg:!inline-flex ${DUGME_ISTAKNUTO}`}
+              onClick={() => otvoriModal()}
+            >
+              Poruči stalak
+            </Dugme>
           </UNaVidiku>
           {/* Desktop slika (nepromenjeno, 524px, oslanja se na flex-shrink). */}
           <UNaVidiku kasnjenje={150} className="relative hidden justify-center lg:flex">
@@ -437,8 +451,15 @@ export function PocetnaStranica() {
               hero) — kvadrat je namerno širi od wrapper-a (puna širina
               vidljive kartice), flex bi ga stisnuo nazad flex-shrink-om;
               "relative left-1/2 -translate-x-1/2" na Kartica3D centrira
-              ga bez tog rizika. */}
-          <div className="relative pt-2 lg:hidden">
+              ga bez tog rizika. "overflow-hidden" OBAVEZAN ovde (za razliku
+              od hero-a, gde isti trik već radi bezbedno) — hero sedi unutar
+              <section> koja već ima overflow-hidden na sebi, ali Sekcija.tsx
+              (CARD koristi nju) ga NEMA nigde, pa bi kvadratov nevidljiv
+              overflow ovde stvarno proširio stranicu (potvrđeno:
+              scrollWidth 409 na 375px ekranu pre ovog dodatka). Vidljiva
+              kartica (uža od wrapper-a, centrirana) ostaje potpuno
+              neisečena — samo providne margine kvadrata se odsecaju. */}
+          <div className="relative overflow-hidden pt-2 lg:hidden">
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0"
@@ -453,24 +474,16 @@ export function PocetnaStranica() {
               interaktivna={false}
             />
           </div>
-          {/* Dugme — izdvojeno iz teksta u sopstveni grid item (vidi
-              napomenu iznad diva). lg:-mt-2 kompenzuje razliku: pre ove
-              izmene je razmak tekst→dugme bio 40px (gap-8 unutar flex
-              kolone + mt-2 na samom dugmetu), sad dolazi od SPOLJAŠNJEG
-              grid gap-a (48px) — -8px (lg:-mt-2) ga vraća na tačnih 40px
-              na desktopu (izmereno pre/posle). Na mobilnom razmak od
-              slike ostaje pun gap-12 (48px), nema kompenzacije — nova
-              vizuelna veza (dugme ispod slike) ranije nije postojala. */}
-          <div className="lg:-mt-2">
-            <Dugme
-              variant="gold"
-              size="lg"
-              className={DUGME_ISTAKNUTO}
-              onClick={() => otvoriModal()}
-            >
-              Poruči stalak
-            </Dugme>
-          </div>
+          {/* Mobilni duplikat dugmeta (vidi napomenu uz desktop dugme
+              iznad) — jedini vidljiv na mobilnom, posle slike u DOM-u. */}
+          <Dugme
+            variant="gold"
+            size="lg"
+            className={`lg:hidden ${DUGME_ISTAKNUTO}`}
+            onClick={() => otvoriModal()}
+          >
+            Poruči stalak
+          </Dugme>
         </div>
       </Sekcija>
 
