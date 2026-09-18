@@ -32,7 +32,13 @@ export function UNaVidiku({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // "Scroll into view" animacije iskljucene na mobilnom (19.09.2026.,
+    // eksplicitno traženo) — sadržaj se odmah prikazuje kao i kod
+    // prefers-reduced-motion, isti lg prag (1024px) kao svuda po sajtu.
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      window.matchMedia("(max-width: 1023px)").matches
+    ) {
       setVidljivo(true);
       return;
     }

@@ -59,7 +59,19 @@ export function PocetnaStranica() {
   // Bafer -220px gore/dole (ispod) sprečava da se ivica slike ogoli pri pomeraju.
   const parallaxRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Iskljuceno na mobilnom (19.09.2026., eksplicitno traženo, snimak
+    // ekrana potvrđuje sečkanje) — i pored rAF throttle-a i "preskoči ako
+    // se ne menja" optimizacije, scroll-driven transform na mobilnim
+    // browserima kasni za stvarnim skrolom (rAF se izvršava POSLE
+    // compositing-a), pa se vizuelno "lovi" umesto glatkog pomeraja. Efekat
+    // je i suptilan na malom ekranu, pa gašenje na mobilnom nije vidljiv
+    // gubitak. Isti lg prag (1024px) kao svuda po sajtu.
+    if (
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      window.matchMedia("(max-width: 1023px)").matches
+    ) {
+      return;
+    }
     const el = parallaxRef.current;
     if (!el) return;
     let uToku = false;
@@ -184,22 +196,22 @@ export function PocetnaStranica() {
                   nadalje, što pokriva realne desktop rezolucije, razlika u
                   odnosu na 24px je vizuelno zanemarljiva.
 
-                  POKUŠANO pa VRAĆENO (19.09.2026.): whitespace-nowrap i na
-                  mobilnom, da se spreči da "Konkurencija nije bolja od vas."
-                  prelomi samu sebe (viđeno na stvarnom telefonu korisnika,
-                  verovatno sistemski font scale). Izazvalo je pravi
-                  horizontalni skrol cele stranice — CSS Grid "1fr" kolona je
-                  zapravo minmax(auto,1fr), pa je nowrap-ov uvećan min-content
-                  širinu paragrafa naterao CEO grid da se raširi preko
-                  viewport-a (grid "blowout"), ne samo da vizuelno štrči.
-                  Dodat je min-w-0 na roditeljsku kolonu (gore) kao trajna
-                  zaštita od ovog obrasca, ali nowrap je vraćen na lg:-only —
-                  između povremenog (redak, samo na uvećanom sistemskom
-                  fontu) prelamanja ove rečenice u 2 reda na mobilnom i
-                  garantovanog odsustva horizontalnog skrola, ovo drugo je
-                  neupitno važnije. */}
+                  whitespace-nowrap ISTORIJA (19.09.2026.): prvi pokušaj ga
+                  je dodao i na mobilnom (bez lg:) da spreči da "Konkurencija
+                  nije bolja od vas." lomi samu sebe (na telefonu korisnika,
+                  verovatno uvećan sistemski font) — to je napravilo PRAVI
+                  horizontalni skrol cele stranice, jer grid stubac bez
+                  zaštite raste da prihvati nowrap-ovan min-content (grid
+                  "blowout"). Vraćeno na lg:-only + dodat min-w-0 na
+                  roditeljsku kolonu (gore) kao odbrana. Korisnik je potom
+                  potvrdio da se rečenica I DALJE lomi na telefonu (jer je
+                  whitespace opet normal na mobilnom) — drugi pokušaj:
+                  nowrap VRAĆEN i na mobilnom, sad bezbedno JER min-w-0 već
+                  postoji — ako tekst ipak ne stane ni bez preloma, odseći
+                  će se vizuelno unutar sekcije (overflow-hidden) umesto da
+                  ponovo razvuče ceo grid. */}
               <p
-                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.125rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong lg:whitespace-nowrap"
+                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.125rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong whitespace-nowrap"
                 style={{ transform: "translateY(2px)" }}
               >
                 Konkurencija nije bolja od vas.
@@ -215,7 +227,11 @@ export function PocetnaStranica() {
                 ref+resize obrazac kao KarticaSlojevi.tsx/DemoDodira.tsx) —
                 fiksnih 320px bi na uskim telefonima štrčalo van ekrana. */}
             <UNaVidiku kasnjenje={60} className="w-full lg:hidden">
-              <div ref={mobilnaSlikaRef} className="mx-auto flex w-full max-w-[320px] justify-center py-2">
+              {/* Levo poravnato (19.09.2026., eksplicitno traženo) — bilo
+                  centrirano (mx-auto justify-center), jedini element u hero
+                  koloni koji je odudarao od levog poravnanja naslova/
+                  podnaslova/dugmeta/zvezdica. */}
+              <div ref={mobilnaSlikaRef} className="flex w-full max-w-[320px] justify-start py-2">
                 <Kartica3D sirina={sirinaMobilneSlike} />
               </div>
             </UNaVidiku>

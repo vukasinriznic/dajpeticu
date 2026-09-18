@@ -242,6 +242,29 @@
     }
   }
 
+  /* Ručno tempirano zatvaranje (19.09.2026.) — allow-discrete gore
+     zavisi od dosta novije browser podrške (Chrome 117+/Safari 17.4+) i
+     korisnik je snimkom potvrdio da se na njegovom telefonu blur uopšte
+     ne povuče pri zatvaranju (samo naglo nestane ili ostane). dialog[open]
+     ostaje na .open DOK traje izlazna tranzicija (Modal.tsx zove pravi
+     close() tek posle 260ms), pa .zatvara-se ovde radi kao OBIČNA
+     (ne-discrete) opacity/transform tranzicija — ne zavisi od
+     allow-discrete podrške uopšte, samo standardni CSS koji radi svuda.
+     [open] u selektoru je zbog specifičnosti (mora da pobedi dialog[open]
+     pravila iznad, bez obzira na redosled u fajlu). */
+  dialog[open].zatvara-se {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  dialog[open].zatvara-se::backdrop {
+    opacity: 0;
+  }
+
+  dialog.korpa-drawer[open].zatvara-se {
+    transform: translateX(100%);
+  }
+
   /* Google Places Autocomplete padajuća lista (DodajUKorpuPopup.tsx) — Google
      je crta izvan React stabla (direktno u <body>), pa se boji isključivo
      preko globalnih .pac-* klasa koje sam widget dodaje; nema drugog načina

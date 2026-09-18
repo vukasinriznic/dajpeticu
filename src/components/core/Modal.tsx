@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 // Native <dialog> — ugrađen focus trap, ::backdrop (stil u globals.css),
 // zatvaranje na Escape, showModal()/close(). Bez ijedne nove zavisnosti,
@@ -20,12 +20,30 @@ export function Modal({
   variant?: "fullscreen" | "drawer";
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  // Ručno tempirano zatvaranje (19.09.2026.) — pravi dialog.close() se
+  // odlaže 260ms (malo preko 240ms CSS trajanja) dok ".zatvara-se" klasa
+  // (globals.css) vizuelno vrati opacity/transform/blur na "zatvoreno"
+  // stanje kroz OBIČNU tranziciju. Bez ovoga smo se oslanjali isključivo
+  // na allow-discrete (novija CSS mogućnost) za izlaznu animaciju — na
+  // korisnikovom telefonu se blur uopšte nije povlačio pri zatvaranju.
+  const [zatvaranje, setZatvaranje] = useState(false);
 
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
-    if (!open && dialog.open) dialog.close();
+    if (open) {
+      setZatvaranje(false);
+      if (!dialog.open) dialog.showModal();
+      return;
+    }
+    if (dialog.open) {
+      setZatvaranje(true);
+      const t = setTimeout(() => {
+        dialog.close();
+        setZatvaranje(false);
+      }, 260);
+      return () => clearTimeout(t);
+    }
   }, [open]);
 
   // <dialog> sam po sebi ne garantuje da se pozadina ne skroluje u svim
@@ -53,9 +71,10 @@ export function Modal({
       // tamniji, pa scrollbar deluje "belo" umesto da prati temu kao na
       // ostatku sajta.
       className={
-        variant === "drawer"
+        (variant === "drawer"
           ? "korpa-drawer fixed inset-y-0 left-auto right-0 m-0 h-screen max-h-screen w-full sm:w-[37vw] sm:min-w-[460px] max-w-none overflow-y-auto rounded-none border-0 border-l border-l-[var(--color-gold)] bg-white p-0 [color-scheme:dark]"
-          : "fixed inset-0 m-0 h-screen max-h-screen w-screen max-w-none overflow-y-auto rounded-none border-0 bg-white p-0 [color-scheme:dark]"
+          : "fixed inset-0 m-0 h-screen max-h-screen w-screen max-w-none overflow-y-auto rounded-none border-0 bg-white p-0 [color-scheme:dark]") +
+        (zatvaranje ? " zatvara-se" : "")
       }
     >
       {children}
