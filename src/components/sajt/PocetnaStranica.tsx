@@ -168,14 +168,24 @@ export function PocetnaStranica() {
                   SAMO mobilni zahtev (lg:hidden <br/>; skriveni razmak
                   "hidden lg:inline" sprečava da se rečenice slepe kad je
                   <br/> uklonjen sa lg+). Desktop max spušten sa 1.5rem na
-                  1.4rem i dodat lg:whitespace-nowrap (18.09.2026.) — ova
+                  1.4rem i dodat whitespace-nowrap (18.09.2026.) — ova
                   konkretna rečenica na 24px ne staje u jedan red u koloni
                   hero teksta (koja je pola širine kontejnera minus gap) sve
                   do ~1600px širine ekrana; 22.4px staje već od ~1280px
                   nadalje, što pokriva realne desktop rezolucije, razlika u
-                  odnosu na 24px je vizuelno zanemarljiva. */}
+                  odnosu na 24px je vizuelno zanemarljiva. whitespace-nowrap
+                  je BEZ lg: prefiksa (važi i na mobilnom) — na jednom
+                  stvarnom telefonu je "Konkurencija nije bolja od vas."
+                  samo prelomilo SEBE u dva reda (verovatno sistemski font
+                  scale uvećava tekst preko onoga što smo mogli da
+                  reprodukujemo u test okruženju), pošto p nema fiksnu
+                  širinu (shrink-to-fit u flex koloni) nowrap je ovde
+                  bezbedan — red će samo narasti do prirodne širine
+                  rečenice umesto da je prelomi, <br/> i dalje pravi
+                  nameravani prelom IZMEĐU rečenica jer whitespace:nowrap
+                  ne utiče na eksplicitne <br/> elemente. */}
               <p
-                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.125rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong lg:whitespace-nowrap"
+                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.125rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong whitespace-nowrap"
                 style={{ transform: "translateY(2px)" }}
               >
                 Konkurencija nije bolja od vas.
@@ -204,7 +214,10 @@ export function PocetnaStranica() {
                 Poruči stalak
               </Dugme>
             </UNaVidiku>
-            <UNaVidiku kasnjenje={240} className="flex items-center gap-3">
+            {/* Mobilno: zvezde i tekst u odvojenim redovima (traženo
+                18.09.2026. — na mobilnom je tekst upadao u isti red kao
+                zvezde). Desktop nepromenjen (flex-row, jedan red). */}
+            <UNaVidiku kasnjenje={240} className="flex flex-col items-start gap-2 lg:flex-row lg:items-center lg:gap-3">
               <OcenaZvezdicama velicina={22} />
               <span className="font-tekst text-body-sm text-text-muted">
                 Poruči za 1 minut, stiže poštom. Plaćate pouzećem.
