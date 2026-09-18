@@ -38,6 +38,21 @@ export function PocetnaStranica() {
     return () => clearTimeout(t);
   }, []);
 
+  // Slika stalka na mobilnom (ispod podnaslova) — sirina se meri iz
+  // stvarno dostupnog prostora, isti ref+resize obrazac kao
+  // KarticaSlojevi.tsx/DemoDodira.tsx, umesto fiksnog broja koji bi na
+  // uskim telefonima štrčao van ekrana.
+  const mobilnaSlikaRef = useRef<HTMLDivElement>(null);
+  const [sirinaMobilneSlike, setSirinaMobilneSlike] = useState(280);
+  useEffect(() => {
+    const izmeri = () => {
+      if (mobilnaSlikaRef.current) setSirinaMobilneSlike(mobilnaSlikaRef.current.offsetWidth);
+    };
+    izmeri();
+    window.addEventListener("resize", izmeri);
+    return () => window.removeEventListener("resize", izmeri);
+  }, []);
+
   // Pozadina se pomera sporije od sadržaja pri skrolu (klasičan parallax).
   // Direktna DOM manipulacija (ne useState) namerno — React re-render po
   // scroll frejmu bi bio suvišan trošak za ovako sitan vizuelni efekat.
@@ -74,7 +89,7 @@ export function PocetnaStranica() {
       {/* HERO */}
       <section
         id="top"
-        className="relative grid min-h-screen content-center overflow-hidden bg-surface-0 px-5 py-8"
+        className="relative grid min-h-screen content-start lg:content-center overflow-hidden bg-surface-0 px-5 pt-28 pb-8 lg:py-8"
       >
         {/* next/image umesto CSS background-image — automatski AVIF/WebP,
             responsive veličine i prioritetno učitavanje (LCP). Izvorni fajl je
@@ -147,12 +162,31 @@ export function PocetnaStranica() {
               </span>
             </h1>
             <UNaVidiku>
+              {/* text-h3 min (20px) je bio veći od traženog — sopstveni
+                  clamp umesto deljenog tokena, isti vw/max kao text-h3
+                  (2.6vw, 1.5rem) da desktop ostane nepromenjen, samo je
+                  mobilni pod spušten na 18px (18.09.2026., eksplicitno
+                  traženo). <br/> umesto prirodnog prelamanja — dve rečenice
+                  uvek idu u dva reda, ne zavisi od širine ekrana. */}
               <p
-                className="m-0 max-w-[46ch] font-prikaz text-h3 leading-heading font-medium text-text-strong"
+                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.125rem,2.6vw,1.5rem)] leading-heading font-medium text-text-strong"
                 style={{ transform: "translateY(2px)" }}
               >
-                Konkurencija nije bolja od vas. Samo ima više recenzija.
+                Konkurencija nije bolja od vas.
+                <br />
+                Samo ima više recenzija.
               </p>
+            </UNaVidiku>
+            {/* Slika stalka — na mobilnom ide OVDE, u toku sadržaja (ispod
+                podnaslova, iznad dugmeta); na desktopu (lg+) je sakrivena jer
+                stalak već ima svoju veliku sliku u desnoj koloni (ispod, van
+                ovog diva). sirina se meri iz stvarno dostupnog prostora (isti
+                ref+resize obrazac kao KarticaSlojevi.tsx/DemoDodira.tsx) —
+                fiksnih 320px bi na uskim telefonima štrčalo van ekrana. */}
+            <UNaVidiku kasnjenje={60} className="w-full lg:hidden">
+              <div ref={mobilnaSlikaRef} className="mx-auto flex w-full max-w-[320px] justify-center py-2">
+                <Kartica3D sirina={sirinaMobilneSlike} />
+              </div>
             </UNaVidiku>
             <UNaVidiku kasnjenje={120} className="mt-4 flex flex-wrap items-center gap-3">
               <Dugme
