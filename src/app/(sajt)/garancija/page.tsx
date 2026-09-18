@@ -6,6 +6,7 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Garancija",
+  alternates: { canonical: "/garancija" },
 };
 
 function Odeljak({ naslov, children }: { naslov: string; children: React.ReactNode }) {
