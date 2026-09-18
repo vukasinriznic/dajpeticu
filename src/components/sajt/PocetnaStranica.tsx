@@ -315,7 +315,21 @@ export function PocetnaStranica() {
                   ceo izračun; običan blok wrapper (bez flex) to ne radi,
                   dete jednostavno prelije van svoje kutije, što ovde
                   sekcija (overflow-hidden) tiho seče. */}
-              <div ref={mobilnaSlikaRef} className="w-full pt-2">
+              <div ref={mobilnaSlikaRef} className="relative w-full pt-2">
+                {/* Zeleni "blush" iza slike (19.09.2026., eksplicitno
+                    traženo) — isti obrazac kao CARD-ov zlatni sjaj iza
+                    njegove slike, ovde u primary-quiet zelenoj (ista
+                    nijansa kao hero-ova gornja pozadinska radijalna
+                    senka, linija ~164) da se uklopi u hero-ovu zelenu
+                    temu umesto CARD-ove zlatne. */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    background:
+                      "radial-gradient(55% 55% at 50% 50%, var(--color-primary-quiet), transparent 70%)",
+                  }}
+                />
                 {/* ×0.8 (19.09.2026., "smanji karticu za 20%") posle
                     obrnutog izračuna pune širine — i dalje sabijeno na
                     levu ivicu (poravnanje="left"), samo 20% uže od pune
@@ -421,7 +435,11 @@ export function PocetnaStranica() {
                 Recenzije rastu <Podvuceno>same od sebe</Podvuceno>
               </span>
             </h2>
-            <p className="m-0 font-tekst text-h3 leading-heading text-text-quiet-on-inverse">
+            {/* Podnaslov 18px na mobilnom (bio ~20px, text-h3 pod) —
+                eksplicitno traženo za sve sekcijske podnaslove OSIM hero-a,
+                19.09.2026. lg:text-h3 vraća originalni deljeni token
+                nepromenjen na desktopu. */}
+            <p className="m-0 font-tekst text-[18px] leading-heading text-text-quiet-on-inverse lg:text-h3">
               Stalak radi za vas i kad niste tu. Svaki dolazak mušterije je prilika da vas neko
               novi pronađe na Google-u.
             </p>
@@ -520,7 +538,9 @@ export function PocetnaStranica() {
           <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-strong">
             <Podvuceno>Kako radi</Podvuceno>
           </h2>
-          <p className="m-0 font-tekst text-h3 leading-heading text-text-body">
+          {/* 18px (isti zahtev kao CARD/ISKUSTVA/CIJENE) — ovaj blok je već
+              lg:hidden pa nema potrebe za lg: revert. */}
+          <p className="m-0 font-tekst text-[18px] leading-heading text-text-body">
             Mi ga podesimo. Vi ga stavite na željeno mesto.
           </p>
         </UNaVidiku>
@@ -566,7 +586,7 @@ export function PocetnaStranica() {
           <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-strong">
             <Podvuceno>Šta kažu vlasnici</Podvuceno>
           </h2>
-          <p className="m-0 font-tekst text-h3 leading-heading text-text-body">
+          <p className="m-0 font-tekst text-[18px] leading-heading text-text-body lg:text-h3">
             Pridružite se biznisima koji već sakupljaju petice.
           </p>
         </UNaVidiku>
@@ -617,7 +637,7 @@ export function PocetnaStranica() {
               <Podvuceno>mesečnih troškova.</Podvuceno>
             </span>
           </h2>
-          <p className="m-0 font-tekst text-h3 leading-heading text-text-quiet-on-inverse">
+          <p className="m-0 font-tekst text-[18px] leading-heading text-text-quiet-on-inverse lg:text-h3">
             Više stalaka znači više prilika da vas mušterija oceni, i nižu cenu po stalku.
           </p>
         </UNaVidiku>
