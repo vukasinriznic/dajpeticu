@@ -204,8 +204,13 @@ export function PocetnaStranica() {
                 podvucenoIscrtano gore, povlači se tek pošto se ceo hero
                 sleže. */}
             {/* Mobilni pod 60px (3.75rem), bio 56px — eksplicitno traženo
-                19.09.2026. Desktop max (6.5rem) nepromenjen. */}
-            <h1 className="m-0 text-center font-prikaz text-[clamp(3.75rem,7.5vw,6.5rem)] leading-display font-semibold tracking-display text-text-strong lg:text-left">
+                19.09.2026. Desktop max (6.5rem) nepromenjen.
+                text-center UKLONJEN (isti dan, korisnik se predomislio) —
+                blok (h1 kao celina) ostaje centriran na stranici preko
+                roditeljevog items-center, ali TEKST unutar njega je levo
+                poravnat (druga linija "pet zvezdica" počinje na istom
+                levom rubu kao "Jedan tap", ne centrirana ispod nje). */}
+            <h1 className="m-0 font-prikaz text-[clamp(3.75rem,7.5vw,6.5rem)] leading-display font-semibold tracking-display text-text-strong">
               <span className="inline-block animate-[dp-otkrivanje-sleva_700ms_cubic-bezier(.2,.7,.3,1)_both]">
                 Jedan tap
               </span>
@@ -244,9 +249,15 @@ export function PocetnaStranica() {
                   postoji — ako tekst ipak ne stane ni bez preloma, odseći
                   će se vizuelno unutar sekcije (overflow-hidden) umesto da
                   ponovo razvuče ceo grid. Mobilni pod podignut na 20px
-                  (1.25rem, bio 18px) — eksplicitno traženo 19.09.2026. */}
+                  (1.25rem, bio 18px) — eksplicitno traženo 19.09.2026.
+
+                  text-center UKLONJEN (isti dan, korisnik se predomislio) —
+                  isti razlog kao h1 iznad: blok ostaje centriran na
+                  stranici (roditeljev items-center), tekst unutar njega je
+                  levo poravnat (druga rečenica počinje na istom rubu kao
+                  prva, ne centrirana ispod nje). */}
               <p
-                className="m-0 max-w-[46ch] text-center font-prikaz text-[clamp(1.25rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong whitespace-nowrap lg:text-left"
+                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.25rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong whitespace-nowrap"
                 style={{ transform: "translateY(2px)" }}
               >
                 Konkurencija nije bolja od vas.
