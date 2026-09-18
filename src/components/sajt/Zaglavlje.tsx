@@ -114,19 +114,25 @@ export function Zaglavlje() {
       }`}
     >
       <div className="mx-auto grid max-w-[var(--container)] grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 pt-6 pb-2.5">
-        <Logotip kontekst="header" className="justify-self-start" />
+        <Logotip kontekst="header" className="col-start-1 justify-self-start" />
         {/* Sredishnja kolona je "auto" širine između dve jednake 1fr
             kolone — to je centrira u odnosu na CEO header, ne samo na
             preostali prostor, bez obzira što logo i desna grupa nisu iste
-            širine. Na mobilnom je prazna (linkovi žive u meniju ispod). */}
-        <nav className="hidden items-center gap-10 md:flex">
+            širine. Na mobilnom je prazna (linkovi žive u meniju ispod).
+            col-start-* na sva tri deteta je OBAVEZNO ovde — bez toga, kad
+            je <nav> display:none (mobilno), CSS Grid auto-placement ga
+            potpuno uklanja iz rasporeda pa desna grupa (sledeće dete u
+            DOM redosledu) upadne u DRUGU (auto) kolonu umesto u treću,
+            čime cela desna grupa vizuelno "pobegne" ulevo od desne ivice
+            umesto da bude uz nju. */}
+        <nav className="col-start-2 hidden items-center gap-10 md:flex">
           {NAV.map(([id, naziv]) => (
             <NavLink key={id} tamno={tamnaPozadina} onClick={() => idiNa(id)}>
               {naziv}
             </NavLink>
           ))}
         </nav>
-        <div className="flex items-center justify-end gap-6 justify-self-end">
+        <div className="col-start-3 flex items-center justify-end gap-6 justify-self-end">
           <button
             type="button"
             onClick={otvoriKorpu}

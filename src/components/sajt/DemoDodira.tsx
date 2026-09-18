@@ -1,18 +1,39 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Kartica } from "@/components/core/Kartica";
 import { Dugme } from "@/components/core/Dugme";
 import { OcenaZvezdicama } from "@/components/core/OcenaZvezdicama";
 import { MaketaKartice } from "@/components/sajt/MaketaKartice";
 
 const TRAJANJE = "3.6s cubic-bezier(.2,.7,.3,1) both";
+// Najveća širina kartice na dovoljno širokom ekranu — na uskim telefonima se
+// smanjuje (vidi useEffect ispod), inače bi fiksnih 300px "štrčalo" izvan
+// kutije (koja na malom ekranu ima manje raspoloživog prostora zbog
+// Sekcija/Kartica padding-a) i overflow-hidden bi je vidljivo odsekao sa
+// obe strane.
+const MAKS_SIRINA_KARTICE = 300;
 
 export function DemoDodira() {
   const telefonRef = useRef<HTMLDivElement>(null);
   const formaRef = useRef<HTMLDivElement>(null);
   const idleRef = useRef<HTMLDivElement>(null);
   const pulsRef = useRef<HTMLDivElement>(null);
+  const kutijaRef = useRef<HTMLDivElement>(null);
+  const [sirinaKartice, setSirinaKartice] = useState(MAKS_SIRINA_KARTICE);
+
+  useEffect(() => {
+    const izmeri = () => {
+      const k = kutijaRef.current;
+      if (!k) return;
+      // 48px (24px sa svake strane) sigurnosna margina da kartica ne
+      // dodiruje ivice kutije čak i na najužim telefonima.
+      setSirinaKartice(Math.min(MAKS_SIRINA_KARTICE, k.offsetWidth - 48));
+    };
+    izmeri();
+    window.addEventListener("resize", izmeri);
+    return () => window.removeEventListener("resize", izmeri);
+  }, []);
 
   const pusti = () => {
     const parovi: [HTMLDivElement | null, string][] = [
@@ -42,6 +63,7 @@ export function DemoDodira() {
         </div>
 
         <div
+          ref={kutijaRef}
           onClick={pusti}
           role="button"
           tabIndex={0}
@@ -77,8 +99,11 @@ export function DemoDodira() {
             ref={pulsRef}
             className="absolute top-[132px] left-1/2 z-[1] -ml-7 h-14 w-14 rounded-full border-2 border-primary opacity-0"
           />
-          <div className="absolute bottom-5 left-1/2 -ml-[150px]">
-            <MaketaKartice sirina={300} ton="ink" nagib={0} />
+          {/* Levi offset se računa iz STVARNE (dinamičke) širine kartice,
+              ne fiksnih -150px — inače bi centriranje "pobeglo" čim se
+              sirinaKartice smanji na uskom ekranu. */}
+          <div className="absolute bottom-5 left-1/2" style={{ marginLeft: -sirinaKartice / 2 }}>
+            <MaketaKartice sirina={sirinaKartice} ton="ink" nagib={0} />
           </div>
         </div>
       </div>
