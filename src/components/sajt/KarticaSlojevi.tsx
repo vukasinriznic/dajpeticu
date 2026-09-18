@@ -426,7 +426,7 @@ export function KarticaSlojevi() {
 // pokušaj) NIJE dovoljno, jer je vidljiva razdvojena kartica i dalje
 // mnogo uža od kvadrata; 1.8× je empirijski proveren (uživo, zoom) da
 // vidljiva kartica dosegne skoro celu širinu kolone.
-const UVECANJE_SLOJEVA = 1.8;
+const UVECANJE_SLOJEVA = 1.3;
 
 export function KarticaSlojeviStatic() {
   const omotacRef = useRef<HTMLDivElement>(null);

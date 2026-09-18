@@ -230,7 +230,9 @@ export function PocetnaStranica() {
                 roditeljevog items-center, ali TEKST unutar njega je levo
                 poravnat (druga linija "pet zvezdica" počinje na istom
                 levom rubu kao "Jedan tap", ne centrirana ispod nje). */}
-            <h1 className="m-0 font-prikaz text-[clamp(3.75rem,7.5vw,6.5rem)] leading-display font-semibold tracking-display text-text-strong">
+            {/* Mobilni pod 64px (4rem, bio 60px) — eksplicitno traženo
+                19.09.2026. Desktop max (6.5rem) nepromenjen. */}
+            <h1 className="m-0 font-prikaz text-[clamp(4rem,7.5vw,6.5rem)] leading-display font-semibold tracking-display text-text-strong">
               <span className="inline-block animate-[dp-otkrivanje-sleva_700ms_cubic-bezier(.2,.7,.3,1)_both]">
                 Jedan tap
               </span>
@@ -275,9 +277,16 @@ export function PocetnaStranica() {
                   isti razlog kao h1 iznad: blok ostaje centriran na
                   stranici (roditeljev items-center), tekst unutar njega je
                   levo poravnat (druga rečenica počinje na istom rubu kao
-                  prva, ne centrirana ispod nje). */}
+                  prva, ne centrirana ispod nje).
+
+                  Mobilni pod 24px (bio 20px, eksplicitno traženo
+                  19.09.2026.) — fiksna vrednost, ne clamp, jer je 24px VEĆE
+                  od desktop maksimuma (22.4px/1.4rem) — isti "obrnut"
+                  slučaj kao "RSD" u CenovnaKartica.tsx ranije ove sesije,
+                  jedan clamp ne može izraziti oboje. lg: vraća originalni
+                  clamp nepromenjen. */}
               <p
-                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.25rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong whitespace-nowrap"
+                className="m-0 max-w-[46ch] font-prikaz text-[24px] leading-heading font-medium text-text-strong whitespace-nowrap lg:text-[clamp(1.25rem,2.6vw,1.4rem)]"
                 style={{ transform: "translateY(2px)" }}
               >
                 Konkurencija nije bolja od vas.
@@ -347,10 +356,19 @@ export function PocetnaStranica() {
                 Centriranje (w-full justify-center) UKLONJENO (19.09.2026.,
                 isti dan) — dugme vraćeno na levo poravnato na mobilnom,
                 isto kao ostatak kolone. */}
-            <UNaVidiku kasnjenje={120} className="flex flex-wrap items-center gap-3 lg:mt-4">
+            {/* w-full i na UNaVidiku omotaču, ne samo na dugmetu (19.09.2026.,
+                "isti width kao dugme u sekciji card") — roditeljska hero
+                kolona je "items-start" (shrink-to-fit svaki red na svoj
+                sadržaj), pa je "width:100%" na SAMOM dugmetu bio 100% od
+                omotača koji se sam skupio na dugmetov prirodni sadržaj —
+                kružna zavisnost koja se svodi na prirodnu širinu (194px,
+                izmereno). Omotač takođe mora eksplicitno na w-full da bi
+                se prvo ON razvukao na punu širinu kolone (335px), pa tek
+                onda dugme unutar njega na 100% TE (već pune) širine. */}
+            <UNaVidiku kasnjenje={120} className="flex w-full flex-wrap items-center gap-3 lg:w-auto lg:mt-4">
               <Dugme
                 size="lg"
-                className={DUGME_ISTAKNUTO}
+                className={`w-full lg:w-auto ${DUGME_ISTAKNUTO}`}
                 onClick={() => otvoriModal()}
               >
                 Poruči stalak
