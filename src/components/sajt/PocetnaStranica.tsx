@@ -163,17 +163,24 @@ export function PocetnaStranica() {
             </h1>
             <UNaVidiku>
               {/* text-h3 min (20px) je bio veći od traženog — sopstveni
-                  clamp umesto deljenog tokena, isti vw/max kao text-h3
-                  (2.6vw, 1.5rem) da desktop ostane nepromenjen, samo je
-                  mobilni pod spušten na 18px (18.09.2026., eksplicitno
-                  traženo). <br/> umesto prirodnog prelamanja — dve rečenice
-                  uvek idu u dva reda, ne zavisi od širine ekrana. */}
+                  clamp umesto deljenog tokena. Mobilni pod spušten na 18px
+                  (18.09.2026., eksplicitno traženo), prelom u dva reda je
+                  SAMO mobilni zahtev (lg:hidden <br/>; skriveni razmak
+                  "hidden lg:inline" sprečava da se rečenice slepe kad je
+                  <br/> uklonjen sa lg+). Desktop max spušten sa 1.5rem na
+                  1.4rem i dodat lg:whitespace-nowrap (18.09.2026.) — ova
+                  konkretna rečenica na 24px ne staje u jedan red u koloni
+                  hero teksta (koja je pola širine kontejnera minus gap) sve
+                  do ~1600px širine ekrana; 22.4px staje već od ~1280px
+                  nadalje, što pokriva realne desktop rezolucije, razlika u
+                  odnosu na 24px je vizuelno zanemarljiva. */}
               <p
-                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.125rem,2.6vw,1.5rem)] leading-heading font-medium text-text-strong"
+                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.125rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong lg:whitespace-nowrap"
                 style={{ transform: "translateY(2px)" }}
               >
                 Konkurencija nije bolja od vas.
-                <br />
+                <br className="lg:hidden" />
+                <span className="hidden lg:inline"> </span>
                 Samo ima više recenzija.
               </p>
             </UNaVidiku>
