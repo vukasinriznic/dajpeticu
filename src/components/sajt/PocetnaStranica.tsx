@@ -256,11 +256,19 @@ export function PocetnaStranica() {
                   centrirana UNUTAR njega (vidi Kartica3D.tsx), pa je bez
                   ovoga i dalje ostajala vizuelno pomerena udesno u odnosu
                   na tekst iznad, iako je omotač već bio uz levu ivicu. */}
-              <div ref={mobilnaSlikaRef} className="flex w-full max-w-[352px] justify-start py-2">
+              <div ref={mobilnaSlikaRef} className="flex w-full max-w-[352px] justify-start pt-2">
                 <Kartica3D sirina={sirinaMobilneSlike} poravnanje="left" />
               </div>
             </UNaVidiku>
-            <UNaVidiku kasnjenje={120} className="mt-4 flex flex-wrap items-center gap-3">
+            {/* mt-4 prebačen na lg:-only (19.09.2026., traženo smanjenje
+                razmaka pre dugmeta NA MOBILNOM) — na mobilnom se sabirao sa
+                roditeljevim flex gap-5 pravivši 44px do slike (8px iz
+                slikinog starog py-2 + 20px gap + 16px mt-4); sad je na
+                mobilnom razmak samo bazni gap-5 (20px). Desktop zadržava
+                originalni mt-4 (dugme tu nema sliku iznad sebe — mobilna
+                slika je lg:hidden — pa mu ta dodatna margina i dalje treba
+                da ne "zalepi" dugme direktno uz podnaslov). */}
+            <UNaVidiku kasnjenje={120} className="flex flex-wrap items-center gap-3 lg:mt-4">
               <Dugme
                 size="lg"
                 className={DUGME_ISTAKNUTO}
