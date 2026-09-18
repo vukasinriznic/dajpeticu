@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Dugme } from "@/components/core/Dugme";
-import { OcenaZvezdicama } from "@/components/core/OcenaZvezdicama";
 import { Podvuceno } from "@/components/core/Podvuceno";
 import { Sekcija } from "@/components/sajt/Sekcija";
 import { KorpaFormaNarudzbine } from "@/components/sajt/KorpaFormaNarudzbine";
 import { useKorpa, type StavkaKorpe } from "@/components/sajt/KorpaKontekst";
 import { ZaglavljePlacanje } from "@/components/sajt/ZaglavljePlacanje";
-import { formatRSD } from "@/lib/cene";
 
 type SnimakKorpe = { stavke: StavkaKorpe[]; ukupnaKolicina: number; ukupnaCena: number };
 
@@ -25,7 +24,7 @@ export default function PlacanjePage() {
   // Drži se OVDE (ne u KorpaFormaNarudzbine), jer uspešno slanje odmah prazni
   // korpu — da stranica ne bi preskočila na "korpa je prazna" pre nego što
   // korisnik vidi potvrdu, provera uspeha mora doći PRE provere praznine.
-  const [poslato, setPoslato] = useState<{ ukupnaCena: number; telefon: string } | null>(null);
+  const [poslato, setPoslato] = useState<{ telefon: string } | null>(null);
 
   // Poslednje NEPRAZNO stanje korpe — kad korisnik isprazni korpu preko
   // drawer-a dok je već na /placanje (a ne pre ulaska na stranicu), stavke
@@ -50,25 +49,23 @@ export default function PlacanjePage() {
   const prikaz = stavke.length > 0 ? { stavke, ukupnaKolicina, ukupnaCena } : snimak;
 
   if (poslato) {
+    // Bez ZaglavljePlacanje/Sekcija ovde namerno — ovo je krajnja tačka toka
+    // (nema više kuda da se ide osim nazad na početnu), pa cela stranica
+    // postaje jedna centrirana potvrda preko celog ekrana, bez nav-a koji
+    // bi sugerisao da ima još nešto da se radi.
     return (
-      <>
-        <ZaglavljePlacanje />
-        <Sekcija ton="inverse">
-          <div className="mx-auto flex max-w-[62ch] flex-col items-start gap-4">
-            <OcenaZvezdicama velicina={28} />
-            <h1 className="m-0 font-prikaz text-h1 leading-heading font-normal text-white">
-              Primili smo porudžbinu.
-            </h1>
-            <p className="m-0 font-tekst text-body text-[rgba(191,227,208,0.85)]">
-              Zovemo vas na {poslato.telefon} da potvrdimo adresu i link vaše Google strane. Poštaru
-              plaćate {formatRSD(poslato.ukupnaCena)}.
-            </p>
-            <Dugme variant="gold" onClick={() => router.push("/")}>
-              Nazad na početnu
-            </Dugme>
-          </div>
-        </Sekcija>
-      </>
+      <section className="flex min-h-screen flex-col items-center justify-center gap-4 bg-bg-inverse px-5 text-center">
+        <Image src="/checked.png" alt="" width={72} height={72} />
+        <h1 className="m-0 font-prikaz text-h1 leading-heading font-normal text-white">
+          Primili smo porudžbinu.
+        </h1>
+        <p className="m-0 max-w-[62ch] font-tekst text-body text-[rgba(191,227,208,0.85)]">
+          Zovemo vas na {poslato.telefon} da potvrdimo adresu i link vaše Google strane.
+        </p>
+        <Dugme variant="gold" onClick={() => router.push("/")}>
+          Nazad na početnu
+        </Dugme>
+      </section>
     );
   }
 
