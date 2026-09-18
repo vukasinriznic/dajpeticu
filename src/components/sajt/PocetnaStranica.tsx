@@ -41,9 +41,11 @@ export function PocetnaStranica() {
   // Slika stalka na mobilnom (ispod podnaslova) — sirina se meri iz
   // stvarno dostupnog prostora, isti ref+resize obrazac kao
   // KarticaSlojevi.tsx/DemoDodira.tsx, umesto fiksnog broja koji bi na
-  // uskim telefonima štrčao van ekrana.
+  // uskim telefonima štrčao van ekrana. Podrazumevano 308 (19.09.2026.,
+  // bilo 280) — 10% veće na zahtev korisnika; wrapper ispod ima isti +10%
+  // na svoj max-w (352px, bilo 320px) da mera prati novi plafon.
   const mobilnaSlikaRef = useRef<HTMLDivElement>(null);
-  const [sirinaMobilneSlike, setSirinaMobilneSlike] = useState(280);
+  const [sirinaMobilneSlike, setSirinaMobilneSlike] = useState(308);
   useEffect(() => {
     const izmeri = () => {
       if (mobilnaSlikaRef.current) setSirinaMobilneSlike(mobilnaSlikaRef.current.offsetWidth);
@@ -143,11 +145,26 @@ export function PocetnaStranica() {
         />
         {/* Beli scrim iza teksta — pozadina je dosta "šarena" (geometrijski
             oblici menjaju svetlinu), pa tekst preko nje gubi na čitljivosti.
-            Gradijent je najjači tačno iza teksta (levo) i nestaje ka desnoj
-            strani gde je kartica, da se pozadina tamo i dalje vidi. */}
+            Na desktopu je tekst LEVO a kartica DESNO (2 kolone), pa je
+            gradijent horizontalni (100deg) — najjači iza teksta, nestaje ka
+            kartici. Na mobilnom je raspored VERTIKALAN (tekst pa ispod
+            slika) — isti horizontalni gradijent bi prekrio skoro celu širinu
+            ekrana belim velom i ispod teksta, tačno tamo gde sad sedi
+            slika stalka, zbog čega je pozadina delovala "mutno"/isprano
+            (prijavio korisnik 19.09.2026.). Zato je od te izmene gradijent
+            vertikalan (180deg) na mobilnom — jak iza teksta pri vrhu,
+            nestaje pre nego što stigne do slike ispod. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 lg:hidden"
+          style={{
+            background:
+              "linear-gradient(180deg, rgb(255 255 255 / 0.82) 0%, rgb(255 255 255 / 0.55) 14%, rgb(255 255 255 / 0.15) 26%, transparent 38%)",
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 hidden lg:block"
           style={{
             background:
               "linear-gradient(100deg, rgb(255 255 255 / 0.82) 0%, rgb(255 255 255 / 0.6) 32%, rgb(255 255 255 / 0.15) 55%, transparent 72%)",
@@ -171,7 +188,9 @@ export function PocetnaStranica() {
                 "pet zvezdica" se namerno NE otkriva u isto vreme — vidi
                 podvucenoIscrtano gore, povlači se tek pošto se ceo hero
                 sleže. */}
-            <h1 className="m-0 font-prikaz text-[clamp(3.5rem,7.5vw,6.5rem)] leading-display font-semibold tracking-display text-text-strong">
+            {/* Mobilni pod 60px (3.75rem), bio 56px — eksplicitno traženo
+                19.09.2026. Desktop max (6.5rem) nepromenjen. */}
+            <h1 className="m-0 font-prikaz text-[clamp(3.75rem,7.5vw,6.5rem)] leading-display font-semibold tracking-display text-text-strong">
               <span className="inline-block animate-[dp-otkrivanje-sleva_700ms_cubic-bezier(.2,.7,.3,1)_both]">
                 Jedan tap
               </span>
@@ -209,9 +228,10 @@ export function PocetnaStranica() {
                   nowrap VRAĆEN i na mobilnom, sad bezbedno JER min-w-0 već
                   postoji — ako tekst ipak ne stane ni bez preloma, odseći
                   će se vizuelno unutar sekcije (overflow-hidden) umesto da
-                  ponovo razvuče ceo grid. */}
+                  ponovo razvuče ceo grid. Mobilni pod podignut na 20px
+                  (1.25rem, bio 18px) — eksplicitno traženo 19.09.2026. */}
               <p
-                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.125rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong whitespace-nowrap"
+                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.25rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong whitespace-nowrap"
                 style={{ transform: "translateY(2px)" }}
               >
                 Konkurencija nije bolja od vas.
@@ -230,9 +250,14 @@ export function PocetnaStranica() {
               {/* Levo poravnato (19.09.2026., eksplicitno traženo) — bilo
                   centrirano (mx-auto justify-center), jedini element u hero
                   koloni koji je odudarao od levog poravnanja naslova/
-                  podnaslova/dugmeta/zvezdica. */}
-              <div ref={mobilnaSlikaRef} className="flex w-full max-w-[320px] justify-start py-2">
-                <Kartica3D sirina={sirinaMobilneSlike} />
+                  podnaslova/dugmeta/zvezdica. poravnanje="left" na
+                  Kartica3D je DRUGI deo istog zahteva — sama fotografija
+                  kartice je uža od svog kvadratnog omotača i podrazumevano
+                  centrirana UNUTAR njega (vidi Kartica3D.tsx), pa je bez
+                  ovoga i dalje ostajala vizuelno pomerena udesno u odnosu
+                  na tekst iznad, iako je omotač već bio uz levu ivicu. */}
+              <div ref={mobilnaSlikaRef} className="flex w-full max-w-[352px] justify-start py-2">
+                <Kartica3D sirina={sirinaMobilneSlike} poravnanje="left" />
               </div>
             </UNaVidiku>
             <UNaVidiku kasnjenje={120} className="mt-4 flex flex-wrap items-center gap-3">

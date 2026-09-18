@@ -35,12 +35,19 @@ export function Kartica3D({
   className = "",
   slika = "/images/stalak_beli.webp",
   razmerSlike = RAZMER_SLIKE_PODRAZUMEVANO,
+  poravnanje = "center",
 }: {
   sirina?: number;
   interaktivna?: boolean;
   className?: string;
   slika?: string;
   razmerSlike?: string;
+  // Slika kartice je uža od kvadratnog omotača (RAZMER_SLIKE gore), pa
+  // podrazumevano centriranje ostavlja providan prostor sa obe strane.
+  // "left" (19.09.2026., mobilni hero) uklanja levi prostor — kartica
+  // vizuelno naleže na levu ivicu omotača, da se poravna sa tekstom iznad
+  // nje. Podrazumevano "center" ostaje nepromenjeno svuda drugde.
+  poravnanje?: "center" | "left";
 }) {
   const [nagib, setNagib] = useState({ x: 0, y: 0 });
   const [kursor, setKursor] = useState({ px: 0.5, py: 0.5 });
@@ -90,7 +97,7 @@ export function Kartica3D({
           aspectRatio: "1",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: poravnanje === "left" ? "flex-start" : "center",
           transform: `rotateX(${nagib.x}deg) rotateY(${nagib.y}deg) scale(${uHoveru ? 1.045 : 1})`,
           transition: "transform 300ms cubic-bezier(.2,.7,.3,1)",
         }}
