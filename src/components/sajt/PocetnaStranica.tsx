@@ -191,7 +191,11 @@ export function PocetnaStranica() {
               normalno ponašanje: kolona nikad ne premaši svoj 1fr udeo, a
               eventualni preširok sadržaj se samo vizuelno seče unutar nje
               (sekcija već ima overflow-hidden). */}
-          <div className="flex min-w-0 flex-col items-start gap-5">
+          {/* items-center lg:items-start (19.09.2026.) — naslov i podnaslov
+              centrirani na mobilnom, po istom obrascu kao slika/dugme/
+              zvezde/tekst ispod (sve već centrirano); desktop nepromenjen
+              (items-start, levo poravnato). */}
+          <div className="flex min-w-0 flex-col items-center gap-5 lg:items-start">
             {/* Svaki red se otkriva sleva nadesno (dp-otkrivanje-sleva) —
                 eksplicitna odluka da naslov, iako je LCP element, dobije
                 upečatljiv ulazak; trajanja su kratka (700ms) da hit na
@@ -201,7 +205,7 @@ export function PocetnaStranica() {
                 sleže. */}
             {/* Mobilni pod 60px (3.75rem), bio 56px — eksplicitno traženo
                 19.09.2026. Desktop max (6.5rem) nepromenjen. */}
-            <h1 className="m-0 font-prikaz text-[clamp(3.75rem,7.5vw,6.5rem)] leading-display font-semibold tracking-display text-text-strong">
+            <h1 className="m-0 text-center font-prikaz text-[clamp(3.75rem,7.5vw,6.5rem)] leading-display font-semibold tracking-display text-text-strong lg:text-left">
               <span className="inline-block animate-[dp-otkrivanje-sleva_700ms_cubic-bezier(.2,.7,.3,1)_both]">
                 Jedan tap
               </span>
@@ -242,7 +246,7 @@ export function PocetnaStranica() {
                   ponovo razvuče ceo grid. Mobilni pod podignut na 20px
                   (1.25rem, bio 18px) — eksplicitno traženo 19.09.2026. */}
               <p
-                className="m-0 max-w-[46ch] font-prikaz text-[clamp(1.25rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong whitespace-nowrap"
+                className="m-0 max-w-[46ch] text-center font-prikaz text-[clamp(1.25rem,2.6vw,1.4rem)] leading-heading font-medium text-text-strong whitespace-nowrap lg:text-left"
                 style={{ transform: "translateY(2px)" }}
               >
                 Konkurencija nije bolja od vas.
