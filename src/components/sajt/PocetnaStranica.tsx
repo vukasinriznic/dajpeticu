@@ -307,10 +307,23 @@ export function PocetnaStranica() {
                     "iskljuci hover efekat na mobile") — gasi tilt/sjaj na
                     pomeraj prsta i "disanje" animaciju u mirovanju; desktop
                     (drugi Kartica3D pozivi ispod, lg:grid/CARD sekcija)
-                    ostaje interaktivan, nepromenjen. */}
+                    ostaje interaktivan, nepromenjen.
+
+                    Centrirano (19.09.2026., probno — "da vidimo kako ce to
+                    da izgleda") — poravnanje="left" → "center" (fotografija
+                    centrirana UNUTAR kvadrata) + "relative left-1/2
+                    -translate-x-1/2" na sam kvadrat da centrira kvadrat
+                    unutar wrapper-a. "mx-auto" NIJE dovoljan ovde — kvadrat
+                    je ŠIRI od wrapper-a, a margin:auto se u tom
+                    "overflow" slučaju po CSS specifikaciji svodi na 0 (ne
+                    deli se ravnomerno), pa je isprobano i odbačeno (kvadrat
+                    je ostajao nalepljen za levu ivicu). left-50%+
+                    translateX(-50%) je standardan trik za centriranje
+                    elementa šireg od svog roditelja, radi bez obzira na
+                    odnos širina. */}
                 <Kartica3D
                   sirina={Math.round((sirinaMobilneSlike / RAZMER_KARTICE_U_KVADRATU) * 0.8)}
-                  poravnanje="left"
+                  className="relative left-1/2 -translate-x-1/2"
                   interaktivna={false}
                 />
               </div>
