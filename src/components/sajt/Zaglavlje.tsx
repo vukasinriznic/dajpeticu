@@ -242,7 +242,7 @@ export function Zaglavlje() {
           <div
             className={`flex flex-col px-5 transition-transform duration-[350ms] ease-[cubic-bezier(.32,.72,0,1)] ${
               otvoren ? "translate-y-0" : "-translate-y-6"
-            } border-b-2 ${tamnaPozadina ? "border-[var(--color-gold)]" : "border-primary"}`}
+            } border-b ${tamnaPozadina ? "border-[var(--color-gold)]" : "border-primary"}`}
           >
             {NAV.map(([id, naziv]) => (
               <button
