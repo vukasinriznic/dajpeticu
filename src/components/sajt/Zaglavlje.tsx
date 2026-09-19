@@ -245,11 +245,22 @@ export function Zaglavlje() {
             pozadina: panel tamnozelen (--color-bg-inverse), linije i
             krajnja linija zlatne. Linija IZNAD prvog linka (border-t)
             je UKLONJENA (eksplicitno traženo). */}
+      {/* Omotač sa overflow-hidden je OBAVEZAN: panel translatovan za
+          -100% svoje visine ostaje sa donjim krajem tačno na dnu header-a,
+          pa je bez sečenja njegov donji deo (linija + "Poruči" dugme)
+          ostajao PREKO trake navbara dok je meni zatvoren — pojavljivalo
+          se veliko dugme umesto logoa/korpe/menija. Omotač (bez pozadine,
+          pointer-events-none dok je zatvoren) seče sve što je iznad
+          njegove gornje ivice, ispod header-a. */}
       <div
-        className={`absolute inset-x-0 top-full transition-transform duration-[350ms] ease-[cubic-bezier(.32,.72,0,1)] md:hidden ${
+        className={`absolute inset-x-0 top-full overflow-hidden md:hidden ${otvoren ? "" : "pointer-events-none"}`}
+      >
+      <div
+        className={`transition-transform duration-[350ms] ease-[cubic-bezier(.32,.72,0,1)] ${
           tamnaPozadina ? "bg-[var(--color-bg-inverse)]" : "bg-surface-0"
         }`}
         style={{ transform: `translateY(${otvoren ? "0" : "-100%"})` }}
+        inert={!otvoren}
       >
         <div className="flex flex-col px-5">
           {NAV.map(([id, naziv]) => (
@@ -287,6 +298,7 @@ export function Zaglavlje() {
             </Dugme>
           </div>
         </div>
+      </div>
       </div>
     </header>
   );
