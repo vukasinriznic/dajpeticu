@@ -7,17 +7,14 @@ import { KORACI } from "@/components/sajt/KakoRadiScroll";
 // Visina fiksnog headera (Zaglavlje.tsx) na mobilnom — sticky se lepi tik
 // ispod njega, a vidljiva visina sekcije je ostatak ekrana.
 const NAV_VISINA = 82;
-// Koliko skrola (u svh) pripada jednom koraku. Manje od 100 — cilj je da
-// sekcija ne oduzima previše skrola, a ipak da svaki korak "sleže".
+// Skrol (u svh) koji zauzima jedan korak u sticky sekciji.
 const SKROL_PO_KORAKU_SVH = 50;
-// "Zaključavanje" na koraku: kad skrol pređe granicu između dva koraka,
-// držimo poziciju uz tu granicu ovoliko ms — jak zamah ne može da preskoči
-// korak. HOLD_KORAKA je dozvoljeni luft (u delovima koraka) oko granice.
-const ZAKLJUCAJ_MS = 450;
-const HOLD_KORAKA = 0.12;
-// Vreme (ms) za koje se prikazana popuna linije približi cilju ~63% — veće =
-// mekše/sporije praćenje skrola.
-const GLATKOCA_LINIJE_MS = 90;
+// Koliko px skrola od "mirne" pozicije koraka pokreće prelaz na sledeći/
+// prethodni korak, koliko traje glatki prelaz, i koliko skrol mora da miruje
+// posle prelaza pre nego što novi potez sme da pokrene sledeći.
+const PRAG_PX = 36;
+const TRAJANJE_MS = 550;
+const MIROVANJE_MS = 140;
 
 const UPIT_KRETANJA = "(prefers-reduced-motion: reduce)";
 function pretplataKretanja(cb: () => void) {
@@ -26,22 +23,22 @@ function pretplataKretanja(cb: () => void) {
   return () => mq.removeEventListener("change", cb);
 }
 
-// Mobilna verzija "Kako radi" (19.09.2026.) — sticky "scrollytelling" kao i
-// na desktopu (KakoRadiScroll.tsx), ali prilagođen telefonu: samo pokazivač
-// koraka (horizontalni krugovi), tekst koraka i slika. Naslov/podnaslov sekcije
-// ostaju IZNAD i skroluju se pre zaključavanja (manji telefoni nemaju mesta).
-// Slike se ne seku — uklapaju se u preostalu visinu. Stanje (aktivan korak) se
-// postavlja SAMO kad se korak promeni; popuna linija ide direktno preko DOM-a
-// kroz sopstvenu rAF petlju koja je glatko (eksponencijalno) prati — iOS šalje
-// scroll događaje neravnomerno, pa direktno vezivanje za skrol "seče".
+const ublazi = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+// Mobilna verzija "Kako radi" (19.09.2026.) — sticky sekcija u kojoj JEDAN
+// POTEZ SKROLA = JEDAN KORAK. Kad korisnik krene da skroluje dole (ili gore)
+// od mirne pozicije koraka, sami glatko prelazimo na sledeći (prethodni) korak;
+// dok prelaz traje ulaz se ignoriše, a sledeći potez se prihvata tek kad skrol
+// utihne — jak zamah ne može da preskoči korak. Na poslednjem koraku dalji skrol
+// dole je slobodan (otpušta sekciju), a na prvom skrol gore izlazi iz sekcije.
+// Linija i pokazivač se pune vremenskom (CSS) animacijom pri promeni koraka, ne
+// prate piksele skrola — iOS ih šalje neravnomerno pa je to bilo sečkanje.
+// Naslov/podnaslov sekcije ostaju IZNAD; slike se ne seku.
 export function KakoRadiMobilno() {
   const omotacRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
-  const linijeRef = useRef<(HTMLSpanElement | null)[]>([]);
+  const idiNaRef = useRef<(k: number) => void>(() => {});
   const [aktivan, setAktivan] = useState(0);
-  // Dok traje programski (glatki) skrol na klik na krug, zaključavanje je
-  // isključeno da ne prekida taj skrol.
-  const bezZakljucavanjaDoRef = useRef(0);
   const smanjenoKretanje = useSyncExternalStore(pretplataKretanja, () => matchMedia(UPIT_KRETANJA).matches, () => false);
 
   useEffect(() => {
@@ -50,95 +47,76 @@ export function KakoRadiMobilno() {
     if (!omotac || !sticky) return;
     const N = KORACI.length;
 
-    // --- glatka popuna linija (ciljna vs. prikazana vrednost) ---
-    const cilj = new Array(N - 1).fill(0);
-    const prikazano = new Array(N - 1).fill(0);
-    let petljaId = 0;
-    let poslednjeVreme = 0;
-    const upisi = () => {
-      linijeRef.current.forEach((el, i) => {
-        if (el) el.style.transform = `scaleX(${prikazano[i] ?? 0})`;
-      });
-    };
-    const petlja = (t: number) => {
-      const dt = poslednjeVreme ? Math.min(t - poslednjeVreme, 64) : 16;
-      poslednjeVreme = t;
-      const k = 1 - Math.exp(-dt / GLATKOCA_LINIJE_MS);
-      let miruje = true;
-      for (let i = 0; i < prikazano.length; i++) {
-        const d = cilj[i] - prikazano[i];
-        if (Math.abs(d) < 0.002) prikazano[i] = cilj[i];
-        else {
-          prikazano[i] += d * k;
-          miruje = false;
-        }
-      }
-      upisi();
-      if (miruje) {
-        petljaId = 0;
-        poslednjeVreme = 0;
-      } else petljaId = requestAnimationFrame(petlja);
-    };
-    const pokreniPetlju = () => {
-      if (!petljaId) petljaId = requestAnimationFrame(petlja);
+    let strana = 0; // korak u kome se "odmara" skrol
+    let animira = false;
+    let cekaMirovanje = false;
+    let animId = 0;
+    let mirTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const geometrija = () => {
+      const r = omotac.getBoundingClientRect();
+      const putanja = r.height - sticky.offsetHeight;
+      const yStart = window.scrollY + r.top - NAV_VISINA;
+      return { putanja, yStart, yZaKorak: (k: number) => yStart + (k / N) * putanja };
     };
 
-    // --- zaključavanje na granicama koraka ---
-    let poslednjePos: number | null = null;
-    let sidro: number | null = null;
-    let zakljucanDo = 0;
+    const idi = (k: number) => {
+      const { putanja, yZaKorak } = geometrija();
+      if (putanja <= 0) return;
+      const cilj = Math.min(Math.max(k, 0), N - 1);
+      strana = cilj;
+      setAktivan(cilj);
+      const od = window.scrollY;
+      const doY = yZaKorak(cilj);
+      cancelAnimationFrame(animId);
+      if (smanjenoKretanje || Math.abs(doY - od) < 1) {
+        window.scrollTo({ top: doY, behavior: "instant" });
+        return;
+      }
+      animira = true;
+      cekaMirovanje = true;
+      const pocetak = performance.now();
+      const korak = (t: number) => {
+        const p = Math.min((t - pocetak) / TRAJANJE_MS, 1);
+        window.scrollTo({ top: od + (doY - od) * ublazi(p), behavior: "instant" });
+        if (p < 1) animId = requestAnimationFrame(korak);
+        else animira = false;
+      };
+      animId = requestAnimationFrame(korak);
+    };
+    idiNaRef.current = idi;
 
     let uToku = false;
     const izracunaj = () => {
       uToku = false;
-      const r = omotac.getBoundingClientRect();
-      const putanja = r.height - sticky.offsetHeight;
+      if (animira) return;
+      const { putanja, yStart, yZaKorak } = geometrija();
       if (putanja <= 0) return;
-      const vrhOmotaca = window.scrollY + r.top;
-      const yZaPos = (pos: number) => vrhOmotaca - NAV_VISINA + (pos / N) * putanja;
-      const sirovoP = (NAV_VISINA - r.top) / putanja;
-      let pos = Math.min(Math.max(sirovoP, 0), 1) * N;
-
-      const sada = performance.now();
-      if (sirovoP > 0 && sirovoP < 1 && !smanjenoKretanje && sada > bezZakljucavanjaDoRef.current) {
-        if (sidro !== null && sada < zakljucanDo) {
-          const lo = sidro - HOLD_KORAKA;
-          const hi = sidro + HOLD_KORAKA;
-          if (pos > hi || pos < lo) {
-            pos = pos > hi ? hi : lo;
-            window.scrollTo({ top: yZaPos(pos), behavior: "instant" });
-          }
-        } else {
-          sidro = null;
-          if (poslednjePos !== null && Math.floor(poslednjePos) !== Math.floor(pos)) {
-            const granica = pos > poslednjePos ? Math.floor(poslednjePos) + 1 : Math.floor(poslednjePos);
-            if (granica >= 1 && granica <= N - 1) {
-              sidro = granica;
-              zakljucanDo = sada + ZAKLJUCAJ_MS;
-              const lo = granica - HOLD_KORAKA;
-              const hi = granica + HOLD_KORAKA;
-              if (pos > hi || pos < lo) {
-                pos = pos > hi ? hi : lo;
-                window.scrollTo({ top: yZaPos(pos), behavior: "instant" });
-              }
-            }
-          }
-        }
-        poslednjePos = pos;
-      } else {
-        sidro = null;
-        poslednjePos = null;
+      const y = window.scrollY;
+      const p = (y - yStart) / putanja;
+      // Van sticky zone: pamtimo sa koje strane smo (ulaz odozgo = prvi korak,
+      // odozdo = poslednji) i ne diramo skrol.
+      if (p <= 0) {
+        strana = 0;
+        setAktivan(0);
+        return;
       }
-
-      // Mala tolerancija — na tačnoj granici (npr. 1.0) korak je već novi.
-      setAktivan(Math.min(Math.floor(pos + 0.001), N - 1));
-      for (let i = 0; i < N - 1; i++) cilj[i] = Math.min(Math.max(pos - i, 0), 1);
-      if (smanjenoKretanje) {
-        for (let i = 0; i < N - 1; i++) prikazano[i] = cilj[i];
-        upisi();
-      } else pokreniPetlju();
+      if (p >= 1) {
+        strana = N - 1;
+        setAktivan(N - 1);
+        return;
+      }
+      if (cekaMirovanje) return;
+      const odmak = y - yZaKorak(strana);
+      if (odmak >= PRAG_PX && strana < N - 1) idi(strana + 1);
+      else if (odmak <= -PRAG_PX && strana > 0) idi(strana - 1);
     };
     const naSkrol = () => {
+      clearTimeout(mirTimer);
+      mirTimer = setTimeout(() => {
+        cekaMirovanje = false;
+        if (!animira) izracunaj();
+      }, MIROVANJE_MS);
       if (uToku) return;
       uToku = true;
       requestAnimationFrame(izracunaj);
@@ -149,23 +127,10 @@ export function KakoRadiMobilno() {
     return () => {
       window.removeEventListener("scroll", naSkrol);
       window.removeEventListener("resize", naSkrol);
-      if (petljaId) cancelAnimationFrame(petljaId);
+      cancelAnimationFrame(animId);
+      clearTimeout(mirTimer);
     };
   }, [smanjenoKretanje]);
-
-  // Klik na krug skroluje na početak tog koraka (granica), da odmah bude
-  // aktivan sa popunjenom linijom do njega.
-  const naKrug = (i: number, vreme: number) => {
-    const omotac = omotacRef.current;
-    const sticky = stickyRef.current;
-    if (!omotac || !sticky) return;
-    const r = omotac.getBoundingClientRect();
-    const putanja = r.height - sticky.offsetHeight;
-    const vrhOmotaca = window.scrollY + r.top;
-    const cilj = vrhOmotaca - NAV_VISINA + ((i + 0.02) / KORACI.length) * putanja;
-    bezZakljucavanjaDoRef.current = vreme + 1200;
-    window.scrollTo({ top: cilj, behavior: smanjenoKretanje ? "auto" : "smooth" });
-  };
 
   return (
     <div
@@ -190,7 +155,7 @@ export function KakoRadiMobilno() {
                 <button
                   type="button"
                   aria-current={i === aktivan ? "step" : undefined}
-                  onClick={(e) => naKrug(i, e.timeStamp)}
+                  onClick={() => idiNaRef.current(i)}
                   aria-label={`Idi na korak ${i + 1}: ${korak.naslov}`}
                   className={`grid h-11 w-11 shrink-0 cursor-pointer place-items-center rounded-full border-2 border-solid border-primary font-prikaz text-[1.25rem] leading-none font-normal outline-none transition-colors duration-300 motion-reduce:transition-none ${
                     zavrsen ? "bg-primary text-text-on-primary" : "bg-white text-primary"
@@ -202,11 +167,10 @@ export function KakoRadiMobilno() {
                   // Bez razmaka (mx) — linija je spojena sa krugovima sa obe strane.
                   <span aria-hidden="true" className="relative h-0.5 flex-1 overflow-hidden bg-border-soft">
                     <span
-                      ref={(el) => {
-                        linijeRef.current[i] = el;
-                      }}
-                      className="absolute inset-0 origin-left bg-primary"
-                      style={{ transform: "scaleX(0)" }}
+                      className={`absolute inset-0 origin-left bg-primary ${
+                        smanjenoKretanje ? "" : "transition-transform duration-[550ms] ease-in-out"
+                      }`}
+                      style={{ transform: aktivan > i ? "scaleX(1)" : "scaleX(0)" }}
                     />
                   </span>
                 )}
