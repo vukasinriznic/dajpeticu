@@ -3,6 +3,7 @@ import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import { site } from "@/lib/site";
 import { KorpaProvider } from "@/components/sajt/KorpaKontekst";
 import { Analitika } from "@/components/sajt/Analitika";
+import { StabilnaVisina } from "@/components/sajt/StabilnaVisina";
 import "./globals.css";
 
 // Tipografija Opcija A — vraćeno kao radna osnova dok se ceo sajt ne izgradi;
@@ -79,6 +80,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizacijaJsonLd) }}
         />
         <KorpaProvider>{children}</KorpaProvider>
+        <StabilnaVisina />
         <Analitika />
       </body>
     </html>

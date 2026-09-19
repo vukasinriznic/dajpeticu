@@ -114,8 +114,25 @@ export function KakoRadiMobilno() {
     const naSkrol = () => {
       clearTimeout(mirTimer);
       mirTimer = setTimeout(() => {
+        const bilaPauza = cekaMirovanje;
         cekaMirovanje = false;
-        if (!animira) izracunaj();
+        if (animira) return;
+        if (bilaPauza) {
+          // Zamah prsta koji je nastavio posle prelaza ne sme da pokrene NOVI
+          // korak (tako se sa 3. koraka odmah završavalo na 1.) — kad skrol
+          // utihne, samo se vrati na mirnu poziciju trenutnog koraka.
+          const { putanja, yStart, yZaKorak } = geometrija();
+          const y = window.scrollY;
+          const p = putanja > 0 ? (y - yStart) / putanja : -1;
+          if (p > 0 && p < 1) {
+            const odmak = y - yZaKorak(strana);
+            if ((odmak >= PRAG_PX && strana < N - 1) || odmak <= -PRAG_PX) {
+              window.scrollTo({ top: yZaKorak(strana), behavior: "instant" });
+            }
+          }
+          return;
+        }
+        izracunaj();
       }, MIROVANJE_MS);
       if (uToku) return;
       uToku = true;
@@ -137,13 +154,15 @@ export function KakoRadiMobilno() {
       ref={omotacRef}
       className="relative lg:hidden"
       style={{
-        height: `calc(100svh - ${NAV_VISINA}px + ${KORACI.length * SKROL_PO_KORAKU_SVH}svh)`,
+        // var(--vh) — visina postavljena JEDNOM (vidi StabilnaVisina.tsx), ne prati
+        // uvlačenje/izvlačenje trake in-app browsera (Instagram) tokom skrola.
+        height: `calc(var(--vh, 100svh) * ${1 + (KORACI.length * SKROL_PO_KORAKU_SVH) / 100} - ${NAV_VISINA}px)`,
       }}
     >
       <div
         ref={stickyRef}
         className="sticky flex flex-col gap-4 py-3"
-        style={{ top: NAV_VISINA, height: `calc(100svh - ${NAV_VISINA}px)` }}
+        style={{ top: NAV_VISINA, height: `calc(var(--vh, 100svh) - ${NAV_VISINA}px)` }}
       >
         {/* Horizontalni pokazivač: krugovi 1–2–3 povezani linijom koja se
             popunjava kako koraci prolaze; krugovi su dugmad (skok na korak). */}

@@ -133,7 +133,7 @@ export function PocetnaStranica() {
         // (32px) fiksno odudarao. Isti clamp sad i ovde na mobilnom, samo
         // za dno (vrh ostaje pt-28 zbog fixed header-a). Desktop nepromenjen
         // (lg:py-8 i dalje pobeđuje na lg+, kao i pre).
-        className="relative grid min-h-screen content-start lg:content-center overflow-hidden bg-surface-0 px-5 pt-28 pb-[clamp(56px,9vw,120px)] lg:py-8"
+        className="relative grid min-h-[var(--vh,100vh)] content-start lg:min-h-screen lg:content-center overflow-hidden bg-surface-0 px-5 pt-28 pb-[clamp(56px,9vw,120px)] lg:py-8"
       >
         {/* next/image umesto CSS background-image — automatski AVIF/WebP,
             responsive veličine i prioritetno učitavanje (LCP). Izvorni fajl je
