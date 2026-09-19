@@ -527,6 +527,54 @@ export function PocetnaStranica() {
         </div>
       </Sekcija>
 
+      {/* ISKUSTVA */}
+      <Sekcija id="iskustva" ton="alt">
+        <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-4">
+          <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-strong">
+            <Podvuceno>Šta kažu vlasnici</Podvuceno>
+          </h2>
+          <p className="m-0 font-tekst text-[18px] leading-heading text-text-body lg:text-h3">
+            Pridružite se biznisima koji već sakupljaju petice.
+          </p>
+        </UNaVidiku>
+        <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <UNaVidiku rastegni>
+            <Utisak
+              citat="Stavio sam stalak na pult u ponedeljak, do petka smo imali više novih ocena nego za prethodna 2 meseca."
+              ime="Marko Jović"
+              posao="Frizerski salon"
+              grad="Kragujevac"
+            />
+          </UNaVidiku>
+          <UNaVidiku rastegni kasnjenje={100}>
+            <Utisak
+              ton="inverse"
+              citat="Na prvu mi je delovalo skupo staviti stalak na svaki sto. Ispostavilo se da je to bila najisplativija odluka, recenzije stižu neprekidno. Preporuka!"
+              ime="Tijana Ilić"
+              posao="Kafić"
+              grad="Novi Sad"
+            />
+          </UNaVidiku>
+          <UNaVidiku rastegni kasnjenje={200}>
+            <Utisak
+              citat="Kod nas osoblje ne mora ništa da objašnjava, a recenzije rastu... pohvale."
+              ime="Dušan Petrović"
+              posao="Restoran"
+              grad="Niš"
+            />
+          </UNaVidiku>
+        </div>
+      </Sekcija>
+
+      {/* STRUKTURA — sekcija sa slojevima kartice (bivša "Zašto radi", preimenovana
+          19.09.2026. jer ne objašnjava zašto radi, već od čega je kartica
+          sastavljena). Redosled na stranici: hero, card, iskustva, struktura,
+          kako radi, cene, pitanja. */}
+      <Sekcija id="kartica-struktura" ton="inverse" className="nav-tamno">
+        <KarticaSlojevi />
+        <KarticaSlojeviStatic />
+      </Sekcija>
+
       {/* KAKO RADI */}
       <Sekcija id="kako" ton="light">
         {/* Mobilno: običan stacked prikaz, bez sticky/scroll efekta (100vh se
@@ -570,52 +618,6 @@ export function PocetnaStranica() {
         </div>
         {/* Desktop: sekcija se "zaključa" i koraci se ređaju kako se skroluje. */}
         <KakoRadiScroll />
-      </Sekcija>
-
-      {/* KARTICA_STRUKTURA — bivša "Zašto radi", inverzna sekcija. Premeštena
-          da ide odmah posle "Kako radi" (pre "Cijene"). */}
-      <Sekcija id="kartica-struktura" ton="inverse" className="nav-tamno">
-        <KarticaSlojevi />
-        <KarticaSlojeviStatic />
-      </Sekcija>
-
-      {/* ISKUSTVA */}
-      <Sekcija id="iskustva" ton="alt">
-        <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-4">
-          <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-strong">
-            <Podvuceno>Šta kažu vlasnici</Podvuceno>
-          </h2>
-          <p className="m-0 font-tekst text-[18px] leading-heading text-text-body lg:text-h3">
-            Pridružite se biznisima koji već sakupljaju petice.
-          </p>
-        </UNaVidiku>
-        <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          <UNaVidiku rastegni>
-            <Utisak
-              citat="Stavio sam stalak na pult u ponedeljak, do petka smo imali više novih ocena nego za prethodna 2 meseca."
-              ime="Marko Jović"
-              posao="Frizerski salon"
-              grad="Kragujevac"
-            />
-          </UNaVidiku>
-          <UNaVidiku rastegni kasnjenje={100}>
-            <Utisak
-              ton="inverse"
-              citat="Na prvu mi je delovalo skupo staviti stalak na svaki sto. Ispostavilo se da je to bila najisplativija odluka, recenzije stižu neprekidno. Preporuka!"
-              ime="Tijana Ilić"
-              posao="Kafić"
-              grad="Novi Sad"
-            />
-          </UNaVidiku>
-          <UNaVidiku rastegni kasnjenje={200}>
-            <Utisak
-              citat="Kod nas osoblje ne mora ništa da objašnjava, a recenzije rastu... pohvale."
-              ime="Dušan Petrović"
-              posao="Restoran"
-              grad="Niš"
-            />
-          </UNaVidiku>
-        </div>
       </Sekcija>
 
       {/* CIJENE */}

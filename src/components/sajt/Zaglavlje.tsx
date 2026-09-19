@@ -8,9 +8,9 @@ import { Dugme } from "@/components/core/Dugme";
 import { useKorpa } from "@/components/sajt/KorpaKontekst";
 
 const NAV = [
+  ["iskustva", "Iskustva"],
   ["kako", "Kako radi"],
   ["cijene", "Cene"],
-  ["iskustva", "Iskustva"],
   ["pitanja", "Pitanja"],
 ] as const;
 
