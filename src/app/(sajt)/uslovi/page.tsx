@@ -21,7 +21,7 @@ function Odeljak({ naslov, children }: { naslov: string; children: React.ReactNo
 
 export default function UsloviPage() {
   return (
-    <Sekcija ton="light">
+    <Sekcija ton="light" className="!pt-28 lg:!pt-[clamp(56px,9vw,120px)]">
       <div className="flex flex-col gap-4">
         <h1 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-strong">
           <Podvuceno>Uslovi korišćenja</Podvuceno>
