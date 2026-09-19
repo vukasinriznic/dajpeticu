@@ -82,7 +82,13 @@ export const Unos = forwardRef<HTMLInputElement, Props>(function Unos(props, ref
             autoComplete={props.autoComplete}
             value={value}
             placeholder={placeholder}
-            onFocus={() => setFokus(true)}
+            onFocus={(e) => {
+              setFokus(true);
+              // Kad se tastatura otvori, dovedi polje na sredinu vidljivog
+              // dela (iOS ga inače ostavi pod tastaturom ili skoči).
+              const polje = e.currentTarget;
+              setTimeout(() => polje.scrollIntoView({ block: "center", behavior: "smooth" }), 300);
+            }}
             onBlur={() => setFokus(false)}
             onChange={onChange}
             // data-tamno — browser autofill (Chrome/Edge) crta sopstvenu belu

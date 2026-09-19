@@ -80,7 +80,10 @@ export function Modal({
             // ionako identičan, adresna traka se ne pomera). Zlatni levi
             // border UKLONJEN na mobilnom (border-l-0), vraćen na sm+.
             "korpa-drawer fixed inset-y-0 left-auto right-0 m-0 h-[100dvh] max-h-screen w-full border-l-0 sm:h-screen sm:w-[37vw] sm:min-w-[460px] sm:border-l sm:border-l-[var(--color-gold)] max-w-none overflow-y-auto rounded-none border-0 bg-white p-0 [color-scheme:dark]"
-          : "fixed inset-0 m-0 h-[100dvh] max-h-[100dvh] w-screen max-w-none overflow-y-auto overscroll-contain rounded-none border-0 bg-[var(--color-bg-inverse)] p-0 backdrop:!bg-[var(--color-bg-inverse)] backdrop:!backdrop-blur-none [color-scheme:dark]") +
+          : // !transform-none — samo fade (bez scale) za fullscreen popup: transform
+            // na position:fixed elementu na iOS Safari-ju kvari skrol i pomeranje
+            // pri otvaranju tastature (fokus na "Naziv biznisa").
+            "!transform-none fixed inset-0 m-0 h-[100dvh] max-h-[100dvh] w-screen max-w-none overflow-y-auto overscroll-contain rounded-none border-0 bg-[var(--color-bg-inverse)] p-0 backdrop:!bg-[var(--color-bg-inverse)] backdrop:!backdrop-blur-none [color-scheme:dark]") +
         (zatvaranje ? " zatvara-se" : "")
       }
     >
