@@ -55,6 +55,7 @@ export function Modal({
     // tastature. position:fixed na body ukida svaki skrolabilni prostor
     // dokumenta; scroll pozicija se pamti i vraća pri zatvaranju.
     const y = window.scrollY;
+    const putanjaPriOtvaranju = window.location.pathname;
     const st = document.body.style;
     const prethodno = { overflow: st.overflow, position: st.position, top: st.top, width: st.width };
     st.overflow = "hidden";
@@ -77,7 +78,9 @@ export function Modal({
       st.position = prethodno.position;
       st.top = prethodno.top;
       st.width = prethodno.width;
-      window.scrollTo(0, y);
+      // Ako se ruta u međuvremenu promenila (npr. korpa → /placanje), nova
+      // stranica treba da bude na vrhu, a ne na staroj poziciji skrola.
+      window.scrollTo(0, window.location.pathname === putanjaPriOtvaranju ? y : 0);
     };
   }, [open, variant]);
 
