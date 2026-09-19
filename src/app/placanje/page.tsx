@@ -46,6 +46,12 @@ export default function PlacanjePage() {
     if (hidrirano && stavke.length === 0 && !poslato) router.replace("/");
   }, [hidrirano, stavke.length, poslato, router]);
 
+  // Potvrda je jedan ekran bez skrola — vrati pogled na vrh (forma je bila
+  // skrolovana) da se ne vidi prazan prostor ispod potvrde.
+  useEffect(() => {
+    if (poslato) window.scrollTo(0, 0);
+  }, [poslato]);
+
   const prikaz = stavke.length > 0 ? { stavke, ukupnaKolicina, ukupnaCena } : snimak;
 
   if (poslato) {
@@ -54,7 +60,7 @@ export default function PlacanjePage() {
     // postaje jedna centrirana potvrda preko celog ekrana, bez nav-a koji
     // bi sugerisao da ima još nešto da se radi.
     return (
-      <section className="flex min-h-screen flex-col items-center justify-center gap-4 bg-bg-inverse px-5 text-center">
+      <section className="flex h-[100dvh] flex-col items-center justify-center gap-4 overflow-hidden bg-bg-inverse px-5 text-center lg:h-auto lg:min-h-screen lg:overflow-visible">
         <Image src="/images/checked.png" alt="" width={72} height={72} />
         <h1 className="m-0 font-prikaz text-h1 leading-heading font-normal text-white">
           Primili smo porudžbinu.
