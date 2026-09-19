@@ -36,7 +36,7 @@ export function KorpaDrawer({
   const prekoracenje = ukupnaKolicina > MAX_KOLICINA;
 
   return (
-    <div className="flex min-h-screen flex-col bg-[var(--color-bg-inverse)]">
+    <div className={`flex flex-col bg-[var(--color-bg-inverse)] ${stavke.length === 0 ? "h-[100dvh] overflow-hidden" : "min-h-[100dvh]"}`}>
       <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-[rgba(255,197,61,0.2)] bg-[var(--color-bg-inverse)] px-6 py-5">
         <h2 className="m-0 font-prikaz text-h2 leading-heading font-normal text-white">
           <Podvuceno>Vaša korpa</Podvuceno> {stavke.length > 0 && `· ${ukupnaKolicina}`}
@@ -45,7 +45,7 @@ export function KorpaDrawer({
           type="button"
           onClick={onZatvori}
           aria-label="Zatvori korpu"
-          className="grid h-11 w-11 place-items-center border-0 bg-none text-[var(--color-gold)] transition-transform duration-200 hover:scale-110"
+          className="grid h-11 w-11 place-items-center border-0 bg-none outline-none focus:outline-none focus-visible:outline-none text-[var(--color-gold)] transition-transform duration-200 hover:scale-110"
         >
           <X size={28} strokeWidth={2.25} />
         </button>
