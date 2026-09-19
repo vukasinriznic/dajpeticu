@@ -288,20 +288,18 @@ export function Zaglavlje() {
                 setOtvoren(false);
                 idiNa(id);
               }}
-              className={`border-b py-[14px] text-left font-tekst text-body font-medium last:border-0 ${
+              className={`border-b py-[14px] text-left font-tekst text-body font-medium ${
                 tamnaPozadina ? "border-[var(--color-gold)] text-text-on-inverse" : "border-primary text-text-strong"
               }`}
             >
               {naziv}
             </button>
           ))}
-          {/* Krajnja linija (19.09.2026., eksplicitno traženo) — odvojena od
-              per-link border-b iznad (koji na poslednjem linku ima
-              last:border-0), boja u tonu dugmeta ispod (primary/gold). */}
-          <div
-            className="h-px w-full"
-            style={{ backgroundColor: tamnaPozadina ? "var(--color-gold)" : "var(--color-primary)" }}
-          />
+          {/* Posebna krajnja linija UKLONJENA — poslednji link više nije
+              :last-child (iza njega ide div sa dugmetom), pa last:border-0
+              nikad nije važilo za "Pitanja": imao je sopstveni border-b
+              (1px) I odvojenu h-px liniju ispod = 2px. Sad je to samo
+              border-b poslednjeg linka, 1px. */}
           <div className="py-4">
             <Dugme
               full
