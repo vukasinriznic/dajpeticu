@@ -413,6 +413,7 @@ export function DodajUKorpuPopup({
 
         <Unos
           ref={nazivInputRef}
+          enterZatvara
           label="Naziv biznisa"
           name="nazivBiznisa"
           value={nazivBiznisa}

@@ -15,6 +15,8 @@ type ZajednickoSvojstvo = {
   // Tamna varijanta — zlatna bordura i "mint" tekst umesto zelene/tamne, za
   // upotrebu na tamnozelenoj pozadini (vidi DodajUKorpuPopup.tsx).
   tamno?: boolean;
+  // Enter na tastaturi zatvara tastaturu (blur) umesto da samo ostane otvorena.
+  enterZatvara?: boolean;
 };
 
 type Props =
@@ -91,6 +93,17 @@ export const Unos = forwardRef<HTMLInputElement, Props>(function Unos(props, ref
             }}
             onBlur={() => setFokus(false)}
             onChange={onChange}
+            enterKeyHint={props.enterZatvara ? "done" : undefined}
+            onKeyDown={
+              props.enterZatvara
+                ? (e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      e.currentTarget.blur();
+                    }
+                  }
+                : undefined
+            }
             // data-tamno — browser autofill (Chrome/Edge) crta sopstvenu belu
             // pozadinu preko input-a, ignorišući bg-transparent; fix živi u
             // globals.css (input:autofill), ovaj atribut mu bira taman/svetao

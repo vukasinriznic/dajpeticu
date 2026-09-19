@@ -50,12 +50,50 @@ export function Modal({
   // browserima — zaključavamo je ručno dok je modal otvoren.
   useEffect(() => {
     if (!open) return;
-    const prethodni = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    // iOS Safari ignoriše overflow:hidden na body — kad se otvori tastatura,
+    // stranica se ispod dialoga i dalje može pomeriti i "provirivati" iza
+    // tastature. position:fixed na body ukida svaki skrolabilni prostor
+    // dokumenta; scroll pozicija se pamti i vraća pri zatvaranju.
+    const y = window.scrollY;
+    const st = document.body.style;
+    const prethodno = { overflow: st.overflow, position: st.position, top: st.top, width: st.width };
+    st.overflow = "hidden";
+    st.position = "fixed";
+    st.top = `-${y}px`;
+    st.width = "100%";
     return () => {
-      document.body.style.overflow = prethodni;
+      st.overflow = prethodno.overflow;
+      st.position = prethodno.position;
+      st.top = prethodno.top;
+      st.width = prethodno.width;
+      window.scrollTo(0, y);
     };
   }, [open]);
+
+  // Dialog prati VIDLJIVI deo ekrana (iznad tastature): na iOS-u tastatura ne
+  // menja layout viewport, pa 100dvh ostaje pun ekran i sadržaj završi iza
+  // tastature. Visina se postavlja na visualViewport.height (fullscreen).
+  useEffect(() => {
+    if (!open || variant !== "fullscreen") return;
+    const vv = window.visualViewport;
+    const dialog = ref.current;
+    if (!vv || !dialog) return;
+    const podesi = () => {
+      dialog.style.height = `${vv.height}px`;
+      dialog.style.maxHeight = `${vv.height}px`;
+      dialog.style.top = `${vv.offsetTop}px`;
+    };
+    podesi();
+    vv.addEventListener("resize", podesi);
+    vv.addEventListener("scroll", podesi);
+    return () => {
+      vv.removeEventListener("resize", podesi);
+      vv.removeEventListener("scroll", podesi);
+      dialog.style.height = "";
+      dialog.style.maxHeight = "";
+      dialog.style.top = "";
+    };
+  }, [open, variant]);
 
   return (
     <dialog
