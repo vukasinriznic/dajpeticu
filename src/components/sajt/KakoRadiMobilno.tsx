@@ -9,7 +9,7 @@ import { KORACI } from "@/components/sajt/KakoRadiScroll";
 const NAV_VISINA = 82;
 // Koliko skrola (u svh) pripada jednom koraku. Manje od 100 — cilj je da
 // sekcija ne oduzima previše skrola, a ipak da svaki korak "sleže".
-const SKROL_PO_KORAKU_SVH = 60;
+const SKROL_PO_KORAKU_SVH = 50;
 
 const UPIT_KRETANJA = "(prefers-reduced-motion: reduce)";
 function pretplataKretanja(cb: () => void) {
@@ -28,6 +28,9 @@ function pretplataKretanja(cb: () => void) {
 export function KakoRadiMobilno() {
   const omotacRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
+  // Popuna linija između krugova ide direktno preko DOM-a (bez React stanja) —
+  // kontinualno prati skrol kao na desktopu, bez re-rendera na svaki frame.
+  const linijeRef = useRef<(HTMLSpanElement | null)[]>([]);
   const [aktivan, setAktivan] = useState(0);
   const smanjenoKretanje = useSyncExternalStore(pretplataKretanja, () => matchMedia(UPIT_KRETANJA).matches, () => false);
 
@@ -43,7 +46,13 @@ export function KakoRadiMobilno() {
       if (putanja <= 0) return;
       // Sticky počinje da "drži" kad vrh omotača dođe na NAV_VISINA.
       const p = Math.min(Math.max((NAV_VISINA - r.top) / putanja, 0), 1);
-      setAktivan(Math.min(Math.floor(p * KORACI.length), KORACI.length - 1));
+      const sirovi = p * KORACI.length;
+      setAktivan(Math.min(Math.floor(sirovi), KORACI.length - 1));
+      // Linija i izlazi iz kruga i (deo skrola koraka i) i stiže do kruga i+1
+      // tačno kad on postane aktivan — isto kao linija na desktopu.
+      linijeRef.current.forEach((el, i) => {
+        if (el) el.style.transform = `scaleX(${Math.min(Math.max(sirovi - i, 0), 1)})`;
+      });
     };
     const naSkrol = () => {
       if (uToku) return;
@@ -83,7 +92,7 @@ export function KakoRadiMobilno() {
     >
       <div
         ref={stickyRef}
-        className="sticky flex flex-col gap-5 py-4"
+        className="sticky flex flex-col gap-4 py-3"
         style={{ top: NAV_VISINA, height: `calc(100svh - ${NAV_VISINA}px)` }}
       >
         {/* Horizontalni pokazivač: krugovi 1–2–3 povezani linijom koja se
@@ -105,12 +114,16 @@ export function KakoRadiMobilno() {
                   {i + 1}
                 </button>
                 {i < KORACI.length - 1 && (
-                  <span
-                    aria-hidden="true"
-                    className={`mx-2 h-0.5 flex-1 transition-colors duration-500 motion-reduce:transition-none ${
-                      i < aktivan ? "bg-primary" : "bg-border-soft"
-                    }`}
-                  />
+                  // Bez razmaka (mx) — linija je spojena sa krugovima sa obe strane.
+                  <span aria-hidden="true" className="relative h-0.5 flex-1 overflow-hidden bg-border-soft">
+                    <span
+                      ref={(el) => {
+                        linijeRef.current[i] = el;
+                      }}
+                      className="absolute inset-0 origin-left bg-primary"
+                      style={{ transform: "scaleX(0)" }}
+                    />
+                  </span>
                 )}
               </div>
             );
@@ -135,27 +148,41 @@ export function KakoRadiMobilno() {
           ))}
         </div>
 
-        {/* Slika popunjava preostalu visinu; svaka je uklopljena celom
-            površinom (max-h/max-w), bez sečenja. */}
-        <div className="relative min-h-0 flex-1">
-          {KORACI.map((korak, i) => (
-            <div
-              key={korak.naslov}
-              aria-hidden={i !== aktivan}
-              className={`absolute inset-0 flex items-center justify-center ${prelaz}`}
-              style={{ opacity: i === aktivan ? 1 : 0 }}
-            >
-              <Image
-                src={korak.slika}
-                alt={korak.naslov}
-                width={900}
-                height={1125}
-                sizes="100vw"
-                quality={90}
-                className="h-auto max-h-full w-auto max-w-full rounded-image"
-              />
-            </div>
-          ))}
+        {/* Slika je pune širine kontejnera (odnos 4:5, bez sečenja). Ako
+            ekran nije dovoljno visok da stane, širina se smanjuje tako da cela
+            slika ostane vidljiva: container-type:size + cqw/cqh jedinice daju
+            širinu = min(100% širine, 80% visine prostora). Ista animacija kao
+            na desktopu (KakoRadiScroll.tsx): cross-dissolve uz blago
+            zatamnjenje izlazne slike. */}
+        <div className="relative min-h-0 flex-1" style={{ containerType: "size" }}>
+          {KORACI.map((korak, i) => {
+            const uFokusu = i === aktivan;
+            return (
+              <div
+                key={korak.naslov}
+                aria-hidden={!uFokusu}
+                className={`absolute inset-0 flex items-center justify-center ${
+                  smanjenoKretanje ? "" : "transition-[opacity,filter] duration-700 ease-out"
+                }`}
+                style={{
+                  opacity: uFokusu ? 1 : 0,
+                  filter: uFokusu ? "brightness(1)" : "brightness(0.7)",
+                }}
+              >
+                <div style={{ width: "min(100cqw, 80cqh)" }}>
+                  <Image
+                    src={korak.slika}
+                    alt={korak.naslov}
+                    width={900}
+                    height={1125}
+                    sizes="100vw"
+                    quality={90}
+                    className="h-auto w-full rounded-image"
+                  />
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
