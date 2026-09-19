@@ -185,13 +185,13 @@ export function DodajUKorpuPopup({
 
   return (
     <div
-      className={`relative grid min-h-screen grid-cols-1 md:grid-cols-2 ${tamno ? "bg-[var(--color-bg-inverse)]" : "bg-white"}`}
+      className={`relative grid min-h-[100dvh] grid-cols-1 md:grid-cols-2 ${tamno ? "bg-[var(--color-bg-inverse)]" : "bg-white"}`}
     >
       <button
         type="button"
         onClick={onClose}
         aria-label="Zatvori"
-        className={`absolute top-6 right-6 z-10 grid h-12 w-12 place-items-center border-0 bg-none transition-transform duration-200 hover:scale-110 ${tamno ? "text-[var(--color-gold)]" : "text-primary"}`}
+        className={`absolute top-6 right-6 z-10 grid h-12 w-12 place-items-center border-0 bg-none outline-none focus:outline-none focus-visible:outline-none transition-transform duration-200 hover:scale-110 ${tamno ? "text-[var(--color-gold)]" : "text-primary"}`}
       >
         <X size={36} strokeWidth={2.25} />
       </button>
