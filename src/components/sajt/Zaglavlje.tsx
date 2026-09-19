@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Logotip } from "@/components/core/Logotip";
@@ -74,6 +74,19 @@ const LINIJA_NAVA = 45;
 export function Zaglavlje() {
   const { otvoriModal, otvoriKorpu, ukupnaKolicina } = useKorpa();
   const [otvoren, setOtvoren] = useState(false);
+  // Panel menija živi VAN <header>-a (vidi ispod), pa mu se gornja ivica
+  // mora izmeriti — visina header-a je određena sadržajem (logo/ikonice).
+  const headerRef = useRef<HTMLElement>(null);
+  const [visinaHeadera, setVisinaHeadera] = useState(82);
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const izmeri = () => setVisinaHeadera(el.offsetHeight);
+    izmeri();
+    const posmatrac = new ResizeObserver(izmeri);
+    posmatrac.observe(el);
+    return () => posmatrac.disconnect();
+  }, []);
   // Nav je fixed preko hero-a — providan dok je na vrhu, dobija stakleni
   // blur čim se skroluje (isti obrazac kao ancora-ai.vercel.app: samo
   // backdrop-filter se menja, nema obojene pozadine ni senke).
@@ -129,7 +142,9 @@ export function Zaglavlje() {
   }, [putanja]);
 
   return (
+    <>
     <header
+      ref={headerRef}
       className={`fixed inset-x-0 top-0 z-20 transition-[backdrop-filter] duration-300 ${
         skrolovano ? "backdrop-blur-md" : "backdrop-blur-none"
       }`}
@@ -222,6 +237,7 @@ export function Zaglavlje() {
           </button>
         </div>
       </div>
+    </header>
       {/* Panel — restrukturiran 19.09.2026. (potpuni obrt na "zavesa"
           animaciju, eksplicitno traženo umesto height-reveal-a):
           - position:absolute, top-full — sedi TAČNO ispod header-a,
@@ -253,11 +269,12 @@ export function Zaglavlje() {
           pointer-events-none dok je zatvoren) seče sve što je iznad
           njegove gornje ivice, ispod header-a. */}
       <div
-        className={`absolute inset-x-0 top-full overflow-hidden md:hidden ${otvoren ? "" : "pointer-events-none"}`}
+        className={`fixed inset-x-0 z-20 overflow-hidden md:hidden ${otvoren ? "" : "pointer-events-none"}`}
+        style={{ top: visinaHeadera }}
       >
       <div
         className={`backdrop-blur-md transition-transform duration-[350ms] ease-[cubic-bezier(.32,.72,0,1)] ${
-          tamnaPozadina ? "bg-[var(--color-bg-inverse)]/80" : "bg-white/80"
+          tamnaPozadina ? "bg-[var(--color-bg-inverse)]/30" : "bg-white/30"
         }`}
         style={{ transform: `translateY(${otvoren ? "0" : "-100%"})` }}
         inert={!otvoren}
@@ -300,6 +317,6 @@ export function Zaglavlje() {
         </div>
       </div>
       </div>
-    </header>
+    </>
   );
 }
