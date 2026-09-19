@@ -82,7 +82,7 @@ export function KorpaFormaNarudzbine({
   stavke: StavkaKorpe[];
   ukupnaKolicina: number;
   ukupnaCena: number;
-  onUspeh: (payload: { telefon: string }) => void;
+  onUspeh: (payload: { telefon: string; id: string; ukupnaCena: number }) => void;
 }) {
   const { isprazniKorpu } = useKorpa();
   const [polja, setPolja] = useState<Polja>(PRAZNA_POLJA);
@@ -143,7 +143,7 @@ export function KorpaFormaNarudzbine({
       // uspešnu porudžbinu) na trenutak prikazao "korpa je prazna" umesto
       // potvrde — zato roditelj prvo upamti uspeh, pa tek onda ovaj poziv
       // isprazni korpu; redosled je bitan.
-      onUspeh({ telefon: polja.telefon });
+      onUspeh({ telefon: polja.telefon, id: String(json.id), ukupnaCena: Number(json.ukupnaCena) });
       isprazniKorpu();
     } catch {
       setOpstaGreska("Nismo uspeli da pošaljemo porudžbinu. Proverite internet i pokušajte ponovo.");

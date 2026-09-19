@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Dugme } from "@/components/core/Dugme";
+import { pratiDogadjaj, stavkaZaAnalitiku } from "@/lib/analitika";
 import { Podvuceno } from "@/components/core/Podvuceno";
 import { KorpaStavka } from "@/components/sajt/KorpaStavka";
 import type { StavkaKorpe } from "@/components/sajt/KorpaKontekst";
@@ -143,7 +144,14 @@ export function KorpaDrawer({
               disabled={prekoracenje}
               // Bez onZatvori() — drawer ostaje preko stranice dok se ruta ne
               // promeni (KorpaKontekst ga tada zatvara), da se početna ne vidi.
-              onClick={() => router.push("/placanje")}
+              onClick={() => {
+                pratiDogadjaj("begin_checkout", {
+                  currency: "RSD",
+                  value: ukupnaCena,
+                  items: stavke.map(stavkaZaAnalitiku),
+                });
+                router.push("/placanje");
+              }}
             >
               Plaćanje
             </Dugme>

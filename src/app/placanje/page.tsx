@@ -10,6 +10,7 @@ import { Sekcija } from "@/components/sajt/Sekcija";
 import { KorpaFormaNarudzbine } from "@/components/sajt/KorpaFormaNarudzbine";
 import { useKorpa, type StavkaKorpe } from "@/components/sajt/KorpaKontekst";
 import { ZaglavljePlacanje } from "@/components/sajt/ZaglavljePlacanje";
+import { pratiDogadjaj, stavkaZaAnalitiku } from "@/lib/analitika";
 
 type SnimakKorpe = { stavke: StavkaKorpe[]; ukupnaKolicina: number; ukupnaCena: number };
 
@@ -111,7 +112,16 @@ export default function PlacanjePage() {
             stavke={prikaz.stavke}
             ukupnaKolicina={prikaz.ukupnaKolicina}
             ukupnaCena={prikaz.ukupnaCena}
-            onUspeh={setPoslato}
+            onUspeh={(p) => {
+              setPoslato({ telefon: p.telefon });
+              // purchase — samo id porudžbine, vrednost i stavke (bez ličnih podataka).
+              pratiDogadjaj("purchase", {
+                transaction_id: p.id,
+                currency: "RSD",
+                value: p.ukupnaCena,
+                items: prikaz.stavke.map(stavkaZaAnalitiku),
+              });
+            }}
           />
           {/* Stranica namerno nema Podnozje (fokus na formi) — ali stranica
               koja uzima lične podatke ne sme da bude bez ijednog linka ka

@@ -72,7 +72,11 @@ export default function PrivatnostPage() {
 
         <Odeljak naslov="Kolačići">
           <p className="m-0">
-            Sajt trenutno ne koristi kolačiće za praćenje niti analitiku. Sadržaj korpe (šta ste
+            Uz vaš pristanak (baner pri prvom dolasku) koristimo Google Analytics kolačiće da bismo
+            anonimno videli kako se sajt koristi (koje strane se posećuju, koliko ljudi stigne do
+            porudžbine). U analitiku ne šaljemo ime, adresu, telefon, email ni naziv biznisa.
+            Ako odbijete, analitički kolačići se ne postavljaju, a sajt radi isto. Izbor možete
+            promeniti brisanjem podataka sajta u browseru. Sadržaj korpe (šta ste
             dodali pre nego što pošaljete porudžbinu) čuvamo u localStorage vašeg browsera, ne na
             serveru, taj podatak ostaje samo na vašem uređaju i mi mu nemamo pristup.
           </p>
