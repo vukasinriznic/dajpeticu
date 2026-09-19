@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Logotip } from "@/components/core/Logotip";
@@ -74,19 +74,6 @@ const LINIJA_NAVA = 45;
 export function Zaglavlje() {
   const { otvoriModal, otvoriKorpu, ukupnaKolicina } = useKorpa();
   const [otvoren, setOtvoren] = useState(false);
-  // Panel menija živi VAN <header>-a (vidi ispod), pa mu se gornja ivica
-  // mora izmeriti — visina header-a je određena sadržajem (logo/ikonice).
-  const headerRef = useRef<HTMLElement>(null);
-  const [visinaHeadera, setVisinaHeadera] = useState(82);
-  useEffect(() => {
-    const el = headerRef.current;
-    if (!el) return;
-    const izmeri = () => setVisinaHeadera(el.offsetHeight);
-    izmeri();
-    const posmatrac = new ResizeObserver(izmeri);
-    posmatrac.observe(el);
-    return () => posmatrac.disconnect();
-  }, []);
   // Nav je fixed preko hero-a — providan dok je na vrhu, dobija stakleni
   // blur čim se skroluje (isti obrazac kao ancora-ai.vercel.app: samo
   // backdrop-filter se menja, nema obojene pozadine ni senke).
@@ -142,9 +129,8 @@ export function Zaglavlje() {
   }, [putanja]);
 
   return (
-    <>
+
     <header
-      ref={headerRef}
       className={`fixed inset-x-0 top-0 z-20 transition-[backdrop-filter] duration-300 ${
         skrolovano || otvoren ? "backdrop-blur-md" : "backdrop-blur-none"
       }`}
@@ -237,84 +223,57 @@ export function Zaglavlje() {
           </button>
         </div>
       </div>
-    </header>
-      {/* Panel — restrukturiran 19.09.2026. (potpuni obrt na "zavesa"
-          animaciju, eksplicitno traženo umesto height-reveal-a):
-          - position:absolute, top-full — sedi TAČNO ispod header-a,
-            bez potrebe da znamo header-ovu visinu u px (menja se sama
-            ako se header ikad promeni).
-          - transform: translateY(-100%) → 0, ne height — panel je UVEK
-            svoje pune (sadržajem određene) visine, samo je sklonjen
-            "uvučen" iznad vidljivog dela (kao zavesa namotana u šinu) kad
-            je zatvoren, i "spušta se" transform-om kad se otvori. Ovo je i
-            tehnički ispravnije od animiranja height-a (GPU-kompozitovano,
-            bez ponovnog layout-a na svakom frejmu) i vizuelno tačno ono
-            što je traženo ("da se podize i spusta kao zavesa").
-          - overflow-hidden na roditelju (spoljašnji <header>, već
-            position:fixed) nije potreban — panel translatovan -100% je
-            van vidljivog dela sam po sebi (jednostavno "iza" header-a),
-            ne mora dodatno da se seče.
-          - Pozadina/linije menjaju boju prema tamnaPozadina (isto stanje
-            koje već boji logo/linkove/CTA) — svetla pozadina: bela
-            pozadina panela, linije #bfe3d0 (ista nijansa kao CARD
-            podnaslov), krajnja linija u boji "primary" dugmeta; tamna
-            pozadina: panel tamnozelen (--color-bg-inverse), linije i
-            krajnja linija zlatne. Linija IZNAD prvog linka (border-t)
-            je UKLONJENA (eksplicitno traženo). */}
-      {/* Omotač sa overflow-hidden je OBAVEZAN: panel translatovan za
-          -100% svoje visine ostaje sa donjim krajem tačno na dnu header-a,
-          pa je bez sečenja njegov donji deo (linija + "Poruči" dugme)
-          ostajao PREKO trake navbara dok je meni zatvoren — pojavljivalo
-          se veliko dugme umesto logoa/korpe/menija. Omotač (bez pozadine,
-          pointer-events-none dok je zatvoren) seče sve što je iznad
-          njegove gornje ivice, ispod header-a. */}
+      {/* Panel je SASTAVNI DEO header-a (opet unutar njega, 19.09.2026.) —
+          kad je bio odvojen (fixed sibling sa sopstvenim blur-om), izmedju
+          trake i panela se videla linija/šav jer dva odvojena blur sloja
+          ne poklapaju ivicu. Sad header raste zajedno sa panelom i JEDAN
+          backdrop-filter (na <header>) zamućuje celu površinu, pa su traka
+          i meni jedna celina. Otvaranje/zatvaranje: grid-template-rows
+          0fr -> 1fr (animira "auto" visinu bez merenja) + sadržaj koji se
+          spušta/podiže, kao zavesa. Linije menjaju boju prema
+          tamnaPozadina (svetla: primary zelena, tamna: zlatna). */}
       <div
-        className={`fixed inset-x-0 z-20 overflow-hidden md:hidden ${otvoren ? "" : "pointer-events-none"}`}
-        style={{ top: visinaHeadera }}
-      >
-      <div
-        className={`backdrop-blur-md transition-transform duration-[350ms] ease-[cubic-bezier(.32,.72,0,1)] ${
-          tamnaPozadina ? "border-b border-[var(--color-gold)]" : "border-b border-primary"
+        className={`grid transition-[grid-template-rows] duration-[350ms] ease-[cubic-bezier(.32,.72,0,1)] md:hidden ${
+          otvoren ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         }`}
-        style={{ transform: `translateY(${otvoren ? "0" : "-100%"})` }}
         inert={!otvoren}
       >
-        <div className="flex flex-col px-5">
-          {NAV.map(([id, naziv]) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => {
-                setOtvoren(false);
-                idiNa(id);
-              }}
-              className={`border-b py-[14px] text-left font-tekst text-body font-medium ${
-                tamnaPozadina ? "border-[var(--color-gold)] text-text-on-inverse" : "border-primary text-text-strong"
-              }`}
-            >
-              {naziv}
-            </button>
-          ))}
-          {/* Posebna krajnja linija UKLONJENA — poslednji link više nije
-              :last-child (iza njega ide div sa dugmetom), pa last:border-0
-              nikad nije važilo za "Pitanja": imao je sopstveni border-b
-              (1px) I odvojenu h-px liniju ispod = 2px. Sad je to samo
-              border-b poslednjeg linka, 1px. */}
-          <div className="py-4">
-            <Dugme
-              full
-              variant={tamnaPozadina ? "gold" : "primary"}
-              onClick={() => {
-                setOtvoren(false);
-                otvoriModal();
-              }}
-            >
-              Poruči
-            </Dugme>
+        <div className="min-h-0 overflow-hidden">
+          <div
+            className={`flex flex-col px-5 transition-transform duration-[350ms] ease-[cubic-bezier(.32,.72,0,1)] ${
+              otvoren ? "translate-y-0" : "-translate-y-6"
+            } border-b ${tamnaPozadina ? "border-[var(--color-gold)]" : "border-primary"}`}
+          >
+            {NAV.map(([id, naziv]) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => {
+                  setOtvoren(false);
+                  idiNa(id);
+                }}
+                className={`border-b py-[14px] text-left font-tekst text-body font-medium ${
+                  tamnaPozadina ? "border-[var(--color-gold)] text-text-on-inverse" : "border-primary text-text-strong"
+                }`}
+              >
+                {naziv}
+              </button>
+            ))}
+            <div className="py-4">
+              <Dugme
+                full
+                variant={tamnaPozadina ? "gold" : "primary"}
+                onClick={() => {
+                  setOtvoren(false);
+                  otvoriModal();
+                }}
+              >
+                Poruči
+              </Dugme>
+            </div>
           </div>
         </div>
       </div>
-      </div>
-    </>
+    </header>
   );
 }
