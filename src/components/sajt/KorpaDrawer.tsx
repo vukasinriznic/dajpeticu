@@ -141,10 +141,9 @@ export function KorpaDrawer({
               full
               variant="gold"
               disabled={prekoracenje}
-              onClick={() => {
-                onZatvori();
-                router.push("/placanje");
-              }}
+              // Bez onZatvori() — drawer ostaje preko stranice dok se ruta ne
+              // promeni (KorpaKontekst ga tada zatvara), da se početna ne vidi.
+              onClick={() => router.push("/placanje")}
             >
               Plaćanje
             </Dugme>

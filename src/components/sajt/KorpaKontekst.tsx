@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import { ukupnoKorpa } from "@/lib/cene";
 import type { Boja } from "@/lib/validacijaPorudzbine";
 import { Modal } from "@/components/core/Modal";
@@ -55,6 +56,17 @@ export function KorpaProvider({ children }: { children: ReactNode }) {
   const [otvorenModal, setOtvorenModal] = useState(false);
   const [otvorenaKorpa, setOtvorenaKorpa] = useState(false);
   const [pocetnaKolicina, setPocetnaKolicina] = useState(1);
+
+  // Korpa (drawer) se zatvara TEK kad se ruta stvarno promeni (npr. "Plaćanje"
+  // → /placanje). Ranije je dugme zatvaralo drawer odmah, pa se tokom njegovog
+  // izlaznog fade-a (260ms) na trenutak videla početna pre nove stranice.
+  // Obrazac "prilagodi stanje tokom render-a" (bez efekta).
+  const putanja = usePathname();
+  const [prethodnaPutanja, setPrethodnaPutanja] = useState(putanja);
+  if (putanja !== prethodnaPutanja) {
+    setPrethodnaPutanja(putanja);
+    setOtvorenaKorpa(false);
+  }
 
   // Hidracija iz localStorage tek POSLE mount-a — u samom render-u bi server
   // (uvek prazna korpa) i klijent (možda već ima nešto u localStorage-u)
