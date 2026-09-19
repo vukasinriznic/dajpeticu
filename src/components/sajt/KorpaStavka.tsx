@@ -3,8 +3,12 @@
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Dugme } from "@/components/core/Dugme";
-import { MAX_KOLICINA, formatRSD, cenaKarticaZaStavku, kolicinaSlovima } from "@/lib/cene";
+import { MAX_KOLICINA, formatRSD, cenaKarticaZaStavku, jedinicnaCena, kolicinaSlovima } from "@/lib/cene";
 import type { StavkaKorpe } from "@/components/sajt/KorpaKontekst";
+
+// Prvobitna cena jednog stalka (ista kao u DodajUKorpuPopup.tsx) — precrtana kad korpa ima 1 stalak.
+const CENA_PRVOBITNA_ZA_JEDAN = 3790;
+const CENA_JEDNE = jedinicnaCena(1);
 
 // Tamnozelena/zlatna tema — jedina upotreba ovog fajla je KorpaDrawer.tsx.
 export function KorpaStavka({
@@ -21,6 +25,10 @@ export function KorpaStavka({
   // Cena stavke zavisi od ukupne količine cele korpe (popust po tier-u), ne
   // samo od sopstvene količine — zato prima ukupnaKolicinaKorpe kao prop.
   const cena = cenaKarticaZaStavku(ukupnaKolicinaKorpe, stavka.kolicina);
+  // Precrtana cena: sa 1 stalkom u korpi prvobitna (3 790), inače cena bez
+  // popusta na količinu — isto kao u popupu.
+  const precrtana =
+    (ukupnaKolicinaKorpe <= 1 ? CENA_PRVOBITNA_ZA_JEDAN : CENA_JEDNE) * stavka.kolicina;
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-field border border-[rgba(255,197,61,0.25)] bg-[rgba(255,197,61,0.06)] p-5">
@@ -42,7 +50,9 @@ export function KorpaStavka({
             {stavka.boja === "crna" ? "Crni" : "Beli"} stalak
           </span>
           <span className="font-tekst text-body-sm text-[rgba(191,227,208,0.75)]">
-            {kolicinaSlovima(stavka.kolicina)} · {formatRSD(cena)}
+            {kolicinaSlovima(stavka.kolicina)} ·{" "}
+            {precrtana > cena && <span className="mr-1 line-through opacity-70">{formatRSD(precrtana)}</span>}
+            {formatRSD(cena)}
           </span>
         </div>
       </div>
