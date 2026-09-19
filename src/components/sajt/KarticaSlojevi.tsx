@@ -445,18 +445,12 @@ export function KarticaSlojevi() {
 // videlo se uživo (screenshot) da samo "puna širina kutije" (prethodni
 // pokušaj) NIJE dovoljno, jer je vidljiva razdvojena kartica i dalje
 // mnogo uža od kvadrata. Binarno pretraženo između 1.3× (bezbedno) i
-// 1.8× (vidljivo sečenje) — 1.65× je bio najveći bez sečenja NA OSTALA
-// TRI sloja, ali je prednji (najbliži, najviše uvećan perspektivom) i
-// dalje bio blago isečen (drugi krug istog dana) — otud PRVI_SLOJ_SKALA
-// ispod, koji ga dodatno stanjuje NEZAVISNO od ovog opšteg faktora.
-const UVECANJE_SLOJEVA = 1.65;
-
-// Prednji sloj (sloj_1, "Prednja strana") je pod perspektivom uvek najviše
-// uvećan i najbliži ivici wrapper-a od sva 4 — sopstveni, manji skala
-// faktor (originalni je 0.96) mu daje malo više vazduha bez potrebe da se
-// UVECANJE_SLOJEVA iznad spusti (što bi nepotrebno smanjilo i ostala 3
-// sloja, koja se već lepo uklapaju).
-const PRVI_SLOJ_SKALA = 0.82;
+// 1.8× (vidljivo sečenje). Prednji sloj (najbliži, najviše uvećan
+// perspektivom) je na 1.65× i dalje bio blago isečen; posebno stanjivanje
+// samo tog sloja je odbačeno (korisnik traži da svi slojevi budu ISTE
+// veličine), pa je opšti faktor spušten na 1.5× koji je uživo proveren
+// čist za sva 4 sloja.
+const UVECANJE_SLOJEVA = 1.5;
 
 export function KarticaSlojeviStatic() {
   const omotacRef = useRef<HTMLDivElement>(null);
@@ -476,7 +470,6 @@ export function KarticaSlojeviStatic() {
           traženo). */}
       <StatickiPrikaz
         forsiranaSirina={Math.round(sirinaOmotaca * UVECANJE_SLOJEVA)}
-        prviSlojSkala={PRVI_SLOJ_SKALA}
         obrnutRedosled
       />
     </div>
