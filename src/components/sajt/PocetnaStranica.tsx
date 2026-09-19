@@ -5,13 +5,13 @@ import Image from "next/image";
 import { Dugme, DUGME_ISTAKNUTO } from "@/components/core/Dugme";
 import { OcenaZvezdicama } from "@/components/core/OcenaZvezdicama";
 import { Podvuceno } from "@/components/core/Podvuceno";
-import { KorakStavka } from "@/components/marketing/KorakStavka";
 import { Utisak } from "@/components/marketing/Utisak";
 import { Akordeon, PitanjeOdgovor } from "@/components/marketing/PitanjeOdgovor";
 import { Sekcija } from "@/components/sajt/Sekcija";
 import { UNaVidiku } from "@/components/core/UNaVidiku";
 import { Kartica3D } from "@/components/sajt/Kartica3D";
-import { KakoRadiScroll, KORACI } from "@/components/sajt/KakoRadiScroll";
+import { KakoRadiScroll } from "@/components/sajt/KakoRadiScroll";
+import { KakoRadiMobilno } from "@/components/sajt/KakoRadiMobilno";
 import { KarticaSlojevi, KarticaSlojeviStatic } from "@/components/sajt/KarticaSlojevi";
 import { Cenovnik } from "@/components/sajt/Cenovnik";
 import { useKorpa } from "@/components/sajt/KorpaKontekst";
@@ -591,31 +591,10 @@ export function PocetnaStranica() {
             Mi ga podesimo. Vi ga stavite na željeno mesto.
           </p>
         </UNaVidiku>
-        {/* "Probajte i sami" (DemoDodira) UKLONJENO sa sajta (19.09.2026.,
-            eksplicitno traženo) — komponenta i njena datoteka su obrisane,
-            nije korišćena nigde drugde. Umesto nje, ispod SVAKOG koraka ide
-            njegova sopstvena slika (ista koju koristi i desktop verzija,
-            KORACI izvezen iz KakoRadiScroll.tsx — jedan izvor istine za
-            putanje), pune širine kolone. */}
-        <div className="flex flex-col gap-10 lg:hidden">
-          {KORACI.map((korak, i) => (
-            <UNaVidiku key={korak.naslov} kasnjenje={i * 100} className="flex flex-col gap-6">
-              <KorakStavka broj={i + 1} naslov={korak.naslov}>
-                {korak.opis}
-              </KorakStavka>
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-image bg-surface-2">
-                <Image
-                  src={korak.slika}
-                  alt={korak.naslov}
-                  fill
-                  sizes="100vw"
-                  quality={90}
-                  className="object-cover"
-                />
-              </div>
-            </UNaVidiku>
-          ))}
-        </div>
+        {/* Mobilno (19.09.2026.): sticky "scrollytelling" — sekcija se zaključa
+            i na skrol smenjuje korake i sliku (cross-fade), pa se otpusti.
+            Vidi KakoRadiMobilno.tsx. Naslov iznad ostaje običan. */}
+        <KakoRadiMobilno />
         {/* Desktop: sekcija se "zaključa" i koraci se ređaju kako se skroluje. */}
         <KakoRadiScroll />
       </Sekcija>
