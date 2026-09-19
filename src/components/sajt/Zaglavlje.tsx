@@ -146,7 +146,7 @@ export function Zaglavlje() {
     <header
       ref={headerRef}
       className={`fixed inset-x-0 top-0 z-20 transition-[backdrop-filter] duration-300 ${
-        skrolovano ? "backdrop-blur-md" : "backdrop-blur-none"
+        skrolovano || otvoren ? "backdrop-blur-md" : "backdrop-blur-none"
       }`}
     >
       <div className="mx-auto grid max-w-[var(--container)] grid-cols-[1fr_auto_1fr] items-center gap-4 px-5 pt-6 pb-2.5">
@@ -274,7 +274,7 @@ export function Zaglavlje() {
       >
       <div
         className={`backdrop-blur-md transition-transform duration-[350ms] ease-[cubic-bezier(.32,.72,0,1)] ${
-          tamnaPozadina ? "bg-[var(--color-bg-inverse)]/30" : "bg-white/30"
+          tamnaPozadina ? "border-b border-[var(--color-gold)]" : "border-b border-primary"
         }`}
         style={{ transform: `translateY(${otvoren ? "0" : "-100%"})` }}
         inert={!otvoren}
@@ -289,7 +289,7 @@ export function Zaglavlje() {
                 idiNa(id);
               }}
               className={`border-b py-[14px] text-left font-tekst text-body font-medium last:border-0 ${
-                tamnaPozadina ? "border-[var(--color-gold)] text-text-on-inverse" : "border-[#bfe3d0] text-text-strong"
+                tamnaPozadina ? "border-[var(--color-gold)] text-text-on-inverse" : "border-primary text-text-strong"
               }`}
             >
               {naziv}
