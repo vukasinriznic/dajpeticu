@@ -61,14 +61,25 @@ export function Modal({
     st.position = "fixed";
     st.top = `-${y}px`;
     st.width = "100%";
+    // Pozadina ispod dialoga (traka između dna popupa i tastature) bila je
+    // bela — bojimo html/body istom tamnom bojom dok je popup otvoren.
+    const html = document.documentElement.style;
+    const prethodnaHtml = html.backgroundColor;
+    const prethodnaBody = st.backgroundColor;
+    if (variant === "fullscreen") {
+      html.backgroundColor = "var(--color-bg-inverse)";
+      st.backgroundColor = "var(--color-bg-inverse)";
+    }
     return () => {
+      html.backgroundColor = prethodnaHtml;
+      st.backgroundColor = prethodnaBody;
       st.overflow = prethodno.overflow;
       st.position = prethodno.position;
       st.top = prethodno.top;
       st.width = prethodno.width;
       window.scrollTo(0, y);
     };
-  }, [open]);
+  }, [open, variant]);
 
   // Dialog prati VIDLJIVI deo ekrana (iznad tastature): na iOS-u tastatura ne
   // menja layout viewport, pa 100dvh ostaje pun ekran i sadržaj završi iza
