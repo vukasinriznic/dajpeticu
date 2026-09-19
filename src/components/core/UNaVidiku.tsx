@@ -58,7 +58,11 @@ export function UNaVidiku({
   return (
     <div
       ref={ref}
-      className={`transition-[opacity,transform] duration-700 ease-[cubic-bezier(.2,.7,.3,1)] ${
+      // max-lg:! — na mobilnom je sadržaj vidljiv OD PRVOG crtanja (čisti CSS, bez
+      // čekanja na JS/hidraciju i bez tranzicije): ranije je krenuo sakriven pa
+      // se "uključivao" tek posle mount-a, pa je npr. hero dugme delovalo kao da
+      // nije tu dok se ne skroluje do njega. Isto za prefers-reduced-motion.
+      className={`transition-[opacity,transform] duration-700 ease-[cubic-bezier(.2,.7,.3,1)] max-lg:!translate-y-0 max-lg:!opacity-100 max-lg:!transition-none motion-reduce:!translate-y-0 motion-reduce:!opacity-100 motion-reduce:!transition-none ${
         vidljivo ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
       } ${rastegni ? "flex h-full flex-col [&>*]:flex-1" : ""} ${className}`}
       style={kasnjenje ? { transitionDelay: `${kasnjenje}ms` } : undefined}
