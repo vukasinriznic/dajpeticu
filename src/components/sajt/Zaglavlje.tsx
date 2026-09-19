@@ -256,8 +256,8 @@ export function Zaglavlje() {
         className={`absolute inset-x-0 top-full overflow-hidden md:hidden ${otvoren ? "" : "pointer-events-none"}`}
       >
       <div
-        className={`transition-transform duration-[350ms] ease-[cubic-bezier(.32,.72,0,1)] ${
-          tamnaPozadina ? "bg-[var(--color-bg-inverse)]" : "bg-surface-0"
+        className={`backdrop-blur-md transition-transform duration-[350ms] ease-[cubic-bezier(.32,.72,0,1)] ${
+          tamnaPozadina ? "bg-[var(--color-bg-inverse)]/80" : "bg-white/80"
         }`}
         style={{ transform: `translateY(${otvoren ? "0" : "-100%"})` }}
         inert={!otvoren}
