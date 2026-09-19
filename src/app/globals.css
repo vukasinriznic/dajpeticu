@@ -412,12 +412,18 @@
    ISPOD sopstvenog reda (bottom: -0.26em) — bez ovoga bi je inset(...0...)
    (koji bi inače tačno pratio visinu reda) trajno odsekao, jer clip-path
    inset ne prati overflow decu, samo geometriju sopstvene kutije. */
+/* 19.09.2026. — NEGATIVNI inset više ne koristimo: mobilni Safari ga ne
+   poštuje pouzdano (seče na ivicu kutije), pa je donji deo slova "p" u
+   "pet zvezdica" bio odsečen dok traje otkrivanje. Umesto toga sami redovi
+   u PocetnaStranica.tsx dobijaju padding (levo/gore/dole/desno) uz jednak
+   negativan margin (raspored ostaje isti), pa kutija koja se seče već
+   obuhvata spuštena slova i podvlaku, a inset je običan 0. */
 @keyframes dp-otkrivanje-sleva {
   from {
-    clip-path: inset(-0.3em 100% -0.7em -10%);
+    clip-path: inset(0 100% 0 0);
   }
   to {
-    clip-path: inset(-0.3em 0% -0.7em -10%);
+    clip-path: inset(0 0% 0 0);
   }
 }
 
