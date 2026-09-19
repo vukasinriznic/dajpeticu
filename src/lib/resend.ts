@@ -1,6 +1,7 @@
 import "server-only";
 import { Resend } from "resend";
 import { site } from "@/lib/site";
+import { esc } from "@/lib/html";
 import { formatRSD, kolicinaSlovima } from "@/lib/cene";
 import type { Porudzbina } from "@/lib/validacijaPorudzbine";
 
@@ -14,7 +15,7 @@ function stavkeHtml(stavke: Porudzbina["stavke"]): string {
   return stavke
     .map(
       (s) =>
-        `<li>${kolicinaSlovima(s.kolicina)} (${s.boja === "crna" ? "crni" : "beli"}) — ${s.nazivBiznisa}</li>`,
+        `<li>${kolicinaSlovima(s.kolicina)} (${s.boja === "crna" ? "crni" : "beli"}) — ${esc(s.nazivBiznisa)}</li>`,
     )
     .join("");
 }
@@ -22,9 +23,9 @@ function stavkeHtml(stavke: Porudzbina["stavke"]): string {
 export async function posaljiObavestenjeVlasniku(porudzbina: Porudzbina & { ukupnaCena: number }) {
   const html = `
     <h2>Nova porudžbina</h2>
-    <p><strong>${porudzbina.ime} ${porudzbina.prezime}</strong> — ${porudzbina.telefon} — ${porudzbina.email}</p>
-    <p>${porudzbina.adresa}, ${porudzbina.postanskiBroj} ${porudzbina.grad}, ${porudzbina.drzava}</p>
-    ${porudzbina.pib ? `<p>PIB: ${porudzbina.pib}</p>` : ""}
+    <p><strong>${esc(porudzbina.ime)} ${esc(porudzbina.prezime)}</strong> — ${esc(porudzbina.telefon)} — ${esc(porudzbina.email)}</p>
+    <p>${esc(porudzbina.adresa)}, ${esc(porudzbina.postanskiBroj)} ${esc(porudzbina.grad)}, ${esc(porudzbina.drzava)}</p>
+    ${porudzbina.pib ? `<p>PIB: ${esc(porudzbina.pib)}</p>` : ""}
     <ul>${stavkeHtml(porudzbina.stavke)}</ul>
     <p><strong>Ukupno: ${formatRSD(porudzbina.ukupnaCena)}</strong></p>
   `;
@@ -53,12 +54,12 @@ export async function posaljiObavestenjeVlasniku(porudzbina: Porudzbina & { ukup
 // dok verifikacija ne bude gotova.
 export async function posaljiPotvrduKupcu(porudzbina: Porudzbina & { ukupnaCena: number }) {
   const html = `
-    <h2>Hvala na porudžbini, ${porudzbina.ime}!</h2>
-    <p>Primili smo vašu porudžbinu. Zovemo vas na ${porudzbina.telefon} da potvrdimo adresu i link vaše
+    <h2>Hvala na porudžbini, ${esc(porudzbina.ime)}!</h2>
+    <p>Primili smo vašu porudžbinu. Zovemo vas na ${esc(porudzbina.telefon)} da potvrdimo adresu i link vaše
     Google strane.</p>
     <ul>${stavkeHtml(porudzbina.stavke)}</ul>
     <p><strong>Ukupno: ${formatRSD(porudzbina.ukupnaCena)}</strong> — plaćate pouzećem.</p>
-    <p>Dostava na: ${porudzbina.adresa}, ${porudzbina.postanskiBroj} ${porudzbina.grad}, ${porudzbina.drzava}</p>
+    <p>Dostava na: ${esc(porudzbina.adresa)}, ${esc(porudzbina.postanskiBroj)} ${esc(porudzbina.grad)}, ${esc(porudzbina.drzava)}</p>
     <p>Pitanja? Javite nam se na ${site.email}.</p>
   `;
 

@@ -37,11 +37,31 @@ export function validirajStavku(
   }
   if (stavka.nazivBiznisa.trim().length < 2) {
     greske.nazivBiznisa = "Unesite naziv biznisa.";
+  } else if (stavka.nazivBiznisa.length > MAX_DUZINA.nazivBiznisa) {
+    greske.nazivBiznisa = `Naziv može imati najviše ${MAX_DUZINA.nazivBiznisa} znakova.`;
   }
   return greske;
 }
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Bez razmaka, zareza, tačke-zareza, navodnika i zagrada — sprečava da jedno
+// polje postane više primalaca ili "Ime <adresa>" u mejl zaglavlju.
+const EMAIL_REGEX = /^[^\s@,;<>()"']+@[^\s@,;<>()"']+\.[^\s@,;<>()"']+$/;
+
+// Gornje granice dužina (odbrana od gigantskih unosa u bazu i mejlove).
+export const MAX_DUZINA = {
+  email: 254,
+  ime: 60,
+  prezime: 60,
+  adresa: 150,
+  grad: 80,
+  drzava: 60,
+  telefon: 30,
+  pib: 9,
+  nazivBiznisa: 120,
+} as const;
+
+const PLACE_ID_REGEX = /^[A-Za-z0-9_-]{10,200}$/;
+export const jeIspravanPlaceId = (id: string) => PLACE_ID_REGEX.test(id);
 
 export function validirajPorudzbinu(
   p: Omit<Porudzbina, "stavke"> & { stavke: Pick<Stavka, "kolicina" | "nazivBiznisa">[] },
@@ -56,6 +76,16 @@ export function validirajPorudzbinu(
   if (!/^\d{5}$/.test(p.postanskiBroj.trim())) greske.postanskiBroj = "Poštanski broj ima pet cifara.";
   if (!p.grad.trim()) greske.grad = "Unesite grad.";
   if (p.telefon.replace(/\D/g, "").length < 8) greske.telefon = "Unesite broj telefona.";
+  // Preduge vrednosti (ne uklapaju se u formu ni u mejl) — jedna zajednička
+  // poruka; nikad ne dolazi od običnog korisnika koji popunjava polja.
+  const PREDUGO = "Uneta vrednost je predugačka.";
+  if (p.email.length > MAX_DUZINA.email) greske.email = PREDUGO;
+  if (p.ime.length > MAX_DUZINA.ime) greske.ime = PREDUGO;
+  if (p.prezime.length > MAX_DUZINA.prezime) greske.prezime = PREDUGO;
+  if (p.adresa.length > MAX_DUZINA.adresa) greske.adresa = PREDUGO;
+  if (p.grad.length > MAX_DUZINA.grad) greske.grad = PREDUGO;
+  if (p.drzava.length > MAX_DUZINA.drzava) greske.drzava = PREDUGO;
+  if (p.telefon.length > MAX_DUZINA.telefon) greske.telefon = PREDUGO;
   // PIB je opcion — ako je unet, mora biti 8 ili 9 cifara (preduzetnik/pravno lice u Srbiji).
   if (p.pib.trim() && !/^\d{8,9}$/.test(p.pib.trim())) {
     greske.pib = "PIB ima 8 ili 9 cifara.";

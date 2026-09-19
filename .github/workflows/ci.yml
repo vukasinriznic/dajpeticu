@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  provera:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+      # Ranjivosti u produkcionim zavisnostima (samo "high" i više obara build).
+      - run: npm audit --omit=dev --audit-level=high
+      # Lažne vrednosti — build ne sme da zavisi od pravih ključeva; server-only
+      # klijenti (Supabase/Resend) samo treba da se inicijalizuju.
+      - run: npm run build
+        env:
+          SUPABASE_URL: https://example.supabase.co
+          SUPABASE_SERVICE_ROLE_KEY: ci-placeholder
+          RESEND_API_KEY: re_ci_placeholder
