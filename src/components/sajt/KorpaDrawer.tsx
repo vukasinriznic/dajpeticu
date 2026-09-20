@@ -99,7 +99,7 @@ export function KorpaDrawer({
           </div>
 
           <div className="sticky bottom-0 z-10 flex flex-col gap-4 border-t border-[rgba(255,197,61,0.2)] bg-[var(--color-bg-inverse)] px-6 py-6">
-            {/* Na 1 kartici poštarina se naplaćuje ali se namerno ne
+            {/* Na 1 kartici kupac poštarinu plaća kuriru (vidi uslove) i to se namerno ne
                 pominje ovde (ništa se ne obećava besplatno); od 2 kartice
                 na dalje red sa ikonicom za svaku otključanu pogodnost, isti
                 obrazac kao u DodajUKorpuPopup.tsx. */}

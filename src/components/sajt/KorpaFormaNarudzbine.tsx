@@ -292,8 +292,8 @@ export function KorpaFormaNarudzbine({
             </span>
           </div>
         ))}
-        {/* Isti obrazac kao u KorpaDrawer.tsx — na 1 kartici se poštarina
-            naplaćuje ali se ne pominje, od 2 kartice pogodnosti se
+        {/* Isti obrazac kao u KorpaDrawer.tsx — na 1 kartici kupac poštarinu plaća kuriru (uslovi)
+            i ne pominje se, od 2 kartice pogodnosti se
             nabrajaju sa ikonicama umesto stare precrtane cene. */}
         {ukupnaKolicina >= PRAG_BESPLATNE_DOSTAVE && (
           <div className="flex flex-col gap-1.5">

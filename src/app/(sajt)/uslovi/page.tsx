@@ -55,8 +55,8 @@ export default function UsloviPage() {
 
         <Odeljak naslov="Cena i plaćanje">
           <p className="m-0">
-            Sve cene na sajtu su u RSD i konačne su, poštarina se uvek prikazuje pre slanja
-            porudžbine. Plaćate pouzećem, gotovinom kuriru ili poštaru pri preuzimanju pošiljke.
+            Sve cene stalaka na sajtu su u RSD. Plaćate pouzećem, gotovinom kuriru ili poštaru pri
+            preuzimanju pošiljke.
           </p>
         </Odeljak>
 
@@ -64,6 +64,10 @@ export default function UsloviPage() {
           <p className="m-0">
             Stalak podesimo istog ili sledećeg radnog dana i šaljemo poštom, obično stiže za 2
             radna dana. Trenutno dostavljamo samo na adrese u Srbiji.
+          </p>
+          <p className="m-0">
+            Za porudžbinu jednog stalka poštarinu plaćate kuriru ili poštaru pri preuzimanju
+            pošiljke. Od dva stalka poštarinu pokrivamo mi.
           </p>
         </Odeljak>
 

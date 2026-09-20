@@ -2,39 +2,43 @@
 // (konkurencija ne nudi popust na količinu uopšte). Nije formula, koraci su
 // namerno neravnomerni (veliki odmah posle 1, 2, 5, 10 kom, pa sve sitniji
 // do 25), pa je tabela pretraga, ne izračunavanje.
+// Cena po komadu, izvedena iz OKRUGLIH ukupnih cena (20.09.2026.) — vlasnik
+// zadaje okrugle iznose, a cena po komadu je ukupno / količina i uvek ceo
+// broj. Ukupno: 1=3.290, 2=5.990, 3=8.400, 4=10.700, 5=12.890, 6=14.490,
+// 7=15.890, 8=17.280, 9=18.450, 10=19.890, 11=21.340, 12=22.920, 13=24.310,
+// 14=25.620, 15=26.790, 16=28.000, 17=29.410, 18=30.780, 19=32.110,
+// 20=33.400, 21=34.650, 22=35.750, 23=37.030, 24=38.400, 25=39.800.
 const CENA_PO_KOLICINI: Record<number, number> = {
   1: 3290,
-  2: 2990,
-  3: 2810,
-  4: 2670,
+  2: 2995,
+  3: 2800,
+  4: 2675,
   5: 2578,
-  6: 2418,
-  7: 2278,
-  8: 2158,
-  9: 2058,
+  6: 2415,
+  7: 2270,
+  8: 2160,
+  9: 2050,
   10: 1989,
-  11: 1949,
-  12: 1909,
-  13: 1869,
-  14: 1829,
-  15: 1789,
-  16: 1749,
-  17: 1729,
-  18: 1709,
-  19: 1689,
-  20: 1669,
-  21: 1649,
-  22: 1629,
-  23: 1609,
-  24: 1599,
-  25: 1590,
+  11: 1940,
+  12: 1910,
+  13: 1870,
+  14: 1830,
+  15: 1786,
+  16: 1750,
+  17: 1730,
+  18: 1710,
+  19: 1690,
+  20: 1670,
+  21: 1650,
+  22: 1625,
+  23: 1610,
+  24: 1600,
+  25: 1592,
 };
 
 // Porudžbine se za sada ne primaju iznad 25 kartica (veće količine —
 // posebna sekcija/kontakt, planirano kasnije, van ovog toka).
 export const MAX_KOLICINA = 25;
-
-export const POSTARINA = 390;
 
 // Podsticaj na veću porudžbinu: besplatna dostava od 2 stalka, gratis mala
 // Google kartica (poklon, ne posebna stavka u korpi — obećanje ispunjeno pri
@@ -42,10 +46,6 @@ export const POSTARINA = 390;
 // kao i popust po količini.
 export const PRAG_BESPLATNE_DOSTAVE = 2;
 export const PRAG_GRATIS_POKLONA = 3;
-
-export function postarina(ukupnaKolicina: number): number {
-  return ukupnaKolicina >= PRAG_BESPLATNE_DOSTAVE ? 0 : POSTARINA;
-}
 
 export function jedinicnaCena(kolicina: number): number {
   const k = Math.min(Math.max(Math.round(kolicina), 1), MAX_KOLICINA);
@@ -70,7 +70,9 @@ export function ukupnoKorpa(stavke: { kolicina: number }[]): number {
     (zbir, s) => zbir + cenaKarticaZaStavku(ukupnaKolicina, s.kolicina),
     0,
   );
-  return cenaKartica + postarina(ukupnaKolicina);
+  // Poštarina se NE računa u iznos (20.09.2026.): pri 1 stalku kupac plaća
+  // kuriru pri preuzimanju (piše u uslovima), od 2 stalka je pokrivamo mi.
+  return cenaKartica;
 }
 
 // 1 stalak · 2-4 stalka · 5+ stalaka (uz mod-100 za 21, 22, 101…)
