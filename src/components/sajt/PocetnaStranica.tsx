@@ -469,8 +469,7 @@ export function PocetnaStranica() {
             <p className="m-0 font-tekst text-[18px] leading-heading text-text-quiet-on-inverse lg:text-h3">
               Stalak radi za vas i kad niste tu. Svaki dolazak mušterije je prilika da vas neko
               novi pronađe na Google-u. Veći stalak stoji na pultu i kod kase, dok manji NFC
-              stalak, uglavnom pronalazi mesto na svakom stolu. Vrh Google pretrage pripada baš
-              vama.
+              stalak, uglavnom pronalazi mesto na svakom stolu.
             </p>
             {/* Dugme SAKRIVENO na mobilnom (19.09.2026., "dugme poruci
                 stalak zelimo da bude ispod slike stalka") — prva probana
