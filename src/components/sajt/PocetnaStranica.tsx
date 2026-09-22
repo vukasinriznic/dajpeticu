@@ -30,23 +30,15 @@ function idiNa(id: string) {
 // tačno određene širine).
 const RAZMER_KARTICE_U_KVADRATU = 848 / 1401;
 
-// Ravna kartica (bez stalka) — novi proizvod dodat u CARD sekciju
-// (20.09.2026.), prikazan POREDO sa stalkom. Sopstveni razmer slike
-// (public/images/kartica_bela.png, 1024×1536), drugačiji od stalka jer je
-// to druga fotografija. Broj — za isti obrnut izračun kvadratne širine kao
-// RAZMER_KARTICE_U_KVADRATU gore; string — isti razmer u CSS aspect-ratio
-// zapisu, prosleđuje se Kartica3D-u kao razmerSlike (Kartica3D podrazumevano
-// koristi stalak-ov razmer, ne ovaj).
-const RAZMER_RAVNE_KARTICE = 1024 / 1536;
-const RAZMER_RAVNE_KARTICE_CSS = "1024 / 1536";
-
-// Desktop veličine za CARD sekciju — stalak je ranije bio sam (524px
-// kvadrat), sad oba proizvoda dele isti prostor pa je svaki kvadrat manji.
-// Cilj je da VIDLJIVA širina bude ista za oba proizvoda (~230px) iako su
-// kvadrati različiti (stalak i kartica imaju različit razmer slike).
-const DESKTOP_VIDLJIVA_SIRINA_PROIZVODA = 230;
-const SIRINA_STALKA_DESKTOP = Math.round(DESKTOP_VIDLJIVA_SIRINA_PROIZVODA / RAZMER_KARTICE_U_KVADRATU);
-const SIRINA_RAVNE_KARTICE_DESKTOP = Math.round(DESKTOP_VIDLJIVA_SIRINA_PROIZVODA / RAZMER_RAVNE_KARTICE);
+// CARD sekcija (20.09.2026.) — umesto dva odvojena proizvoda jedan pored
+// drugog (probano, odbačeno istog dana: dve slike u jednoj koloni fizički
+// ne mogu preći ~210-240px vidljive širine na uobičajenim laptop ekranima,
+// 1280-1440px, a da ne zgnječe tekst ili probiju stranicu), sad je jedna
+// GOTOVA fotografija (stalak + kartica već komponovani zajedno od strane
+// vlasnika) — public/images/card_sekcija.png, 1374×1145 (razmer čuva sam
+// next/image preko width/height propova ispod). Prikazuje se kao obična
+// slika (object-contain), bez Kartica3D-ovog kvadratnog/tilt mehanizma koji
+// je namenjen JEDNOM proizvodu, ne gotovoj kompoziciji.
 
 export function PocetnaStranica() {
   const { otvoriModal } = useKorpa();
@@ -95,22 +87,6 @@ export function PocetnaStranica() {
   // umesto da CARD meri svoju sopstvenu kolonu — garantuje piksel-tačno
   // poklapanje bez oslanjanja na to da su dve kolone slučajno iste širine.
   const sirinaMobilneKartice = Math.round((sirinaMobilneSlike / RAZMER_KARTICE_U_KVADRATU) * 0.8);
-
-  // CARD sekcija mobilno (20.09.2026., dodata ravna kartica pored stalka) —
-  // stalak ovde NIJE isti kao sirinaMobilneKartice iznad (ona ostaje
-  // hero-ova, puna širina kolone) jer sad deli prostor sa drugim
-  // proizvodom. Isti "0.8 od kolone" ukupan prostor kao ranije, ali sad
-  // podeljen na dva proizvoda (minus razmak), svaki po SVOM razmeru slike
-  // (poravnata VIDLJIVA širina, isti princip kao desktop varijanta iznad).
-  const RAZMAK_PROIZVODA_MOBILNI = 16;
-  const vidljivaSirinaPoProizvoduMobilni =
-    (sirinaMobilneSlike * 0.8 - RAZMAK_PROIZVODA_MOBILNI) / 2;
-  const sirinaStalkaCardMobilni = Math.round(
-    vidljivaSirinaPoProizvoduMobilni / RAZMER_KARTICE_U_KVADRATU,
-  );
-  const sirinaRavneKarticeCardMobilni = Math.round(
-    vidljivaSirinaPoProizvoduMobilni / RAZMER_RAVNE_KARTICE,
-  );
 
   // Pozadina se pomera sporije od sadržaja pri skrolu (klasičan parallax).
   // Direktna DOM manipulacija (ne useState) namerno — React re-render po
@@ -440,14 +416,28 @@ export function PocetnaStranica() {
       </section>
 
       {/* CARD */}
-      <Sekcija id="card" ton="alt" className="nav-tamno !bg-[#0B2E20]">
+      {/* Desktop: sekcija je puna visina ekrana (20.09.2026., "kao i pre",
+          posle dodavanja druge slike) — lg:flex + lg:items-center vertikalno
+          centrira sadržaj (jedini unutrašnji div) unutar lg:min-h-screen.
+          Mobilno nepromenjeno (nema lg: prefiksa, ne utiče). */}
+      <Sekcija
+        id="card"
+        ton="alt"
+        className="nav-tamno !bg-[#0B2E20] lg:flex lg:min-h-screen lg:items-center"
+      >
         {/* Mobilni razmaci usklađeni (19.09.2026., eksplicitno traženo):
             gap-12→gap-5 (isti kao hero-ov flex gap-5, isti "pt-2" trik na
             slikinom wrapper-u ispod znači da se razmaci sad tačno poklapaju
             — podnaslov→slika ~28px, slika→dugme ~20px, isto kao hero); h2→p
             gap-8→gap-4, isto kao "Kako radi" sekcija. Desktop nepromenjen
-            (lg: vraća originalne vrednosti). */}
-        <div className="grid grid-cols-1 items-center gap-5 lg:grid-cols-2 lg:gap-12">
+            (lg: vraća originalne vrednosti).
+            lg:grid-cols-[1fr_1.3fr] (20.09.2026., bilo lg:grid-cols-2) — slike
+            su uvećane ~50%, slikina kolona dobija više prostora da ih ne
+            "zgnječi" flex-shrink (Kartica3D nema flex-shrink-0, pa se
+            proizvodi i dalje smanje ako ne stanu — ovo samo smanjuje koliko
+            se smanje na uobičajenim širinama, bez rizika od horizontalnog
+            skrola ako ekran ipak bude uzan). */}
+        <div className="grid grid-cols-1 items-center gap-5 lg:grid-cols-[1fr_1.3fr] lg:gap-12">
           <UNaVidiku className="flex max-w-[62ch] flex-col items-start gap-4 lg:gap-8">
             <h2 className="m-0 font-prikaz text-display-2 leading-heading font-normal tracking-heading text-text-on-inverse">
               {/* Podvlaka ispravljena na mobilnom (19.09.2026., screenshot
@@ -503,17 +493,13 @@ export function PocetnaStranica() {
               Poruči stalak
             </Dugme>
           </UNaVidiku>
-          {/* Desktop slika (20.09.2026., dodata ravna kartica pored stalka —
-              oba proizvoda sad dele isti prostor umesto da stalak sam bude
-              524px; vidi SIRINA_STALKA_DESKTOP/SIRINA_RAVNE_KARTICE_DESKTOP
-              iznad). */}
-          <UNaVidiku
-            kasnjenje={150}
-            className="relative hidden items-center justify-center gap-8 lg:flex"
-          >
-            {/* Brend-tonirani glow iza kartica — ista logika kao radijalni
-                sloj u hero-u, ovde u zlatnoj nijansi da poveže sa "Poruči
-                karticu" dugmetom i zvezdicama. */}
+          {/* Slika (20.09.2026., zamenjena gotovom kompozicijom oba
+              proizvoda — vidi napomenu uz RAZMER_CARD_SEKCIJA iznad). Ista
+              slika za desktop i mobilno, samo je desktop verzija u
+              posebnom UNaVidiku (kašnjenje pri ulasku u vidno polje, kao
+              ranije) dok mobilna nema animaciju (isti obrazac kao ostatak
+              CARD sekcije — scroll-reveal je iskljucen na mobilnom). */}
+          <UNaVidiku kasnjenje={150} className="relative hidden items-center justify-center lg:flex">
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0"
@@ -522,25 +508,17 @@ export function PocetnaStranica() {
                   "radial-gradient(55% 55% at 50% 45%, rgb(255 197 61 / 0.16), transparent 70%)",
               }}
             />
-            <Kartica3D sirina={SIRINA_STALKA_DESKTOP} interaktivna={false} />
-            <Kartica3D
-              sirina={SIRINA_RAVNE_KARTICE_DESKTOP}
-              slika="/images/kartica_bela.png"
-              razmerSlike={RAZMER_RAVNE_KARTICE_CSS}
-              naziv="Daj Peticu NFC kartica"
-              interaktivna={false}
+            <Image
+              src="/images/card_sekcija.png"
+              alt="Daj Peticu NFC stalak i kartica"
+              width={1374}
+              height={1145}
+              sizes="(max-width: 1024px) 0px, 700px"
+              quality={90}
+              className="relative w-full max-w-[700px] object-contain"
             />
           </UNaVidiku>
-          {/* Mobilna slika (20.09.2026., dodata ravna kartica pored stalka —
-              isti trik kao ranije za JEDNU sliku, sad primenjen na CEO RED
-              od dva proizvoda: red kvadrata je širi od wrapper-a (svaki
-              kvadrat je širi od svoje "vidljive" kartice, vidi
-              sirinaStalkaCardMobilni/sirinaRavneKarticeCardMobilni iznad),
-              pa se ceo red centrira preko "left-1/2 -translate-x-1/2" i
-              simetrično odseca "overflow-hidden" wrapper-om (isti razlog
-              kao ranije — Sekcija.tsx nema sopstveni overflow-hidden, bez
-              ovoga bi providne margine kvadrata proširile stranicu). */}
-          <div className="relative overflow-hidden pt-2 lg:hidden">
+          <div className="relative pt-2 lg:hidden">
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-0"
@@ -549,16 +527,15 @@ export function PocetnaStranica() {
                   "radial-gradient(55% 55% at 50% 45%, rgb(255 197 61 / 0.16), transparent 70%)",
               }}
             />
-            <div className="relative left-1/2 flex items-center gap-4 -translate-x-1/2">
-              <Kartica3D sirina={sirinaStalkaCardMobilni} interaktivna={false} />
-              <Kartica3D
-                sirina={sirinaRavneKarticeCardMobilni}
-                slika="/images/kartica_bela.png"
-                razmerSlike={RAZMER_RAVNE_KARTICE_CSS}
-                naziv="Daj Peticu NFC kartica"
-                interaktivna={false}
-              />
-            </div>
+            <Image
+              src="/images/card_sekcija.png"
+              alt="Daj Peticu NFC stalak i kartica"
+              width={1374}
+              height={1145}
+              sizes="100vw"
+              quality={90}
+              className="relative w-full object-contain"
+            />
           </div>
           {/* Mobilni duplikat dugmeta (vidi napomenu uz desktop dugme
               iznad) — jedini vidljiv na mobilnom, posle slike u DOM-u. */}
