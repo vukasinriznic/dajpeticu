@@ -19,20 +19,26 @@ export function slikaProizvoda(velicina: Velicina, boja: Boja): string {
 }
 
 // CSS aspect-ratio zapis (širina/visina) — različit razmer fotografije za
-// veći (848/1401) i manji (0.65) stalak, prosleđuje se Kartica3D-u.
-// kartica_bela.png/kartica_crna.png su 20.09.2026. opsečene na sadržaj i
-// podložene tako da OBE dele TAČNO isti razmer 0.65 (prvobitno 1024×1536 i
-// 1122×1402 — vidljivo različite margine, crna kartica je delovala manje
-// nego bela unutar iste kutije); sad se ne oslanja na "skoro jednako",
-// stvarni fajlovi (860×1323, 782×1203) imaju identičan razmer.
+// veći (848/1401) i manji (872/1355) stalak, prosleđuje se Kartica3D-u.
+// kartica_bela.png/kartica_crna.png su 22.09.2026. ponovo obrađene — prvi
+// pokušaj (samo poravnata providna margina oko cele "silhuete" providnog
+// stalka) NIJE bio dovoljan: sama KARTICA (beli/crni panel sa QR kodom) je
+// na originalnim fotografijama zauzimala različit procenat kadra (bela
+// ~73% širine, crna ~57%), jer providni stalak oko crne kartice zauzima
+// vidljivo više prostora na toj fotografiji. Rešenje: crna slika je
+// UVEĆANA (×1.1755) tako da njen panel (širina) bude piksel-jednak
+// belininom, pa su OBE ponovo centrirane/opsečene oko centra panela na
+// zajedničko platno — sad su panel I platno identične veličine/razmera za
+// obe boje (872×1355 oba fajla), a ceo providni stalak i dalje staje u
+// kadar bez sečenja.
 export function razmerProizvoda(velicina: Velicina): string {
-  return velicina === "manji" ? "0.65" : "848 / 1401";
+  return velicina === "manji" ? "872 / 1355" : "848 / 1401";
 }
 
 // Isti broj kao string (za obrnut izračun kvadratne širine oko mobilne
 // slike — vidi DodajUKorpuPopup.tsx).
 export function razmerProizvodaBroj(velicina: Velicina): number {
-  return velicina === "manji" ? 0.65 : 848 / 1401;
+  return velicina === "manji" ? 872 / 1355 : 848 / 1401;
 }
 
 export function nazivProizvoda(velicina: Velicina): string {
