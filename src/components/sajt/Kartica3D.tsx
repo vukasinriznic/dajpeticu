@@ -36,12 +36,17 @@ export function Kartica3D({
   slika = "/images/stalak_beli.webp",
   razmerSlike = RAZMER_SLIKE_PODRAZUMEVANO,
   poravnanje = "center",
+  // Naziv proizvoda za alt/aria-label — podrazumevano stalak (nepromenjeno
+  // ponašanje za sve postojeće pozive). Druge slike (npr. ravna kartica bez
+  // stalka, CARD sekcija) prosleđuju sopstveni naziv.
+  naziv = "Daj Peticu NFC stalak",
 }: {
   sirina?: number;
   interaktivna?: boolean;
   className?: string;
   slika?: string;
   razmerSlike?: string;
+  naziv?: string;
   // Slika kartice je uža od kvadratnog omotača (RAZMER_SLIKE gore), pa
   // podrazumevano centriranje ostavlja providan prostor sa obe strane.
   // "left" (19.09.2026., mobilni hero) uklanja levi prostor — kartica
@@ -90,7 +95,7 @@ export function Kartica3D({
     >
       <div
         role="img"
-        aria-label="Stalak Daj Peticu"
+        aria-label={naziv}
         style={{
           position: "relative",
           width: "100%",
@@ -116,7 +121,7 @@ export function Kartica3D({
         >
           <Image
             src={slika}
-            alt="Daj Peticu NFC stalak"
+            alt={naziv}
             fill
             sizes={`${sirina}px`}
             quality={90}
