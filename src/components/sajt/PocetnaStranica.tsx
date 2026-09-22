@@ -462,9 +462,16 @@ export function PocetnaStranica() {
                 eksplicitno traženo za sve sekcijske podnaslove OSIM hero-a,
                 19.09.2026. lg:text-h3 vraća originalni deljeni token
                 nepromenjen na desktopu. */}
+            {/* Prošireno (20.09.2026., "objasni da manja kartica dolazi kao
+                zaseban proizvod za svaki sto") — najavljuje drugi proizvod
+                (manja NFC kartica) pre nego što popup/korpa uopšte nauče da
+                je prodaju; dimenzije oba proizvoda navedene eksplicitno. */}
             <p className="m-0 font-tekst text-[18px] leading-heading text-text-quiet-on-inverse lg:text-h3">
               Stalak radi za vas i kad niste tu. Svaki dolazak mušterije je prilika da vas neko
-              novi pronađe na Google-u.
+              novi pronađe na Google-u. Veći stalak (12,75 × 7,6 cm) stoji na pultu i kod kase,
+              dok manja NFC kartica (8,56 × 5,4 cm), koja stiže sa sopstvenim providnim stalkom,
+              zbog svoje veličine i praktičnosti pronalazi mesto na svakom stolu. Vrh Google
+              pretrage pripada baš vama.
             </p>
             {/* Dugme SAKRIVENO na mobilnom (19.09.2026., "dugme poruci
                 stalak zelimo da bude ispod slike stalka") — prva probana
