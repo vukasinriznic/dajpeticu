@@ -319,6 +319,20 @@ export function DodajUKorpuPopup({
               </button>
             ))}
           </div>
+          {/* Napomena SAMO kad je izabran manji stalak (20.09.2026.,
+              eksplicitno traženo) — objašnjava da je to ravna kartica sa
+              sopstvenim providnim stalkom, ne "manja verzija" celog
+              stalka; veći stalak je sam po sebi jasan, pa ne treba dodatni
+              tekst. */}
+          {velicina === "manji" && (
+            <p
+              className={`m-0 px-1 font-tekst text-caption ${
+                tamno ? "text-[rgba(191,227,208,0.75)]" : "text-text-muted"
+              }`}
+            >
+              Dolazi kao NFC kartica u sopstvenom providnom stalku, spremna za sto.
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">

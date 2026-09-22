@@ -19,15 +19,20 @@ export function slikaProizvoda(velicina: Velicina, boja: Boja): string {
 }
 
 // CSS aspect-ratio zapis (širina/visina) — različit razmer fotografije za
-// veći (848/1401) i manji (1024/1536) stalak, prosleđuje se Kartica3D-u.
+// veći (848/1401) i manji (0.65) stalak, prosleđuje se Kartica3D-u.
+// kartica_bela.png/kartica_crna.png su 20.09.2026. opsečene na sadržaj i
+// podložene tako da OBE dele TAČNO isti razmer 0.65 (prvobitno 1024×1536 i
+// 1122×1402 — vidljivo različite margine, crna kartica je delovala manje
+// nego bela unutar iste kutije); sad se ne oslanja na "skoro jednako",
+// stvarni fajlovi (860×1323, 782×1203) imaju identičan razmer.
 export function razmerProizvoda(velicina: Velicina): string {
-  return velicina === "manji" ? "1024 / 1536" : "848 / 1401";
+  return velicina === "manji" ? "0.65" : "848 / 1401";
 }
 
 // Isti broj kao string (za obrnut izračun kvadratne širine oko mobilne
 // slike — vidi DodajUKorpuPopup.tsx).
 export function razmerProizvodaBroj(velicina: Velicina): number {
-  return velicina === "manji" ? 1024 / 1536 : 848 / 1401;
+  return velicina === "manji" ? 0.65 : 848 / 1401;
 }
 
 export function nazivProizvoda(velicina: Velicina): string {
