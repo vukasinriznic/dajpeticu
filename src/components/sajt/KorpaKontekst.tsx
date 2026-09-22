@@ -13,7 +13,7 @@ import { usePathname } from "next/navigation";
 import { cenaKartica } from "@/lib/cene";
 import { pratiDogadjaj, stavkaZaAnalitiku } from "@/lib/analitika";
 import { ukupnoKorpa } from "@/lib/cene";
-import type { Boja } from "@/lib/validacijaPorudzbine";
+import type { Boja, Velicina } from "@/lib/validacijaPorudzbine";
 import { Modal } from "@/components/core/Modal";
 import { DodajUKorpuPopup } from "@/components/sajt/DodajUKorpuPopup";
 import { KorpaDrawer } from "@/components/sajt/KorpaDrawer";
@@ -21,6 +21,7 @@ import { KorpaDrawer } from "@/components/sajt/KorpaDrawer";
 export type StavkaKorpe = {
   id: string;
   boja: Boja;
+  velicina: Velicina;
   kolicina: number;
   nazivBiznisa: string;
   googlePlaceId?: string;

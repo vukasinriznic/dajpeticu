@@ -15,6 +15,7 @@ import {
   PRAG_GRATIS_POKLONA,
 } from "@/lib/cene";
 import { validirajPorudzbinu, validirajUkupnuKolicinu } from "@/lib/validacijaPorudzbine";
+import { slikaProizvoda } from "@/lib/proizvod";
 
 // Cena po jedinici bez popusta na količinu — isti anchor kao u
 // DodajUKorpuPopup.tsx, da se vidi ušteda i ovde u pregledu.
@@ -262,7 +263,7 @@ export function KorpaFormaNarudzbine({
               <span className="flex items-center gap-3">
                 <span className="relative h-12 w-8 shrink-0 overflow-hidden">
                   <Image
-                    src={s.boja === "crna" ? "/images/stalak_crni.webp" : "/images/stalak_beli.webp"}
+                    src={slikaProizvoda(s.velicina, s.boja)}
                     alt=""
                     fill
                     sizes="96px"
@@ -270,7 +271,7 @@ export function KorpaFormaNarudzbine({
                     className="object-contain"
                   />
                 </span>
-                {kolicinaSlovima(s.kolicina)} ({s.boja === "crna" ? "crni" : "beli"})
+                {kolicinaSlovima(s.kolicina)} ({s.velicina === "manji" ? "manji" : "veći"}, {s.boja === "crna" ? "crni" : "beli"})
               </span>
               <span className="font-normal">
                 {CENA_JEDNE * s.kolicina > cenaKarticaZaStavku(ukupnaKolicina, s.kolicina) && (

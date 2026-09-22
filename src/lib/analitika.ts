@@ -51,10 +51,11 @@ export function pratiDogadjaj(ime: string, parametri?: Record<string, unknown>) 
   window.gtag?.("event", ime, parametri);
 }
 
-export function stavkaZaAnalitiku(s: { boja: string; kolicina: number }) {
+export function stavkaZaAnalitiku(s: { boja: string; velicina?: string; kolicina: number }) {
+  const velicina = s.velicina === "manji" ? "manji" : "veci";
   return {
-    item_id: `stalak-${s.boja}`,
-    item_name: `NFC stalak (${s.boja === "crna" ? "crni" : "beli"})`,
+    item_id: `stalak-${velicina}-${s.boja}`,
+    item_name: `NFC ${velicina === "manji" ? "manji" : "veći"} stalak (${s.boja === "crna" ? "crni" : "beli"})`,
     quantity: s.kolicina,
   };
 }

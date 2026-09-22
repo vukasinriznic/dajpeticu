@@ -18,7 +18,8 @@ import {
   PRAG_GRATIS_POKLONA,
 } from "@/lib/cene";
 import { ucitajGoogleMaps } from "@/lib/googleMaps";
-import { validirajStavku, type Boja } from "@/lib/validacijaPorudzbine";
+import { validirajStavku, type Boja, type Velicina } from "@/lib/validacijaPorudzbine";
+import { VELICINE, slikaProizvoda, razmerProizvoda, razmerProizvodaBroj } from "@/lib/proizvod";
 
 // Boja teksta na tamnoj (podrazumevanoj) pozadini popup-a — bela, osim
 // pomoćnog teksta ispod "Naziv biznisa" koji ostaje u prigušenijoj nijansi
@@ -50,12 +51,14 @@ export function DodajUKorpuPopup({
   onClose: () => void;
   onDodaj: (stavka: {
     boja: Boja;
+    velicina: Velicina;
     kolicina: number;
     nazivBiznisa: string;
     googlePlaceId?: string;
   }) => void;
 }) {
   const [boja, setBoja] = useState<Boja>("bela");
+  const [velicina, setVelicina] = useState<Velicina>("veci");
   const [kolicina, setKolicina] = useState(1);
   const [nazivBiznisa, setNazivBiznisa] = useState("");
   const [googlePlaceId, setGooglePlaceId] = useState<string | undefined>(undefined);
@@ -65,11 +68,14 @@ export function DodajUKorpuPopup({
 
   // Mobilna slika stalka (19.09.2026., eksplicitno traženo — "velicine kao
   // u card sekciji") — isti obrazac (izmeri dostupnu širinu, pa računaj
-  // kvadratni Kartica3D omotač UNAZAD preko 848/1401 razmera vidljive
-  // kartice, ×0.8) kao PocetnaStranica.tsx-ov sirinaMobilneKartice; ne može
-  // se deliti direktno (drugi fajl/komponenta), ali je formula identična pa
-  // rezultat izgleda isto na sličnoj širini kolone.
-  const RAZMER_KARTICE_U_KVADRATU = 848 / 1401;
+  // kvadratni Kartica3D omotač UNAZAD preko razmera vidljive kartice, ×0.8)
+  // kao PocetnaStranica.tsx-ov sirinaMobilneKartice; ne može se deliti
+  // direktno (drugi fajl/komponenta), ali je formula identična pa rezultat
+  // izgleda isto na sličnoj širini kolone. Razmer zavisi od IZABRANE
+  // veličine (20.09.2026.) — manji stalak ima drugačiji odnos širina/visina
+  // fotografije (1024/1536) od većeg (848/1401), pa se kvadrat mora
+  // preračunati kad se veličina promeni, ne samo boja.
+  const razmerAktivneSlike = razmerProizvodaBroj(velicina);
   const mobilnaSlikaRef = useRef<HTMLDivElement>(null);
   const [sirinaMobilneSlike, setSirinaMobilneSlike] = useState(335);
   // ResizeObserver, ne efekat+resize-listener (za razliku od hero/CARD, koji
@@ -91,7 +97,7 @@ export function DodajUKorpuPopup({
     posmatrac.observe(el);
     return () => posmatrac.disconnect();
   }, [otvoren]);
-  const sirinaMobilneKartice = Math.round((sirinaMobilneSlike / RAZMER_KARTICE_U_KVADRATU) * 0.8);
+  const sirinaMobilneKartice = Math.round((sirinaMobilneSlike / razmerAktivneSlike) * 0.8);
 
   // Popup ostaje montiran (Modal samo pokazuje/sakriva <dialog>), pa se
   // interno stanje mora ručno resetovati svaki put kad se ponovo otvori —
@@ -99,6 +105,7 @@ export function DodajUKorpuPopup({
   useEffect(() => {
     if (otvoren) {
       setBoja("bela");
+      setVelicina("veci");
       setKolicina(pocetnaKolicina);
       setNazivBiznisa("");
       setGooglePlaceId(undefined);
@@ -174,7 +181,7 @@ export function DodajUKorpuPopup({
       setGreske(nove);
       return;
     }
-    onDodaj({ boja, kolicina, nazivBiznisa: nazivBiznisa.trim(), googlePlaceId });
+    onDodaj({ boja, velicina, kolicina, nazivBiznisa: nazivBiznisa.trim(), googlePlaceId });
   };
 
   // Fiksna tamnozelena tema sa zlatnim akcentima (isti jezik kao "card"
@@ -216,11 +223,11 @@ export function DodajUKorpuPopup({
               "radial-gradient(40% 40% at 50% 45%, rgba(255,197,61,0.4), transparent 70%), radial-gradient(65% 65% at 50% 45%, rgba(255,197,61,0.2), transparent 78%)",
           }}
         />
-        <div className="relative h-[77%] max-h-[704px]" style={{ aspectRatio: "848 / 1401" }}>
+        <div className="relative h-[77%] max-h-[704px]" style={{ aspectRatio: razmerProizvoda(velicina) }}>
           <Image
-            key={boja}
-            src={boja === "crna" ? "/images/stalak_crni.webp" : "/images/stalak_beli.webp"}
-            alt={boja === "crna" ? "Crni Daj Peticu NFC stalak" : "Beli Daj Peticu NFC stalak"}
+            key={`${velicina}-${boja}`}
+            src={slikaProizvoda(velicina, boja)}
+            alt={`${boja === "crna" ? "Crni" : "Beli"} Daj Peticu NFC ${velicina === "manji" ? "manji stalak" : "stalak"}`}
             fill
             sizes="500px"
             quality={90}
@@ -257,12 +264,61 @@ export function DodajUKorpuPopup({
             ova je md:hidden da se ne duplira. */}
         <div ref={mobilnaSlikaRef} className="w-full overflow-hidden md:hidden">
           <Kartica3D
-            key={boja}
+            key={`${velicina}-${boja}`}
             sirina={sirinaMobilneKartice}
-            slika={boja === "crna" ? "/images/stalak_crni.webp" : "/images/stalak_beli.webp"}
+            slika={slikaProizvoda(velicina, boja)}
+            razmerSlike={razmerProizvoda(velicina)}
+            naziv={`${boja === "crna" ? "Crni" : "Beli"} Daj Peticu NFC ${velicina === "manji" ? "manji stalak" : "stalak"}`}
             className="relative left-1/2 -translate-x-1/2"
             interaktivna={false}
           />
+        </div>
+
+        {/* Veličina IZNAD boje (20.09.2026., eksplicitno traženo) — isti
+            vizuelni obrazac kao dugmad za boju ispod (kopiran namerno, da
+            oba izbora deluju kao jedna celina). Dimenzije ispisane sitnije
+            ispod naziva, pomažu odluku bez da budu upadljive. Cena NIJE
+            drugačija za dve veličine (vidi napomenu uz Velicina tip u
+            validacijaPorudzbine.ts) — dok se ne definiše, izbor menja samo
+            sliku/naziv proizvoda u korpi, ne i iznos. */}
+        <div className="flex flex-col gap-2">
+          <span className={`font-tekst text-body-sm font-medium ${tamno ? TEKST_TAMNO : "text-text-body"}`}>
+            Veličina stalka
+          </span>
+          <div className="grid grid-cols-2 gap-3">
+            {VELICINE.map((v) => (
+              <button
+                key={v.vrednost}
+                type="button"
+                onClick={() => setVelicina(v.vrednost)}
+                aria-pressed={velicina === v.vrednost}
+                className={`inline-flex flex-col items-start gap-0.5 rounded-field border-2 px-4 py-3 font-tekst transition-[border-color,background,color] duration-200 ${
+                  velicina === v.vrednost
+                    ? tamno
+                      ? `border-[var(--color-gold)] bg-[rgba(255,197,61,0.14)] ${TEKST_TAMNO}`
+                      : "border-primary bg-primary-quiet text-primary"
+                    : tamno
+                      ? `border-[rgba(191,227,208,0.35)] bg-transparent ${TEKST_TAMNO} hover:border-[rgba(191,227,208,0.6)]`
+                      : "border-border bg-surface-0 text-text-body hover:border-border-strong"
+                }`}
+              >
+                <span className="text-body">{v.naziv}</span>
+                <span
+                  className={`text-caption ${
+                    velicina === v.vrednost
+                      ? tamno
+                        ? "text-[rgba(255,255,255,0.75)]"
+                        : "text-primary/75"
+                      : tamno
+                        ? "text-[rgba(191,227,208,0.6)]"
+                        : "text-text-muted"
+                  }`}
+                >
+                  {v.dimenzije}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="flex flex-col gap-2">
@@ -288,7 +344,7 @@ export function DodajUKorpuPopup({
               >
                 <span aria-hidden="true" className="relative h-12 w-8 shrink-0 overflow-hidden">
                   <Image
-                    src={b.vrednost === "crna" ? "/images/stalak_crni.webp" : "/images/stalak_beli.webp"}
+                    src={slikaProizvoda(velicina, b.vrednost)}
                     alt=""
                     fill
                     sizes="96px"

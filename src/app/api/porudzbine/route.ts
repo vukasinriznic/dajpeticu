@@ -9,6 +9,7 @@ import {
   validirajUkupnuKolicinu,
   jeIspravanPlaceId,
   type Boja,
+  type Velicina,
 } from "@/lib/validacijaPorudzbine";
 
 type Telo = {
@@ -21,7 +22,13 @@ type Telo = {
   postanskiBroj?: string;
   grad?: string;
   telefon?: string;
-  stavke?: { boja?: string; kolicina?: number; nazivBiznisa?: string; googlePlaceId?: string }[];
+  stavke?: {
+    boja?: string;
+    velicina?: string;
+    kolicina?: number;
+    nazivBiznisa?: string;
+    googlePlaceId?: string;
+  }[];
   // Honeypot — pravi korisnici ga nikad ne popune (vizuelno je van ekrana).
   web?: string;
 };
@@ -97,6 +104,9 @@ export async function POST(req: Request) {
   }
   const stavke = telo.stavke.map((s) => ({
     boja: (s.boja === "crna" ? "crna" : "bela") as Boja,
+    // Podrazumevano "veci" za bilo šta osim tačno "manji" — isti obrazac
+    // kao boja iznad, štiti od neispravne/nedostajuće vrednosti sa klijenta.
+    velicina: (s.velicina === "manji" ? "manji" : "veci") as Velicina,
     kolicina: Number(s.kolicina),
     nazivBiznisa: String(s.nazivBiznisa ?? ""),
     // Place ID se čuva samo ako ima oblik pravog ID-a (nikad slobodan tekst).

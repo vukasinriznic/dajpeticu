@@ -15,7 +15,7 @@ function stavkeHtml(stavke: Porudzbina["stavke"]): string {
   return stavke
     .map(
       (s) =>
-        `<li>${kolicinaSlovima(s.kolicina)} (${s.boja === "crna" ? "crni" : "beli"}) — ${esc(s.nazivBiznisa)}</li>`,
+        `<li>${kolicinaSlovima(s.kolicina)} (${s.velicina === "manji" ? "manji" : "veći"}, ${s.boja === "crna" ? "crni" : "beli"}) — ${esc(s.nazivBiznisa)}</li>`,
     )
     .join("");
 }

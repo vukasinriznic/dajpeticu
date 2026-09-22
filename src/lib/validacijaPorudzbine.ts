@@ -5,8 +5,15 @@ import { MAX_KOLICINA } from "@/lib/cene";
 
 export type Boja = "crna" | "bela";
 
+// Veličina stalka (20.09.2026., popup dobio izbor iznad boje) — "veci" je
+// postojeći proizvod (12,75 × 7,6 cm), "manji" je novi (8,56 × 5,4 cm).
+// NAPOMENA: cena se ZA SADA računa isto za obe veličine (ista tabela u
+// cene.ts) — prava cena manjeg stalka još nije definisana.
+export type Velicina = "veci" | "manji";
+
 export type Stavka = {
   boja: Boja;
+  velicina: Velicina;
   kolicina: number;
   nazivBiznisa: string;
   // Google Place ID biznisa (ako je izabran iz Autocomplete predloga) — koristi

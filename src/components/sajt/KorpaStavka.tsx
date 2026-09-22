@@ -4,6 +4,7 @@ import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Dugme } from "@/components/core/Dugme";
 import { MAX_KOLICINA, formatRSD, cenaKarticaZaStavku, jedinicnaCena, kolicinaSlovima } from "@/lib/cene";
+import { slikaProizvoda } from "@/lib/proizvod";
 import type { StavkaKorpe } from "@/components/sajt/KorpaKontekst";
 
 // Prvobitna cena jednog stalka (ista kao u DodajUKorpuPopup.tsx) — precrtana kad korpa ima 1 stalak.
@@ -37,7 +38,7 @@ export function KorpaStavka({
             brzo vizuelno podseti koja je boja stalka u pitanju. */}
         <span className="relative h-12 w-8 shrink-0 overflow-hidden">
           <Image
-            src={stavka.boja === "crna" ? "/images/stalak_crni.webp" : "/images/stalak_beli.webp"}
+            src={slikaProizvoda(stavka.velicina, stavka.boja)}
             alt=""
             fill
             sizes="96px"
@@ -47,7 +48,7 @@ export function KorpaStavka({
         </span>
         <div className="flex flex-col gap-1">
           <span className="font-tekst text-body font-medium text-white">
-            {stavka.boja === "crna" ? "Crni" : "Beli"} stalak
+            {stavka.velicina === "manji" ? "Manji" : "Veći"} {stavka.boja === "crna" ? "crni" : "beli"} stalak
           </span>
           <span className="font-tekst text-body-sm text-[rgba(191,227,208,0.75)]">
             {kolicinaSlovima(stavka.kolicina)} ·{" "}
