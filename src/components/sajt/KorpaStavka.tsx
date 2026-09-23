@@ -14,10 +14,10 @@ import {
 import { slikaProizvoda, opticnaKorekcijaSkalaKorpa } from "@/lib/proizvod";
 import type { StavkaKorpe } from "@/components/sajt/KorpaKontekst";
 
-// Prvobitna cena jednog VEĆEG stalka (ista kao u DodajUKorpuPopup.tsx) —
-// precrtana kad korpa ima samo 1 njega; manji stalak nema tu "bilu" cenu
-// (nema definisanu marketing sidrenu cenu), vidi precrtana ispod.
-const CENA_PRVOBITNA_ZA_JEDAN = 3790;
+// Prvobitne ("bile") cene za 1 komad — iste vrednosti kao u
+// DodajUKorpuPopup.tsx, odvojene po veličini.
+const CENA_PRVOBITNA_ZA_JEDAN = 3800;
+const CENA_PRVOBITNA_ZA_JEDAN_MANJI = 2900;
 const CENA_JEDNE = jedinicnaCena(1);
 const CENA_JEDNE_MANJI = jedinicnaCenaManjiPrikaz(1);
 
@@ -40,12 +40,12 @@ export function KorpaStavka({
   const ukupnaKolicinaIsteVelicine = sveStavke
     .filter((s) => s.velicina === stavka.velicina)
     .reduce((z, s) => z + s.kolicina, 0);
-  // Precrtana cena: veći stalak — sa 1 komadom u korpi prvobitna (3 790),
-  // inače cena bez popusta na količinu (isto kao u popupu). Manji stalak —
-  // nema "prvobitnu", uvek cena bez popusta na količinu.
+  // Precrtana cena: sa 1 komadom te veličine u korpi — prvobitna ("bila")
+  // cena; inače cena bez popusta na količinu. Isto za obe veličine, isti
+  // obrazac kao u popupu.
   const precrtana =
     stavka.velicina === "manji"
-      ? CENA_JEDNE_MANJI * stavka.kolicina
+      ? (ukupnaKolicinaIsteVelicine <= 1 ? CENA_PRVOBITNA_ZA_JEDAN_MANJI : CENA_JEDNE_MANJI) * stavka.kolicina
       : (ukupnaKolicinaIsteVelicine <= 1 ? CENA_PRVOBITNA_ZA_JEDAN : CENA_JEDNE) * stavka.kolicina;
 
   return (

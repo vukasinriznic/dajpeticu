@@ -46,12 +46,12 @@ const CENA_JEDNE = jedinicnaCena(1);
 // Čisto vizuelna precrtana "bila" cena za 1 stalak (sidrena cena, isti trik
 // kao kod konkurencije) — NE menja stvarnu cenu (CENA_JEDNE/cene.ts ostaju
 // netaknuti), samo se prikazuje precrtana ovde u popup-u.
-const CENA_PRVOBITNA_ZA_JEDAN = 3790;
+const CENA_PRVOBITNA_ZA_JEDAN = 3800;
 
-// Manji stalak (23.09.2026.) — sopstveni cenovnik (vidi cene.ts), bez
-// "prvobitne" (bila) cene za 1 komad jer za njega nema definisane marketing
-// sidrene cene kao za veći; ušteda se ipak prikazuje na isti način (u
-// odnosu na cenu jednog komada, izvedenu iz ukupne cene za tier).
+// Manji stalak (23.09.2026.) — sopstveni cenovnik (vidi cene.ts). Ima
+// sopstvenu "bilu" (precrtanu) cenu za 1 komad, isti trik kao veći, samo
+// druga vrednost (24.09.2026., eksplicitno traženo).
+const CENA_PRVOBITNA_ZA_JEDAN_MANJI = 2900;
 const CENA_JEDNE_MANJI = jedinicnaCenaManjiPrikaz(1);
 
 export function DodajUKorpuPopup({
@@ -447,7 +447,13 @@ export function DodajUKorpuPopup({
             {velicina === "manji" ? (
               <>
                 <span>
-                  Cena: {formatRSD(ukupnaCenaManji(kolicina || 1))}
+                  Cena:{" "}
+                  {kolicina <= 1 && (
+                    <span className="mr-1.5 line-through opacity-70">
+                      {formatRSD(CENA_PRVOBITNA_ZA_JEDAN_MANJI)}
+                    </span>
+                  )}
+                  {formatRSD(ukupnaCenaManji(kolicina || 1))}
                   {kolicina > 1 && (
                     <span className="ml-1.5 opacity-70">
                       (<span className="line-through">{formatRSD(CENA_JEDNE_MANJI)}</span>{" "}

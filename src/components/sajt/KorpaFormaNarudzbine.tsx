@@ -20,9 +20,12 @@ import { slikaProizvoda, opticnaKorekcijaSkalaKorpa } from "@/lib/proizvod";
 
 // Cena po jedinici bez popusta na količinu — isti anchor kao u
 // DodajUKorpuPopup.tsx, da se vidi ušteda i ovde u pregledu. Odvojeno za
-// veći i manji stalak, svaki ima sopstveni cenovnik.
+// veći i manji stalak, svaki ima sopstveni cenovnik. Prvobitne ("bile")
+// cene za 1 komad — iste vrednosti kao u popupu/korpi.
 const CENA_JEDNE = jedinicnaCena(1);
 const CENA_JEDNE_MANJI = jedinicnaCenaManjiPrikaz(1);
+const CENA_PRVOBITNA_ZA_JEDAN = 3800;
+const CENA_PRVOBITNA_ZA_JEDAN_MANJI = 2900;
 
 type Polja = {
   email: string;
@@ -280,7 +283,14 @@ export function KorpaFormaNarudzbine({
               <span className="font-normal">
                 {(() => {
                   const cena = cenaStavkeUKorpi(stavke, s);
-                  const precrtana = (s.velicina === "manji" ? CENA_JEDNE_MANJI : CENA_JEDNE) * s.kolicina;
+                  const ukupnaKolicinaIsteVelicine = stavke
+                    .filter((x) => x.velicina === s.velicina)
+                    .reduce((z, x) => z + x.kolicina, 0);
+                  const jedanKomad = ukupnaKolicinaIsteVelicine <= 1;
+                  const precrtana =
+                    s.velicina === "manji"
+                      ? (jedanKomad ? CENA_PRVOBITNA_ZA_JEDAN_MANJI : CENA_JEDNE_MANJI) * s.kolicina
+                      : (jedanKomad ? CENA_PRVOBITNA_ZA_JEDAN : CENA_JEDNE) * s.kolicina;
                   return (
                     <>
                       {precrtana > cena && (
