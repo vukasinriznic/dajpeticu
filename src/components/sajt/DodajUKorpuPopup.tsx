@@ -16,11 +16,13 @@ import {
   ukupnaCenaManji,
   ukupnoKorpa,
   ukupnaKolicinaManjihUKorpi,
+  ukupnaKolicinaVecihUKorpi,
   jedinicnaCenaManjiPrikaz,
   MAX_KOLICINA,
   PRAG_BESPLATNE_DOSTAVE_RSD,
   PRAG_GRATIS_POKLONA,
   PRAG_GRATIS_VECI_STALAK,
+  PRAG_GRATIS_MANJI_STALAK,
 } from "@/lib/cene";
 import { ucitajGoogleMaps } from "@/lib/googleMaps";
 import { validirajStavku, type Boja, type Velicina } from "@/lib/validacijaPorudzbine";
@@ -513,6 +515,7 @@ export function DodajUKorpuPopup({
             const cenaCombined = ukupnoKorpa(hipotetickeStavke);
             const kolicinaCombined = hipotetickeStavke.reduce((z, s) => z + s.kolicina, 0);
             const manjihCombined = ukupnaKolicinaManjihUKorpi(hipotetickeStavke);
+            const vecihCombined = ukupnaKolicinaVecihUKorpi(hipotetickeStavke);
             return (
               <div className="flex flex-col gap-1.5 px-1">
                 {cenaCombined > PRAG_BESPLATNE_DOSTAVE_RSD ? (
@@ -570,6 +573,26 @@ export function DodajUKorpuPopup({
                       </span>
                       <span className={`font-tekst text-caption ${tamno ? "text-white" : "text-text-muted"}`}>
                         {`Poruči ${PRAG_GRATIS_VECI_STALAK}+ manjih stalaka i dobijate gratis veći stalak.`}
+                      </span>
+                    </div>
+                  ))}
+                {(velicina === "veci" || vecihCombined >= PRAG_GRATIS_MANJI_STALAK) &&
+                  (vecihCombined >= PRAG_GRATIS_MANJI_STALAK ? (
+                    <div className="flex items-center gap-2">
+                      <span className="flex w-7 shrink-0 items-center justify-center">
+                        <Image src="/images/gift_icon.png" alt="" width={22} height={22} />
+                      </span>
+                      <span className={`font-tekst text-body-sm font-medium ${tamno ? "text-white" : "text-text-body"}`}>
+                        Gratis manji stalak
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="flex w-7 shrink-0 items-center justify-center">
+                        <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
+                      </span>
+                      <span className={`font-tekst text-caption ${tamno ? "text-white" : "text-text-muted"}`}>
+                        {`Poruči ${PRAG_GRATIS_MANJI_STALAK}+ velikih stalaka i dobijate gratis manji stalak.`}
                       </span>
                     </div>
                   ))}

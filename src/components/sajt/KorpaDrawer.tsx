@@ -14,7 +14,9 @@ import {
   PRAG_BESPLATNE_DOSTAVE_RSD,
   PRAG_GRATIS_POKLONA,
   PRAG_GRATIS_VECI_STALAK,
+  PRAG_GRATIS_MANJI_STALAK,
   ukupnaKolicinaManjihUKorpi,
+  ukupnaKolicinaVecihUKorpi,
 } from "@/lib/cene";
 import { validirajUkupnuKolicinu } from "@/lib/validacijaPorudzbine";
 
@@ -121,7 +123,8 @@ export function KorpaDrawer({
               const imaDostavu = ukupnaCena > PRAG_BESPLATNE_DOSTAVE_RSD;
               const imaPoklon = ukupnaKolicina >= PRAG_GRATIS_POKLONA;
               const imaVeciStalak = ukupnaKolicinaManjihUKorpi(stavke) >= PRAG_GRATIS_VECI_STALAK;
-              const imaIkakvuPogodnost = imaDostavu || imaPoklon || imaVeciStalak;
+              const imaManjiStalak = ukupnaKolicinaVecihUKorpi(stavke) >= PRAG_GRATIS_MANJI_STALAK;
+              const imaIkakvuPogodnost = imaDostavu || imaPoklon || imaVeciStalak || imaManjiStalak;
               return (
                 <>
                   {imaIkakvuPogodnost && (
@@ -148,6 +151,14 @@ export function KorpaDrawer({
                             <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
                           </span>
                           <span className="font-tekst text-body-sm font-medium text-white">Gratis veći stalak</span>
+                        </div>
+                      )}
+                      {imaManjiStalak && (
+                        <div className="flex items-center gap-2">
+                          <span className="flex w-7 shrink-0 items-center justify-center">
+                            <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
+                          </span>
+                          <span className="font-tekst text-body-sm font-medium text-white">Gratis manji stalak</span>
                         </div>
                       )}
                     </div>

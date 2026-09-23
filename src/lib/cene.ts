@@ -53,9 +53,12 @@ export const MAX_KOLICINA = 25;
 //   MANJIH stalaka (bilo koje boje) — samo manji se broje, veći se ne
 //   računaju u ovaj prag (kupac koji već kupuje veće nema poseban podsticaj
 //   da ih poredja do 10, poklon je vezan konkretno za "10 malih").
+// - Gratis MANJI stalak (24.09.2026., novo) — simetrično obrnuto: kad korpa
+//   ima 3 ili više VEĆIH stalaka (bilo koje boje), samo veći se broje.
 export const PRAG_BESPLATNE_DOSTAVE_RSD = 5000;
 export const PRAG_GRATIS_POKLONA = 3;
 export const PRAG_GRATIS_VECI_STALAK = 10;
+export const PRAG_GRATIS_MANJI_STALAK = 3;
 
 export function jedinicnaCena(kolicina: number): number {
   const k = Math.min(Math.max(Math.round(kolicina), 1), MAX_KOLICINA);
@@ -131,11 +134,16 @@ function ukupnaKolicinaZaVelicinu(stavke: StavkaZaCenu[], velicina: VelicinaStav
     .reduce((zbir, s) => zbir + s.kolicina, 0);
 }
 
-// Izvezeno za PRAG_GRATIS_VECI_STALAK — koriste popup/korpa/forma za
-// plaćanje da prikažu "Gratis veći stalak" poruku, isti obrazac kao
-// ukupnaKolicinaZaVelicinu iznad, samo javno dostupan van ovog fajla.
+// Izvezeno za PRAG_GRATIS_VECI_STALAK/PRAG_GRATIS_MANJI_STALAK — koriste
+// popup/korpa/forma za plaćanje da prikažu "Gratis veći/manji stalak"
+// poruku, isti obrazac kao ukupnaKolicinaZaVelicinu iznad, samo javno
+// dostupan van ovog fajla.
 export function ukupnaKolicinaManjihUKorpi(stavke: StavkaZaCenu[]): number {
   return ukupnaKolicinaZaVelicinu(stavke, "manji");
+}
+
+export function ukupnaKolicinaVecihUKorpi(stavke: StavkaZaCenu[]): number {
+  return ukupnaKolicinaZaVelicinu(stavke, "veci");
 }
 
 // Cena JEDNE stavke (jednog reda u korpi) — zavisi od ukupne količine SVIH
