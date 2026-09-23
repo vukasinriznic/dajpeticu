@@ -649,7 +649,7 @@ export function PocetnaStranica() {
             Više stalaka znači više prilika da vas mušterija oceni, i nižu cenu po stalku.
           </p>
         </UNaVidiku>
-        <Cenovnik onOdaberi={(n) => otvoriModal(n)} />
+        <Cenovnik onOdaberi={(n, v) => otvoriModal(n, v)} />
       </Sekcija>
 
       {/* PITANJA */}

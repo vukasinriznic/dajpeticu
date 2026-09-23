@@ -61,12 +61,14 @@ const CENA_JEDNE_MANJI = jedinicnaCenaManjiPrikaz(1);
 export function DodajUKorpuPopup({
   otvoren,
   pocetnaKolicina,
+  pocetnaVelicina,
   postojeceStavke,
   onClose,
   onDodaj,
 }: {
   otvoren: boolean;
   pocetnaKolicina: number;
+  pocetnaVelicina: Velicina;
   // Stavke VEĆ u korpi (24.09.2026.) — pogodnosti ispod (dostava/poklon/
   // gratis veći stalak) gledaju CELU (buduću) korpu, ne samo ovu stavku
   // izolovano, bitno kad se popup otvori iz već neprazne korpe.
@@ -128,13 +130,13 @@ export function DodajUKorpuPopup({
   useEffect(() => {
     if (otvoren) {
       setBoja("bela");
-      setVelicina("veci");
+      setVelicina(pocetnaVelicina);
       setKolicina(pocetnaKolicina);
       setNazivBiznisa("");
       setGooglePlaceId(undefined);
       setGreske({});
     }
-  }, [otvoren, pocetnaKolicina]);
+  }, [otvoren, pocetnaKolicina, pocetnaVelicina]);
 
   // Google Places Autocomplete na polju "Naziv biznisa" — kači se SAMO
   // jednom na dati input (autocompleteZakacenRef), jer popup ostaje montiran

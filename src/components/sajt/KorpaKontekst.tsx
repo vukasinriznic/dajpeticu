@@ -37,7 +37,7 @@ type KorpaKontekstTip = {
   isprazniKorpu: () => void;
   ukupnaKolicina: number;
   ukupnaCena: number;
-  otvoriModal: (pocetnaKolicina?: number) => void;
+  otvoriModal: (pocetnaKolicina?: number, pocetnaVelicina?: Velicina) => void;
   otvoriKorpu: () => void;
   zatvoriKorpu: () => void;
 };
@@ -58,6 +58,7 @@ export function KorpaProvider({ children }: { children: ReactNode }) {
   const [otvorenModal, setOtvorenModal] = useState(false);
   const [otvorenaKorpa, setOtvorenaKorpa] = useState(false);
   const [pocetnaKolicina, setPocetnaKolicina] = useState(1);
+  const [pocetnaVelicina, setPocetnaVelicina] = useState<Velicina>("veci");
 
   // Korpa (drawer) se zatvara TEK kad se ruta stvarno promeni (npr. "Plaćanje"
   // → /placanje). Ranije je dugme zatvaralo drawer odmah, pa se tokom njegovog
@@ -102,8 +103,9 @@ export function KorpaProvider({ children }: { children: ReactNode }) {
 
   const isprazniKorpu = useCallback(() => setStavke([]), []);
 
-  const otvoriModal = useCallback((pocetna: number = 1) => {
+  const otvoriModal = useCallback((pocetna: number = 1, velicina: Velicina = "veci") => {
     setPocetnaKolicina(pocetna);
+    setPocetnaVelicina(velicina);
     setOtvorenModal(true);
   }, []);
 
@@ -133,6 +135,7 @@ export function KorpaProvider({ children }: { children: ReactNode }) {
         <DodajUKorpuPopup
           otvoren={otvorenModal}
           pocetnaKolicina={pocetnaKolicina}
+          pocetnaVelicina={pocetnaVelicina}
           // Postojeća korpa (24.09.2026., eksplicitno traženo) — pogodnosti
           // u popupu (besplatna dostava/poklon/gratis veći stalak) treba da
           // gledaju CELU korpu + ono što se ovde bira, ne samo ovu stavku

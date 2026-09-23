@@ -1,10 +1,13 @@
 import { Check } from "lucide-react";
+import Image from "next/image";
 import { Kartica } from "@/components/core/Kartica";
 import { Znacka } from "@/components/core/Znacka";
 import { Dugme } from "@/components/core/Dugme";
 
 export function CenovnaKartica({
   naziv,
+  slika,
+  razmerSlike,
   cena,
   jedinica = "RSD",
   napomena,
@@ -15,6 +18,11 @@ export function CenovnaKartica({
   onOdaberi,
 }: {
   naziv: string;
+  // Mala slika stalka pored naziva (25.09.2026., eksplicitno traženo) —
+  // vizuelno pokazuje KOJI proizvod (veći/manji) paket nudi, jer naziv sada
+  // više ne piše "2 stalka" nego samo "x 2".
+  slika?: string;
+  razmerSlike?: string;
   cena: string;
   jedinica?: string;
   napomena?: string;
@@ -42,7 +50,17 @@ export function CenovnaKartica({
       }`}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <span className="font-prikaz text-h3 font-normal text-text-strong">{naziv}</span>
+        <span className="flex items-center gap-3">
+          {slika && (
+            <span
+              className="relative h-12 w-8 shrink-0 overflow-hidden"
+              style={{ aspectRatio: razmerSlike }}
+            >
+              <Image src={slika} alt="" fill sizes="48px" className="object-contain" />
+            </span>
+          )}
+          <span className="font-prikaz text-h3 font-normal text-text-strong">{naziv}</span>
+        </span>
         {znacka && <Znacka ton="gold">{znacka}</Znacka>}
       </div>
       <div className="flex flex-wrap items-baseline gap-1.5">
