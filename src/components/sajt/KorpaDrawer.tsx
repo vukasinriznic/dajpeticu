@@ -12,7 +12,6 @@ import {
   formatRSD,
   MAX_KOLICINA,
   PRAG_BESPLATNE_DOSTAVE_RSD,
-  PRAG_GRATIS_POKLONA,
   PRAG_GRATIS_VECI_STALAK,
   PRAG_GRATIS_MANJI_STALAK,
   ukupnaKolicinaManjihUKorpi,
@@ -121,10 +120,9 @@ export function KorpaDrawer({
                 pogodnost, isti obrazac kao u DodajUKorpuPopup.tsx. */}
             {(() => {
               const imaDostavu = ukupnaCena > PRAG_BESPLATNE_DOSTAVE_RSD;
-              const imaPoklon = ukupnaKolicina >= PRAG_GRATIS_POKLONA;
               const imaVeciStalak = ukupnaKolicinaManjihUKorpi(stavke) >= PRAG_GRATIS_VECI_STALAK;
               const imaManjiStalak = ukupnaKolicinaVecihUKorpi(stavke) >= PRAG_GRATIS_MANJI_STALAK;
-              const imaIkakvuPogodnost = imaDostavu || imaPoklon || imaVeciStalak || imaManjiStalak;
+              const imaIkakvuPogodnost = imaDostavu || imaVeciStalak || imaManjiStalak;
               return (
                 <>
                   {imaIkakvuPogodnost && (
@@ -135,14 +133,6 @@ export function KorpaDrawer({
                             <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
                           </span>
                           <span className="font-tekst text-body-sm font-medium text-white">Besplatna poštarina</span>
-                        </div>
-                      )}
-                      {imaPoklon && (
-                        <div className="flex items-center gap-2">
-                          <span className="flex w-7 shrink-0 items-center justify-center">
-                            <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
-                          </span>
-                          <span className="font-tekst text-body-sm font-medium text-white">Gratis Google kartica</span>
                         </div>
                       )}
                       {imaVeciStalak && (

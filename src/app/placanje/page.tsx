@@ -110,7 +110,6 @@ export default function PlacanjePage() {
           </h1>
           <KorpaFormaNarudzbine
             stavke={prikaz.stavke}
-            ukupnaKolicina={prikaz.ukupnaKolicina}
             ukupnaCena={prikaz.ukupnaCena}
             onUspeh={(p) => {
               setPoslato({ telefon: p.telefon });

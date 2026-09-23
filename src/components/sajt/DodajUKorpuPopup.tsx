@@ -20,7 +20,6 @@ import {
   jedinicnaCenaManjiPrikaz,
   MAX_KOLICINA,
   PRAG_BESPLATNE_DOSTAVE_RSD,
-  PRAG_GRATIS_POKLONA,
   PRAG_GRATIS_VECI_STALAK,
   PRAG_GRATIS_MANJI_STALAK,
 } from "@/lib/cene";
@@ -513,7 +512,6 @@ export function DodajUKorpuPopup({
           {(() => {
             const hipotetickeStavke = [...postojeceStavke, { kolicina: kolicina || 1, velicina }];
             const cenaCombined = ukupnoKorpa(hipotetickeStavke);
-            const kolicinaCombined = hipotetickeStavke.reduce((z, s) => z + s.kolicina, 0);
             const manjihCombined = ukupnaKolicinaManjihUKorpi(hipotetickeStavke);
             const vecihCombined = ukupnaKolicinaVecihUKorpi(hipotetickeStavke);
             return (
@@ -533,26 +531,7 @@ export function DodajUKorpuPopup({
                       <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
                     </span>
                     <span className={`font-tekst text-caption ${tamno ? "text-white" : "text-text-muted"}`}>
-                      {`Preko ${formatRSD(PRAG_BESPLATNE_DOSTAVE_RSD)} porudžbine — besplatna dostava.`}
-                    </span>
-                  </div>
-                )}
-                {kolicinaCombined >= PRAG_GRATIS_POKLONA ? (
-                  <div className="flex items-center gap-2">
-                    <span className="flex w-7 shrink-0 items-center justify-center">
-                      <Image src="/images/gift_icon.png" alt="" width={22} height={22} />
-                    </span>
-                    <span className={`font-tekst text-body-sm font-medium ${tamno ? "text-white" : "text-text-body"}`}>
-                      Gratis Google kartica
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <span className="flex w-7 shrink-0 items-center justify-center">
-                      <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
-                    </span>
-                    <span className={`font-tekst text-caption ${tamno ? "text-white" : "text-text-muted"}`}>
-                      Dodaj još jednu za gratis Google karticu.
+                      {`Preko ${formatRSD(PRAG_BESPLATNE_DOSTAVE_RSD)} porudžbine je besplatna dostava.`}
                     </span>
                   </div>
                 )}

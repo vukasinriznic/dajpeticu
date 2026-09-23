@@ -13,7 +13,6 @@ import {
   jedinicnaCenaManjiPrikaz,
   kolicinaSlovima,
   PRAG_BESPLATNE_DOSTAVE_RSD,
-  PRAG_GRATIS_POKLONA,
   PRAG_GRATIS_VECI_STALAK,
   PRAG_GRATIS_MANJI_STALAK,
   ukupnaKolicinaManjihUKorpi,
@@ -86,12 +85,10 @@ const PRAZNA_POLJA: Polja = {
 // deliću sekunde dok traje redirekcija na početnu posle pražnjenja korpe.
 export function KorpaFormaNarudzbine({
   stavke,
-  ukupnaKolicina,
   ukupnaCena,
   onUspeh,
 }: {
   stavke: StavkaKorpe[];
-  ukupnaKolicina: number;
   ukupnaCena: number;
   onUspeh: (payload: { telefon: string; id: string; ukupnaCena: number }) => void;
 }) {
@@ -325,10 +322,9 @@ export function KorpaFormaNarudzbine({
             ikonicama umesto stare precrtane cene. */}
         {(() => {
           const imaDostavu = ukupnaCena > PRAG_BESPLATNE_DOSTAVE_RSD;
-          const imaPoklon = ukupnaKolicina >= PRAG_GRATIS_POKLONA;
           const imaVeciStalak = ukupnaKolicinaManjihUKorpi(stavke) >= PRAG_GRATIS_VECI_STALAK;
           const imaManjiStalak = ukupnaKolicinaVecihUKorpi(stavke) >= PRAG_GRATIS_MANJI_STALAK;
-          const imaIkakvuPogodnost = imaDostavu || imaPoklon || imaVeciStalak || imaManjiStalak;
+          const imaIkakvuPogodnost = imaDostavu || imaVeciStalak || imaManjiStalak;
           return (
             <>
               {imaIkakvuPogodnost && (
@@ -339,14 +335,6 @@ export function KorpaFormaNarudzbine({
                         <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
                       </span>
                       <span className="font-tekst text-body font-medium text-white">Besplatna poštarina</span>
-                    </div>
-                  )}
-                  {imaPoklon && (
-                    <div className="flex items-center gap-2">
-                      <span className="flex w-7 shrink-0 items-center justify-center">
-                        <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
-                      </span>
-                      <span className="font-tekst text-body font-medium text-white">Gratis Google kartica</span>
                     </div>
                   )}
                   {imaVeciStalak && (
