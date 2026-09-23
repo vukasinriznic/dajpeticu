@@ -7,7 +7,7 @@ import { Dugme } from "@/components/core/Dugme";
 import { pratiDogadjaj, stavkaZaAnalitiku } from "@/lib/analitika";
 import { Podvuceno } from "@/components/core/Podvuceno";
 import { KorpaStavka } from "@/components/sajt/KorpaStavka";
-import type { StavkaKorpe } from "@/components/sajt/KorpaKontekst";
+import { useKorpa, type StavkaKorpe } from "@/components/sajt/KorpaKontekst";
 import { formatRSD, MAX_KOLICINA, PRAG_BESPLATNE_DOSTAVE, PRAG_GRATIS_POKLONA } from "@/lib/cene";
 import { validirajUkupnuKolicinu } from "@/lib/validacijaPorudzbine";
 
@@ -31,6 +31,16 @@ export function KorpaDrawer({
   onZatvori: () => void;
 }) {
   const router = useRouter();
+  // "Nastavite kupovinu" (oba dugmeta ispod) — otvara popup za dodavanje
+  // stalka umesto da vodi na početnu (24.09.2026., eksplicitno traženo):
+  // korisnik ostaje u toku porudžbine, bez skrolovanja do dugmeta na
+  // stranici. Drawer se zatvara PRE otvaranja popupa, isti redosled kao
+  // suprotan smer (DodajUKorpuPopup.tsx-ov onDodaj radi close→open).
+  const { otvoriModal } = useKorpa();
+  const nastaviKupovinu = () => {
+    onZatvori();
+    otvoriModal();
+  };
   // validirajUkupnuKolicinu() (server strana rute) bi ovo ionako odbio tek
   // na /placanje — upozorenje ovde sprečava da korisnik prvo sabere veliku
   // korpu (i vidi "tačnu" cenu) pa tek na sledećem koraku sazna da
@@ -76,13 +86,7 @@ export function KorpaDrawer({
             }}
           />
           <p className="m-0 font-tekst text-body text-[rgba(191,227,208,0.85)]">Vaša korpa je prazna.</p>
-          <Dugme
-            variant="gold"
-            onClick={() => {
-              onZatvori();
-              router.push("/");
-            }}
-          >
+          <Dugme variant="gold" onClick={nastaviKupovinu}>
             Nastavite kupovinu
           </Dugme>
         </div>
@@ -159,10 +163,7 @@ export function KorpaDrawer({
             </Dugme>
             <button
               type="button"
-              onClick={() => {
-                onZatvori();
-                router.push("/");
-              }}
+              onClick={nastaviKupovinu}
               className="mx-auto font-tekst text-body-sm text-[rgba(191,227,208,0.85)] underline decoration-[rgba(191,227,208,0.5)] underline-offset-2 transition-colors duration-200 hover:text-white"
             >
               Nastavite kupovinu
