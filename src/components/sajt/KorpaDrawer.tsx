@@ -8,7 +8,14 @@ import { pratiDogadjaj, stavkaZaAnalitiku } from "@/lib/analitika";
 import { Podvuceno } from "@/components/core/Podvuceno";
 import { KorpaStavka } from "@/components/sajt/KorpaStavka";
 import { useKorpa, type StavkaKorpe } from "@/components/sajt/KorpaKontekst";
-import { formatRSD, MAX_KOLICINA, PRAG_BESPLATNE_DOSTAVE, PRAG_GRATIS_POKLONA } from "@/lib/cene";
+import {
+  formatRSD,
+  MAX_KOLICINA,
+  PRAG_BESPLATNE_DOSTAVE_RSD,
+  PRAG_GRATIS_POKLONA,
+  PRAG_GRATIS_VECI_STALAK,
+  ukupnaKolicinaManjihUKorpi,
+} from "@/lib/cene";
 import { validirajUkupnuKolicinu } from "@/lib/validacijaPorudzbine";
 
 // Isti tamnozeleni/zlatni jezik kao DodajUKorpuPopup.tsx — panel usidren
@@ -105,38 +112,59 @@ export function KorpaDrawer({
           </div>
 
           <div className="sticky bottom-0 z-10 flex flex-col gap-4 border-t border-[rgba(255,197,61,0.2)] bg-[var(--color-bg-inverse)] px-6 py-6">
-            {/* Na 1 kartici kupac poštarinu plaća kuriru (vidi uslove) i to se namerno ne
-                pominje ovde (ništa se ne obećava besplatno); od 2 kartice
-                na dalje red sa ikonicom za svaku otključanu pogodnost, isti
-                obrazac kao u DodajUKorpuPopup.tsx. */}
-            {ukupnaKolicina >= PRAG_BESPLATNE_DOSTAVE && (
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="flex w-7 shrink-0 items-center justify-center">
-                    <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
-                  </span>
-                  <span className="font-tekst text-body-sm font-medium text-white">Besplatna poštarina</span>
-                </div>
-                {ukupnaKolicina >= PRAG_GRATIS_POKLONA && (
-                  <div className="flex items-center gap-2">
-                    <span className="flex w-7 shrink-0 items-center justify-center">
-                      <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
+            {/* Na malenoj korpi kupac poštarinu plaća kuriru (vidi uslove) i
+                to se namerno ne pominje ovde (ništa se ne obećava
+                besplatno); iznad praga po CENI (24.09.2026., promenjeno sa
+                praga po količini) red sa ikonicom za svaku otključanu
+                pogodnost, isti obrazac kao u DodajUKorpuPopup.tsx. */}
+            {(() => {
+              const imaDostavu = ukupnaCena > PRAG_BESPLATNE_DOSTAVE_RSD;
+              const imaPoklon = ukupnaKolicina >= PRAG_GRATIS_POKLONA;
+              const imaVeciStalak = ukupnaKolicinaManjihUKorpi(stavke) >= PRAG_GRATIS_VECI_STALAK;
+              const imaIkakvuPogodnost = imaDostavu || imaPoklon || imaVeciStalak;
+              return (
+                <>
+                  {imaIkakvuPogodnost && (
+                    <div className="flex flex-col gap-1.5">
+                      {imaDostavu && (
+                        <div className="flex items-center gap-2">
+                          <span className="flex w-7 shrink-0 items-center justify-center">
+                            <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
+                          </span>
+                          <span className="font-tekst text-body-sm font-medium text-white">Besplatna poštarina</span>
+                        </div>
+                      )}
+                      {imaPoklon && (
+                        <div className="flex items-center gap-2">
+                          <span className="flex w-7 shrink-0 items-center justify-center">
+                            <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
+                          </span>
+                          <span className="font-tekst text-body-sm font-medium text-white">Gratis Google kartica</span>
+                        </div>
+                      )}
+                      {imaVeciStalak && (
+                        <div className="flex items-center gap-2">
+                          <span className="flex w-7 shrink-0 items-center justify-center">
+                            <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
+                          </span>
+                          <span className="font-tekst text-body-sm font-medium text-white">Gratis veći stalak</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <div
+                    className={`flex items-baseline justify-between gap-4 ${
+                      imaIkakvuPogodnost ? "border-t border-[rgba(255,197,61,0.2)] pt-4" : ""
+                    }`}
+                  >
+                    <span className="font-tekst text-body font-normal text-white">Ukupno</span>
+                    <span className="font-prikaz text-h1 font-normal text-[var(--color-gold)]">
+                      {formatRSD(ukupnaCena)}
                     </span>
-                    <span className="font-tekst text-body-sm font-medium text-white">Gratis Google kartica</span>
                   </div>
-                )}
-              </div>
-            )}
-            <div
-              className={`flex items-baseline justify-between gap-4 ${
-                ukupnaKolicina >= PRAG_BESPLATNE_DOSTAVE ? "border-t border-[rgba(255,197,61,0.2)] pt-4" : ""
-              }`}
-            >
-              <span className="font-tekst text-body font-normal text-white">Ukupno</span>
-              <span className="font-prikaz text-h1 font-normal text-[var(--color-gold)]">
-                {formatRSD(ukupnaCena)}
-              </span>
-            </div>
+                </>
+              );
+            })()}
             {prekoracenje && (
               <p className="m-0 font-tekst text-body-sm text-[var(--color-danger)]">
                 Za sada primamo porudžbine do {MAX_KOLICINA} stalaka. Smanjite količinu ili nam se javite

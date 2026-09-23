@@ -16,8 +16,9 @@ import {
   ukupnaCenaManji,
   jedinicnaCenaManjiPrikaz,
   MAX_KOLICINA,
-  PRAG_BESPLATNE_DOSTAVE,
+  PRAG_BESPLATNE_DOSTAVE_RSD,
   PRAG_GRATIS_POKLONA,
+  PRAG_GRATIS_VECI_STALAK,
 } from "@/lib/cene";
 import { ucitajGoogleMaps } from "@/lib/googleMaps";
 import { validirajStavku, type Boja, type Velicina } from "@/lib/validacijaPorudzbine";
@@ -490,51 +491,80 @@ export function DodajUKorpuPopup({
               </>
             )}
           </div>
-          {/* Podsticaj na veću porudžbinu — isti pragovi koje ukupnoKorpa()
-              zaista primenjuje (lib/cene.ts), pa poruka nikad ne obeća nešto
-              što se ne naplati tačno tako u korpi. Ispod 2 kom samo tekst;
-              od 2 kom na dalje red sa ikonicom za svaku otključanu pogodnost. */}
-          {kolicina < PRAG_BESPLATNE_DOSTAVE ? (
-            <div className="flex items-center gap-2 px-1">
-              <span className="flex w-7 shrink-0 items-center justify-center">
-                <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
-              </span>
-              <span className={`font-tekst text-caption ${tamno ? "text-white" : "text-text-muted"}`}>
-                {`Dodaj još ${PRAG_BESPLATNE_DOSTAVE - kolicina} za besplatnu dostavu.`}
-              </span>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-1.5 px-1">
-              {kolicina < PRAG_GRATIS_POKLONA && (
-                <div className="flex items-center gap-2">
-                  <span className="flex w-7 shrink-0 items-center justify-center">
-                    <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
-                  </span>
-                  <span className={`font-tekst text-caption ${tamno ? "text-white" : "text-text-muted"}`}>
-                    Dodaj još jednu za gratis Google karticu.
-                  </span>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <span className="flex w-7 shrink-0 items-center justify-center">
-                  <Image src="/images/shipping_box.png" alt="" width={22} height={22} />
-                </span>
-                <span className={`font-tekst text-body-sm font-medium ${tamno ? "text-white" : "text-text-body"}`}>
-                  Besplatna dostava
-                </span>
+          {/* Podsticaj na veću porudžbinu — tri nezavisne pogodnosti, svaka
+              sa sopstvenim pragom (24.09.2026., besplatna dostava PROMENJENA
+              sa praga po količini na prag po CENI; dodat gratis veći stalak
+              na 10+ manjih). Pragovi su isti koje ukupnoKorpa()/stvarna
+              korpa primenjuju, pa poruka nikad ne obeća nešto što se ne
+              ostvari tačno tako. Cena OVE stavke (kolicina || 1, jer stavka
+              još nije u korpi) — dostava gleda samo ono što se ovde bira,
+              ne celu (eventualno već postojeću) korpu. */}
+          {(() => {
+            const cenaOveStavke =
+              velicina === "manji" ? ukupnaCenaManji(kolicina || 1) : cenaKartica(kolicina || 1);
+            return (
+              <div className="flex flex-col gap-1.5 px-1">
+                {cenaOveStavke > PRAG_BESPLATNE_DOSTAVE_RSD ? (
+                  <div className="flex items-center gap-2">
+                    <span className="flex w-7 shrink-0 items-center justify-center">
+                      <Image src="/images/shipping_box.png" alt="" width={22} height={22} />
+                    </span>
+                    <span className={`font-tekst text-body-sm font-medium ${tamno ? "text-white" : "text-text-body"}`}>
+                      Besplatna dostava
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="flex w-7 shrink-0 items-center justify-center">
+                      <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
+                    </span>
+                    <span className={`font-tekst text-caption ${tamno ? "text-white" : "text-text-muted"}`}>
+                      {`Preko ${formatRSD(PRAG_BESPLATNE_DOSTAVE_RSD)} porudžbine — besplatna dostava.`}
+                    </span>
+                  </div>
+                )}
+                {kolicina >= PRAG_GRATIS_POKLONA ? (
+                  <div className="flex items-center gap-2">
+                    <span className="flex w-7 shrink-0 items-center justify-center">
+                      <Image src="/images/gift_icon.png" alt="" width={22} height={22} />
+                    </span>
+                    <span className={`font-tekst text-body-sm font-medium ${tamno ? "text-white" : "text-text-body"}`}>
+                      Gratis Google kartica
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="flex w-7 shrink-0 items-center justify-center">
+                      <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
+                    </span>
+                    <span className={`font-tekst text-caption ${tamno ? "text-white" : "text-text-muted"}`}>
+                      Dodaj još jednu za gratis Google karticu.
+                    </span>
+                  </div>
+                )}
+                {velicina === "manji" &&
+                  (kolicina >= PRAG_GRATIS_VECI_STALAK ? (
+                    <div className="flex items-center gap-2">
+                      <span className="flex w-7 shrink-0 items-center justify-center">
+                        <Image src="/images/gift_icon.png" alt="" width={22} height={22} />
+                      </span>
+                      <span className={`font-tekst text-body-sm font-medium ${tamno ? "text-white" : "text-text-body"}`}>
+                        Gratis veći stalak
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="flex w-7 shrink-0 items-center justify-center">
+                        <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
+                      </span>
+                      <span className={`font-tekst text-caption ${tamno ? "text-white" : "text-text-muted"}`}>
+                        {`Poruči ${PRAG_GRATIS_VECI_STALAK}+ manjih stalaka i dobijate gratis veći stalak.`}
+                      </span>
+                    </div>
+                  ))}
               </div>
-              {kolicina >= PRAG_GRATIS_POKLONA && (
-                <div className="flex items-center gap-2">
-                  <span className="flex w-7 shrink-0 items-center justify-center">
-                    <Image src="/images/gift_icon.png" alt="" width={22} height={22} />
-                  </span>
-                  <span className={`font-tekst text-body-sm font-medium ${tamno ? "text-white" : "text-text-body"}`}>
-                    Gratis Google kartica
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
+            );
+          })()}
           {greske.kolicina && <span className="text-caption text-danger">{greske.kolicina}</span>}
         </div>
 

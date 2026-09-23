@@ -12,8 +12,10 @@ import {
   jedinicnaCena,
   jedinicnaCenaManjiPrikaz,
   kolicinaSlovima,
-  PRAG_BESPLATNE_DOSTAVE,
+  PRAG_BESPLATNE_DOSTAVE_RSD,
   PRAG_GRATIS_POKLONA,
+  PRAG_GRATIS_VECI_STALAK,
+  ukupnaKolicinaManjihUKorpi,
 } from "@/lib/cene";
 import { validirajPorudzbinu, validirajUkupnuKolicinu } from "@/lib/validacijaPorudzbine";
 import { slikaProizvoda, opticnaKorekcijaSkalaKorpa } from "@/lib/proizvod";
@@ -315,37 +317,58 @@ export function KorpaFormaNarudzbine({
             </span>
           </div>
         ))}
-        {/* Isti obrazac kao u KorpaDrawer.tsx — na 1 kartici kupac poštarinu plaća kuriru (uslovi)
-            i ne pominje se, od 2 kartice pogodnosti se
-            nabrajaju sa ikonicama umesto stare precrtane cene. */}
-        {ukupnaKolicina >= PRAG_BESPLATNE_DOSTAVE && (
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-2">
-              <span className="flex w-7 shrink-0 items-center justify-center">
-                <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
-              </span>
-              <span className="font-tekst text-body font-medium text-white">Besplatna poštarina</span>
-            </div>
-            {ukupnaKolicina >= PRAG_GRATIS_POKLONA && (
-              <div className="flex items-center gap-2">
-                <span className="flex w-7 shrink-0 items-center justify-center">
-                  <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
+        {/* Isti obrazac kao u KorpaDrawer.tsx — na maloj korpi kupac
+            poštarinu plaća kuriru (uslovi) i ne pominje se, iznad praga po
+            CENI (24.09.2026., bilo po količini) pogodnosti se nabrajaju sa
+            ikonicama umesto stare precrtane cene. */}
+        {(() => {
+          const imaDostavu = ukupnaCena > PRAG_BESPLATNE_DOSTAVE_RSD;
+          const imaPoklon = ukupnaKolicina >= PRAG_GRATIS_POKLONA;
+          const imaVeciStalak = ukupnaKolicinaManjihUKorpi(stavke) >= PRAG_GRATIS_VECI_STALAK;
+          const imaIkakvuPogodnost = imaDostavu || imaPoklon || imaVeciStalak;
+          return (
+            <>
+              {imaIkakvuPogodnost && (
+                <div className="flex flex-col gap-1.5">
+                  {imaDostavu && (
+                    <div className="flex items-center gap-2">
+                      <span className="flex w-7 shrink-0 items-center justify-center">
+                        <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
+                      </span>
+                      <span className="font-tekst text-body font-medium text-white">Besplatna poštarina</span>
+                    </div>
+                  )}
+                  {imaPoklon && (
+                    <div className="flex items-center gap-2">
+                      <span className="flex w-7 shrink-0 items-center justify-center">
+                        <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
+                      </span>
+                      <span className="font-tekst text-body font-medium text-white">Gratis Google kartica</span>
+                    </div>
+                  )}
+                  {imaVeciStalak && (
+                    <div className="flex items-center gap-2">
+                      <span className="flex w-7 shrink-0 items-center justify-center">
+                        <Image src="/images/gift_icon.png" alt="" width={18} height={18} />
+                      </span>
+                      <span className="font-tekst text-body font-medium text-white">Gratis veći stalak</span>
+                    </div>
+                  )}
+                </div>
+              )}
+              <div
+                className={`mt-2 flex items-baseline justify-between gap-4 ${
+                  imaIkakvuPogodnost ? "border-t border-[rgba(255,197,61,0.2)] pt-4" : ""
+                }`}
+              >
+                <span className="font-tekst text-body font-normal text-white">Ukupno</span>
+                <span className="font-prikaz text-h1 font-normal text-[var(--color-gold)]">
+                  {formatRSD(ukupnaCena)}
                 </span>
-                <span className="font-tekst text-body font-medium text-white">Gratis Google kartica</span>
               </div>
-            )}
-          </div>
-        )}
-        <div
-          className={`mt-2 flex items-baseline justify-between gap-4 ${
-            ukupnaKolicina >= PRAG_BESPLATNE_DOSTAVE ? "border-t border-[rgba(255,197,61,0.2)] pt-4" : ""
-          }`}
-        >
-          <span className="font-tekst text-body font-normal text-white">Ukupno</span>
-          <span className="font-prikaz text-h1 font-normal text-[var(--color-gold)]">
-            {formatRSD(ukupnaCena)}
-          </span>
-        </div>
+            </>
+          );
+        })()}
       </div>
 
       {opstaGreska && (
