@@ -72,7 +72,12 @@ export function Cenovnik({
               cena={formatRSD(cenaPaketa(p.kolicina, p.velicina)).replace(" RSD", "")}
               napomena={`${formatRSD(cenaPoKomadu)} po stalku`}
               stavke={[...p.stavke]}
-              znacka={`Ušteda ${formatRSD((cenaJedne - cenaPoKomadu) * p.kolicina)}`}
+              // Skraćeno na "-X RSD" (bilo "Ušteda X RSD") — sa malom
+              // slikom ispred naziva red više nema mesta za duži tekst na
+              // mobilnom (25.09.2026., prijavljeno prelamanje na iPhone
+              // 16 širini), a "-" ispred iznosa je uobičajen i jasan zapis
+              // popusta i bez reči "Ušteda".
+              znacka={`-${formatRSD((cenaJedne - cenaPoKomadu) * p.kolicina)}`}
               istaknuta={"istaknuta" in p ? p.istaknuta : false}
               cta={`Izaberi ${kolicinaSlovima(p.kolicina)}`}
               onOdaberi={() => onOdaberi(p.kolicina, p.velicina)}
