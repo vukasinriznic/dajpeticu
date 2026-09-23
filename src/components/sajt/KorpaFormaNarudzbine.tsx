@@ -15,7 +15,7 @@ import {
   PRAG_GRATIS_POKLONA,
 } from "@/lib/cene";
 import { validirajPorudzbinu, validirajUkupnuKolicinu } from "@/lib/validacijaPorudzbine";
-import { slikaProizvoda, opticnaKorekcijaSkala } from "@/lib/proizvod";
+import { slikaProizvoda, opticnaKorekcijaSkalaKorpa } from "@/lib/proizvod";
 
 // Cena po jedinici bez popusta na količinu — isti anchor kao u
 // DodajUKorpuPopup.tsx, da se vidi ušteda i ovde u pregledu.
@@ -269,7 +269,7 @@ export function KorpaFormaNarudzbine({
                     sizes="96px"
                     quality={90}
                     className="object-contain"
-                    style={{ transform: `scale(${opticnaKorekcijaSkala(s.velicina, s.boja)})` }}
+                    style={{ transform: `scale(${opticnaKorekcijaSkalaKorpa(s.velicina, s.boja)})` }}
                   />
                 </span>
                 {kolicinaSlovima(s.kolicina)} ({s.velicina === "manji" ? "manji" : "veći"}, {s.boja === "crna" ? "crni" : "beli"})

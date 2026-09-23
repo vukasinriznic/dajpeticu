@@ -24,7 +24,7 @@ import {
   slikaProizvoda,
   razmerProizvoda,
   razmerProizvodaBroj,
-  opticnaKorekcijaSkala,
+  opticnaKorekcijaSkalaPopup,
 } from "@/lib/proizvod";
 
 // Boja teksta na tamnoj (podrazumevanoj) pozadini popup-a — bela, osim
@@ -239,7 +239,7 @@ export function DodajUKorpuPopup({
           // Omotač nema animaciju, pa scale ovde radi bez sudara.
           style={{
             aspectRatio: razmerProizvoda(velicina),
-            transform: `scale(${opticnaKorekcijaSkala(velicina, boja)})`,
+            transform: `scale(${opticnaKorekcijaSkalaPopup(velicina, boja)})`,
           }}
         >
           <Image
@@ -287,7 +287,7 @@ export function DodajUKorpuPopup({
               centriranjem). */}
           <Kartica3D
             key={`${velicina}-${boja}`}
-            sirina={Math.round(sirinaMobilneKartice * opticnaKorekcijaSkala(velicina, boja))}
+            sirina={Math.round(sirinaMobilneKartice * opticnaKorekcijaSkalaPopup(velicina, boja))}
             slika={slikaProizvoda(velicina, boja)}
             razmerSlike={razmerProizvoda(velicina)}
             naziv={`${boja === "crna" ? "Crni" : "Beli"} Daj Peticu NFC ${velicina === "manji" ? "manji stalak" : "stalak"}`}
