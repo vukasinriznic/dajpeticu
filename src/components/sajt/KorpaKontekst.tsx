@@ -133,6 +133,12 @@ export function KorpaProvider({ children }: { children: ReactNode }) {
         <DodajUKorpuPopup
           otvoren={otvorenModal}
           pocetnaKolicina={pocetnaKolicina}
+          // Postojeća korpa (24.09.2026., eksplicitno traženo) — pogodnosti
+          // u popupu (besplatna dostava/poklon/gratis veći stalak) treba da
+          // gledaju CELU korpu + ono što se ovde bira, ne samo ovu stavku
+          // izolovano (bitno otkad "Nastavite kupovinu" otvara baš ovaj
+          // popup iz VEĆ NEPRAZNE korpe).
+          postojeceStavke={stavke}
           onClose={() => setOtvorenModal(false)}
           onDodaj={(stavka) => {
             dodajStavku(stavka);

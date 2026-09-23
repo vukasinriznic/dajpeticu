@@ -14,6 +14,8 @@ import {
   formatRSD,
   jedinicnaCena,
   ukupnaCenaManji,
+  ukupnoKorpa,
+  ukupnaKolicinaManjihUKorpi,
   jedinicnaCenaManjiPrikaz,
   MAX_KOLICINA,
   PRAG_BESPLATNE_DOSTAVE_RSD,
@@ -58,11 +60,16 @@ const CENA_JEDNE_MANJI = jedinicnaCenaManjiPrikaz(1);
 export function DodajUKorpuPopup({
   otvoren,
   pocetnaKolicina,
+  postojeceStavke,
   onClose,
   onDodaj,
 }: {
   otvoren: boolean;
   pocetnaKolicina: number;
+  // Stavke VEĆ u korpi (24.09.2026.) — pogodnosti ispod (dostava/poklon/
+  // gratis veći stalak) gledaju CELU (buduću) korpu, ne samo ovu stavku
+  // izolovano, bitno kad se popup otvori iz već neprazne korpe.
+  postojeceStavke: { kolicina: number; velicina: Velicina }[];
   onClose: () => void;
   onDodaj: (stavka: {
     boja: Boja;
@@ -496,15 +503,19 @@ export function DodajUKorpuPopup({
               sa praga po količini na prag po CENI; dodat gratis veći stalak
               na 10+ manjih). Pragovi su isti koje ukupnoKorpa()/stvarna
               korpa primenjuju, pa poruka nikad ne obeća nešto što se ne
-              ostvari tačno tako. Cena OVE stavke (kolicina || 1, jer stavka
-              još nije u korpi) — dostava gleda samo ono što se ovde bira,
-              ne celu (eventualno već postojeću) korpu. */}
+              ostvari tačno tako. GLEDA CELU (buduću) korpu — postojeće
+              stavke + ono što se ovde bira (24.09.2026., eksplicitno
+              traženo: "ako već imamo nešto u korpi preko 5000, dostava
+              treba da bude besplatna" i kad se dodaje NOVA, jeftinija
+              stavka) — ne samo ovu stavku izolovano. */}
           {(() => {
-            const cenaOveStavke =
-              velicina === "manji" ? ukupnaCenaManji(kolicina || 1) : cenaKartica(kolicina || 1);
+            const hipotetickeStavke = [...postojeceStavke, { kolicina: kolicina || 1, velicina }];
+            const cenaCombined = ukupnoKorpa(hipotetickeStavke);
+            const kolicinaCombined = hipotetickeStavke.reduce((z, s) => z + s.kolicina, 0);
+            const manjihCombined = ukupnaKolicinaManjihUKorpi(hipotetickeStavke);
             return (
               <div className="flex flex-col gap-1.5 px-1">
-                {cenaOveStavke > PRAG_BESPLATNE_DOSTAVE_RSD ? (
+                {cenaCombined > PRAG_BESPLATNE_DOSTAVE_RSD ? (
                   <div className="flex items-center gap-2">
                     <span className="flex w-7 shrink-0 items-center justify-center">
                       <Image src="/images/shipping_box.png" alt="" width={22} height={22} />
@@ -523,7 +534,7 @@ export function DodajUKorpuPopup({
                     </span>
                   </div>
                 )}
-                {kolicina >= PRAG_GRATIS_POKLONA ? (
+                {kolicinaCombined >= PRAG_GRATIS_POKLONA ? (
                   <div className="flex items-center gap-2">
                     <span className="flex w-7 shrink-0 items-center justify-center">
                       <Image src="/images/gift_icon.png" alt="" width={22} height={22} />
@@ -542,8 +553,8 @@ export function DodajUKorpuPopup({
                     </span>
                   </div>
                 )}
-                {velicina === "manji" &&
-                  (kolicina >= PRAG_GRATIS_VECI_STALAK ? (
+                {(velicina === "manji" || manjihCombined >= PRAG_GRATIS_VECI_STALAK) &&
+                  (manjihCombined >= PRAG_GRATIS_VECI_STALAK ? (
                     <div className="flex items-center gap-2">
                       <span className="flex w-7 shrink-0 items-center justify-center">
                         <Image src="/images/gift_icon.png" alt="" width={22} height={22} />
