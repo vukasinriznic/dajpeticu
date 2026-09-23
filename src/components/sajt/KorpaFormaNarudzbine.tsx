@@ -266,7 +266,7 @@ export function KorpaFormaNarudzbine({
       <div className="flex flex-col gap-2 rounded-field bg-[rgba(255,197,61,0.08)] p-5">
         {stavke.map((s) => (
           <div key={s.id} className="flex flex-col gap-1">
-            <div className="flex items-center justify-between gap-4 font-tekst text-body text-white">
+            <div className="flex flex-col gap-1 font-tekst text-body text-white sm:flex-row sm:items-center sm:justify-between sm:gap-4">
               <span className="flex items-center gap-3">
                 <span className="relative h-12 w-8 shrink-0 overflow-hidden">
                   <Image

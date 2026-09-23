@@ -163,14 +163,20 @@
       box-shadow 999999s ease-in-out 0s;
   }
 
+  /* NEPROVIDNA boja (ne rgba(255,255,255,0.06) kao pre) — providan box-shadow
+     samo LAGANO zatamni browser-ovu SOPSTVENU (svetlu žuto/plavu) autofill
+     pozadinu, ne prekriva je potpuno, pa su polja na /placanje (mobilni
+     autofill, prijavljeno 24.09.2026.) ostajala svetla. #1a3b2d je ručno
+     izračunat ekvivalent te providne bele preko --color-bg-inverse pozadine
+     (isti vizuelni rezultat, ali neproziran — stvarno prekriva UA sloj). */
   input[data-tamno]:autofill {
-    box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.06) inset;
+    box-shadow: 0 0 0 1000px #1a3b2d inset;
     -webkit-text-fill-color: #ffffff;
     caret-color: #ffffff;
   }
 
   input[data-tamno]:-webkit-autofill {
-    box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.06) inset;
+    box-shadow: 0 0 0 1000px #1a3b2d inset;
     -webkit-text-fill-color: #ffffff;
     caret-color: #ffffff;
   }
