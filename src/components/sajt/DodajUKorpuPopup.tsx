@@ -19,7 +19,13 @@ import {
 } from "@/lib/cene";
 import { ucitajGoogleMaps } from "@/lib/googleMaps";
 import { validirajStavku, type Boja, type Velicina } from "@/lib/validacijaPorudzbine";
-import { VELICINE, slikaProizvoda, razmerProizvoda, razmerProizvodaBroj } from "@/lib/proizvod";
+import {
+  VELICINE,
+  slikaProizvoda,
+  razmerProizvoda,
+  razmerProizvodaBroj,
+  opticnaKorekcijaSkala,
+} from "@/lib/proizvod";
 
 // Boja teksta na tamnoj (podrazumevanoj) pozadini popup-a — bela, osim
 // pomoćnog teksta ispod "Naziv biznisa" koji ostaje u prigušenijoj nijansi
@@ -223,7 +229,19 @@ export function DodajUKorpuPopup({
               "radial-gradient(40% 40% at 50% 45%, rgba(255,197,61,0.4), transparent 70%), radial-gradient(65% 65% at 50% 45%, rgba(255,197,61,0.2), transparent 78%)",
           }}
         />
-        <div className="relative h-[77%] max-h-[704px]" style={{ aspectRatio: razmerProizvoda(velicina) }}>
+        <div
+          className="relative h-[77%] max-h-[704px]"
+          // Optička korekcija ide na OMOTAČ, ne na <Image> — <Image> već ima
+          // "animation" u sopstvenom style-u (ulazna dp-slika-pojava), a
+          // dodavanje transform:scale u ISTI style tu vrednost kroz celo
+          // trajanje animacije nadjača (izmereno: computed transform ostaje
+          // "from" keyframe vrednošću zauvek, bez obzira na trajanje).
+          // Omotač nema animaciju, pa scale ovde radi bez sudara.
+          style={{
+            aspectRatio: razmerProizvoda(velicina),
+            transform: `scale(${opticnaKorekcijaSkala(velicina, boja)})`,
+          }}
+        >
           <Image
             key={`${velicina}-${boja}`}
             src={slikaProizvoda(velicina, boja)}
@@ -263,9 +281,13 @@ export function DodajUKorpuPopup({
             Desktop već ima svoju sopstvenu (sticky, levu kolonu) sliku —
             ova je md:hidden da se ne duplira. */}
         <div ref={mobilnaSlikaRef} className="w-full overflow-hidden md:hidden">
+          {/* Kartica3D nema style prop — optička korekcija ide kroz sirinu
+              (isti vizuelni efekat kao transform:scale, bez rizika da se
+              sudari sa Kartica3D-ovim sopstvenim left-1/2/-translate-x-1/2
+              centriranjem). */}
           <Kartica3D
             key={`${velicina}-${boja}`}
-            sirina={sirinaMobilneKartice}
+            sirina={Math.round(sirinaMobilneKartice * opticnaKorekcijaSkala(velicina, boja))}
             slika={slikaProizvoda(velicina, boja)}
             razmerSlike={razmerProizvoda(velicina)}
             naziv={`${boja === "crna" ? "Crni" : "Beli"} Daj Peticu NFC ${velicina === "manji" ? "manji stalak" : "stalak"}`}
