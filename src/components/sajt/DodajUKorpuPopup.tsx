@@ -528,7 +528,7 @@ export function DodajUKorpuPopup({
                 ) : (
                   <div className="flex items-center gap-2">
                     <span className="flex w-7 shrink-0 items-center justify-center">
-                      <Image src="/images/shipping_box.png" alt="" width={18} height={18} />
+                      <Image src="/images/shipping_box.png" alt="" width={22} height={22} />
                     </span>
                     <span className={`font-tekst text-caption ${tamno ? "text-white" : "text-text-muted"}`}>
                       {`Preko ${formatRSD(PRAG_BESPLATNE_DOSTAVE_RSD)} porudžbine je besplatna dostava.`}
