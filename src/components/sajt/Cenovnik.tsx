@@ -21,19 +21,19 @@ const PAKETI = [
   {
     kolicina: 2,
     velicina: "veci" as Velicina,
-    naziv: "x 2",
+    naziv: "Veći x 2",
     stavke: ["Za mali salon ili radnju", "Podešavamo i zaključavamo čip", "Stiže poštom za 2 dana"],
   },
   {
     kolicina: 10,
     velicina: "manji" as Velicina,
-    naziv: "x 10",
-    stavke: ["Kasa, sto, ulaz, terasa", "Podešavamo i zaključavamo čip", "Zamena bez pitanja 90 dana"],
+    naziv: "Manji x 10",
+    stavke: ["Po jedna na svaki sto", "Podešavamo i zaključavamo čip", "Zamena bez pitanja 90 dana"],
   },
   {
     kolicina: 20,
     velicina: "manji" as Velicina,
-    naziv: "x 20",
+    naziv: "Manji x 20",
     stavke: ["Po jedna na svaki sto", "Podešavamo i zaključavamo čip", "Zamena bez pitanja 90 dana"],
     istaknuta: true,
   },
