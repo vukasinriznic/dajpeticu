@@ -9,6 +9,7 @@ import { Podvuceno } from "@/components/core/Podvuceno";
 import { KorpaStavka } from "@/components/sajt/KorpaStavka";
 import type { StavkaKorpe } from "@/components/sajt/KorpaKontekst";
 import { formatRSD, MAX_KOLICINA, PRAG_BESPLATNE_DOSTAVE, PRAG_GRATIS_POKLONA } from "@/lib/cene";
+import { validirajUkupnuKolicinu } from "@/lib/validacijaPorudzbine";
 
 // Isti tamnozeleni/zlatni jezik kao DodajUKorpuPopup.tsx — panel usidren
 // desno (Modal.tsx variant="drawer"), otvara se klikom na ikonicu korpe u
@@ -30,11 +31,12 @@ export function KorpaDrawer({
   onZatvori: () => void;
 }) {
   const router = useRouter();
-  // validirajUkupnuKolicinu() u KorpaFormaNarudzbine.tsx bi ovo ionako
-  // odbio tek na /placanje — upozorenje ovde sprečava da korisnik prvo
-  // sabere veliku korpu (i vidi "tačnu" cenu za sve stavke po najnižem
-  // tier-u) pa tek na sledećem koraku sazna da porudžbina ne prolazi.
-  const prekoracenje = ukupnaKolicina > MAX_KOLICINA;
+  // validirajUkupnuKolicinu() (server strana rute) bi ovo ionako odbio tek
+  // na /placanje — upozorenje ovde sprečava da korisnik prvo sabere veliku
+  // korpu (i vidi "tačnu" cenu) pa tek na sledećem koraku sazna da
+  // porudžbina ne prolazi. Ista funkcija, ista granica — PO VELIČINI
+  // (25 većih I 25 manjih u istoj korpi je u redu), ne zbir cele korpe.
+  const prekoracenje = validirajUkupnuKolicinu(stavke) !== null;
 
   return (
     <div className={`flex flex-col bg-[var(--color-bg-inverse)] ${stavke.length === 0 ? "h-[100dvh] overflow-hidden" : "min-h-[100dvh]"}`}>
@@ -91,7 +93,7 @@ export function KorpaDrawer({
               <KorpaStavka
                 key={s.id}
                 stavka={s}
-                ukupnaKolicinaKorpe={ukupnaKolicina}
+                sveStavke={stavke}
                 onAzuriraj={(patch) => onAzuriraj(s.id, patch)}
                 onUkloni={() => onUkloni(s.id)}
               />

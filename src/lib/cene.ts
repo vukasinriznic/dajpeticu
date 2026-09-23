@@ -56,23 +56,109 @@ export function cenaKartica(kolicina: number): number {
   return jedinicnaCena(kolicina) * kolicina;
 }
 
-// Korpa može imati više stavki (npr. 3 crne + 2 bele kartice) — popust po
-// količini se računa na ZBIR cele korpe, ne po stavci, kao svaki normalan
-// količinski popust. `jedinicnaCena(ukupnaKolicinaKorpe)` daje cenu iz
-// tabele, pa se tom cenom množi količina KONKRETNE stavke.
+// Manji stalak (23.09.2026.) — potpuno drugačiji cenovnik od većeg: vlasnik
+// je odredio OKRUGLE UKUPNE cene direktno (isti brojevi kao u PDF cenovniku
+// koji se šalje kupcima — DAJPETICU_DRIVE/CENE_PDF/Cenovnik_Kartice.pdf),
+// ne cenu po komadu koja se množi količinom (ta tabela se ne deli čisto na
+// cele dinare). Stvarno naplaćen iznos je UVEK direktno iz ove tabele;
+// "cena po komadu" za manji se samo IZVODI (ukupno/količina) za prikaz.
+const UKUPNA_CENA_MANJI: Record<number, number> = {
+  1: 2490,
+  2: 4490,
+  3: 6390,
+  4: 7990,
+  5: 9790,
+  6: 10990,
+  7: 11990,
+  8: 12990,
+  9: 13990,
+  10: 14990,
+  11: 16290,
+  12: 17290,
+  13: 18290,
+  14: 19290,
+  15: 20290,
+  16: 21190,
+  17: 22190,
+  18: 23190,
+  19: 24390,
+  20: 25190,
+  21: 26290,
+  22: 26990,
+  23: 27990,
+  24: 28990,
+  25: 29990,
+};
+
+function steziKolicinu(kolicina: number): number {
+  return Math.min(Math.max(Math.round(kolicina), 1), MAX_KOLICINA);
+}
+
+export function ukupnaCenaManji(kolicina: number): number {
+  return UKUPNA_CENA_MANJI[steziKolicinu(kolicina)];
+}
+
+// Samo za prikaz ("X RSD/kom") — deljenje ukupne cene tim brojem komada ne
+// daje uvek ceo broj (cenovnik je zadat kao ukupno, ne po komadu), pa se
+// ovde samo zaokružuje radi lepog prikaza; stvarna cena ostaje
+// ukupnaCenaManji(), nikad ovaj broj × količina.
+export function jedinicnaCenaManjiPrikaz(kolicina: number): number {
+  const k = steziKolicinu(kolicina);
+  return Math.round(ukupnaCenaManji(k) / k);
+}
+
+// Veći i manji stalak su različiti proizvodi sa različitim cenovnicima —
+// količinski popust se NE meša između njih. Svaka veličina ima sopstveni
+// "pool" (zbir SAMO stavki te veličine u korpi, bilo koje boje), ne zbir
+// cele korpe. "velicina" je opciono i podrazumeva "veci" — stariji pozivi
+// (pre 23.09.2026., kad je postojao samo jedan proizvod) i dalje rade.
+type VelicinaStavke = "veci" | "manji";
+type StavkaZaCenu = { kolicina: number; velicina?: VelicinaStavke };
+
+function ukupnaKolicinaZaVelicinu(stavke: StavkaZaCenu[], velicina: VelicinaStavke): number {
+  return stavke
+    .filter((s) => (s.velicina ?? "veci") === velicina)
+    .reduce((zbir, s) => zbir + s.kolicina, 0);
+}
+
+// Cena JEDNE stavke (jednog reda u korpi) — zavisi od ukupne količine SVIH
+// stavki ISTE veličine u korpi (popust po tier-u), ne cele korpe.
+// Veći: tačno cena-po-komadu × sopstvena količina (uvek se tačno sabira do
+// ukupno, jer je cenovnik zadat po komadu).
+// Manji: PROPORCIONALAN deo ukupne cene tier-a (cenovnik je po UKUPNOJ
+// količini, ne po komadu) — kad je u korpi samo JEDNA stavka te veličine
+// (najčešći slučaj), ovo je prosto ukupnaCenaManji(kolicina). Sa više boja
+// iste veličine u korpi, deli se srazmerno i zaokružuje po redu; stvarno
+// NAPLAĆEN ukupan iznos korpe (ukupnoKorpa ispod) i dalje dolazi direktno
+// iz tabele, ne sabiranjem redova, pa sitno zaokruživanje ovde (do 1-2 RSD)
+// nikad ne menja šta se stvarno naplati.
+export function cenaStavkeUKorpi(stavke: StavkaZaCenu[], stavka: StavkaZaCenu): number {
+  const velicina = stavka.velicina ?? "veci";
+  const ukupnaZaVelicinu = ukupnaKolicinaZaVelicinu(stavke, velicina);
+  if (velicina === "manji") {
+    if (ukupnaZaVelicinu <= 0) return 0;
+    return Math.round(ukupnaCenaManji(ukupnaZaVelicinu) * (stavka.kolicina / ukupnaZaVelicinu));
+  }
+  return jedinicnaCena(ukupnaZaVelicinu) * stavka.kolicina;
+}
+
+// Zadržano zbog kompatibilnosti gde se poziva sa "ukupnaKolicinaKorpe"
+// direktno izračunatom napolju (uvek za VEĆI stalak — manji ide isključivo
+// preko cenaStavkeUKorpi, koji zna da razdvoji veličine).
 export function cenaKarticaZaStavku(ukupnaKolicinaKorpe: number, stavkaKolicina: number): number {
   return jedinicnaCena(ukupnaKolicinaKorpe) * stavkaKolicina;
 }
 
-export function ukupnoKorpa(stavke: { kolicina: number }[]): number {
-  const ukupnaKolicina = stavke.reduce((zbir, s) => zbir + s.kolicina, 0);
-  const cenaKartica = stavke.reduce(
-    (zbir, s) => zbir + cenaKarticaZaStavku(ukupnaKolicina, s.kolicina),
-    0,
-  );
+export function ukupnoKorpa(stavke: StavkaZaCenu[]): number {
+  const veciKolicina = ukupnaKolicinaZaVelicinu(stavke, "veci");
+  const manjiKolicina = ukupnaKolicinaZaVelicinu(stavke, "manji");
+  const cenaVeci = veciKolicina > 0 ? cenaKartica(veciKolicina) : 0;
+  const cenaManji = manjiKolicina > 0 ? ukupnaCenaManji(manjiKolicina) : 0;
   // Poštarina se NE računa u iznos (20.09.2026.): pri 1 stalku kupac plaća
   // kuriru pri preuzimanju (piše u uslovima), od 2 stalka je pokrivamo mi.
-  return cenaKartica;
+  // Prag se računa na UKUPAN broj komada u korpi (bilo koje veličine) —
+  // dostava/poklon su o fizičkoj pošiljci, ne o cenovniku po proizvodu.
+  return cenaVeci + cenaManji;
 }
 
 // 1 stalak · 2-4 stalka · 5+ stalaka (uz mod-100 za 21, 22, 101…)

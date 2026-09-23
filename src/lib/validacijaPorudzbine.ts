@@ -104,10 +104,15 @@ export function validirajPorudzbinu(
 // Cena se ne računa iznad MAX_KOLICINA (25) — pravilo je na nivou CELE
 // korpe (zbir svih stavki/boja), ne po stavci, jer "25 kartica" znači 25
 // komada ukupno u porudžbini, bez obzira na mešavinu boja.
-export function validirajUkupnuKolicinu(stavke: Pick<Stavka, "kolicina">[]): string | null {
-  const ukupno = stavke.reduce((zbir, s) => zbir + s.kolicina, 0);
-  if (ukupno > MAX_KOLICINA) {
-    return `Za sada primamo porudžbine do ${MAX_KOLICINA} stalaka. Za veću količinu, javite nam se direktno.`;
+// Granica je PO VELIČINI (23.09.2026., otkad veći i manji stalak imaju
+// odvojene cenovnike, svaki definisan samo za 1-25 komada) — 25 velikih I
+// 25 malih u istoj korpi je u redu, ali 26 istih nije.
+export function validirajUkupnuKolicinu(stavke: Pick<Stavka, "kolicina" | "velicina">[]): string | null {
+  for (const v of ["veci", "manji"] as const) {
+    const ukupno = stavke.filter((s) => s.velicina === v).reduce((zbir, s) => zbir + s.kolicina, 0);
+    if (ukupno > MAX_KOLICINA) {
+      return `Za sada primamo porudžbine do ${MAX_KOLICINA} stalaka te veličine. Za veću količinu, javite nam se direktno.`;
+    }
   }
   return null;
 }

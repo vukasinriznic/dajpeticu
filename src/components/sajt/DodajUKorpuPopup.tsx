@@ -13,6 +13,8 @@ import {
   cenaKartica,
   formatRSD,
   jedinicnaCena,
+  ukupnaCenaManji,
+  jedinicnaCenaManjiPrikaz,
   MAX_KOLICINA,
   PRAG_BESPLATNE_DOSTAVE,
   PRAG_GRATIS_POKLONA,
@@ -45,6 +47,12 @@ const CENA_JEDNE = jedinicnaCena(1);
 // kao kod konkurencije) — NE menja stvarnu cenu (CENA_JEDNE/cene.ts ostaju
 // netaknuti), samo se prikazuje precrtana ovde u popup-u.
 const CENA_PRVOBITNA_ZA_JEDAN = 3790;
+
+// Manji stalak (23.09.2026.) — sopstveni cenovnik (vidi cene.ts), bez
+// "prvobitne" (bila) cene za 1 komad jer za njega nema definisane marketing
+// sidrene cene kao za veći; ušteda se ipak prikazuje na isti način (u
+// odnosu na cenu jednog komada, izvedenu iz ukupne cene za tier).
+const CENA_JEDNE_MANJI = jedinicnaCenaManjiPrikaz(1);
 
 export function DodajUKorpuPopup({
   otvoren,
@@ -436,23 +444,44 @@ export function DodajUKorpuPopup({
           <div
             className={`flex min-h-7 flex-wrap items-center justify-between gap-2 px-1 font-tekst text-body-sm ${tamno ? TEKST_TAMNO : "text-text-muted"}`}
           >
-            <span>
-              Cena:{" "}
-              {kolicina <= 1 && (
-                <span className="mr-1.5 line-through opacity-70">{formatRSD(CENA_PRVOBITNA_ZA_JEDAN)}</span>
-              )}
-              {formatRSD(cenaKartica(kolicina || 1))}
-              {kolicina > 1 && (
-                <span className="ml-1.5 opacity-70">
-                  (<span className="line-through">{formatRSD(CENA_JEDNE)}</span>{" "}
-                  {formatRSD(jedinicnaCena(kolicina))}/kom)
+            {velicina === "manji" ? (
+              <>
+                <span>
+                  Cena: {formatRSD(ukupnaCenaManji(kolicina || 1))}
+                  {kolicina > 1 && (
+                    <span className="ml-1.5 opacity-70">
+                      (<span className="line-through">{formatRSD(CENA_JEDNE_MANJI)}</span>{" "}
+                      {formatRSD(jedinicnaCenaManjiPrikaz(kolicina))}/kom)
+                    </span>
+                  )}
                 </span>
-              )}
-            </span>
-            {kolicina > 1 && (
-              <Znacka className="!bg-primary !text-white">
-                Ušteda {formatRSD((CENA_JEDNE - jedinicnaCena(kolicina)) * kolicina)}
-              </Znacka>
+                {kolicina > 1 && (
+                  <Znacka className="!bg-primary !text-white">
+                    Ušteda {formatRSD(CENA_JEDNE_MANJI * kolicina - ukupnaCenaManji(kolicina))}
+                  </Znacka>
+                )}
+              </>
+            ) : (
+              <>
+                <span>
+                  Cena:{" "}
+                  {kolicina <= 1 && (
+                    <span className="mr-1.5 line-through opacity-70">{formatRSD(CENA_PRVOBITNA_ZA_JEDAN)}</span>
+                  )}
+                  {formatRSD(cenaKartica(kolicina || 1))}
+                  {kolicina > 1 && (
+                    <span className="ml-1.5 opacity-70">
+                      (<span className="line-through">{formatRSD(CENA_JEDNE)}</span>{" "}
+                      {formatRSD(jedinicnaCena(kolicina))}/kom)
+                    </span>
+                  )}
+                </span>
+                {kolicina > 1 && (
+                  <Znacka className="!bg-primary !text-white">
+                    Ušteda {formatRSD((CENA_JEDNE - jedinicnaCena(kolicina)) * kolicina)}
+                  </Znacka>
+                )}
+              </>
             )}
           </div>
           {/* Podsticaj na veću porudžbinu — isti pragovi koje ukupnoKorpa()

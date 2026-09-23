@@ -3,33 +3,50 @@
 import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Dugme } from "@/components/core/Dugme";
-import { MAX_KOLICINA, formatRSD, cenaKarticaZaStavku, jedinicnaCena, kolicinaSlovima } from "@/lib/cene";
+import {
+  MAX_KOLICINA,
+  formatRSD,
+  cenaStavkeUKorpi,
+  jedinicnaCena,
+  jedinicnaCenaManjiPrikaz,
+  kolicinaSlovima,
+} from "@/lib/cene";
 import { slikaProizvoda, opticnaKorekcijaSkalaKorpa } from "@/lib/proizvod";
 import type { StavkaKorpe } from "@/components/sajt/KorpaKontekst";
 
-// Prvobitna cena jednog stalka (ista kao u DodajUKorpuPopup.tsx) — precrtana kad korpa ima 1 stalak.
+// Prvobitna cena jednog VEĆEG stalka (ista kao u DodajUKorpuPopup.tsx) —
+// precrtana kad korpa ima samo 1 njega; manji stalak nema tu "bilu" cenu
+// (nema definisanu marketing sidrenu cenu), vidi precrtana ispod.
 const CENA_PRVOBITNA_ZA_JEDAN = 3790;
 const CENA_JEDNE = jedinicnaCena(1);
+const CENA_JEDNE_MANJI = jedinicnaCenaManjiPrikaz(1);
 
 // Tamnozelena/zlatna tema — jedina upotreba ovog fajla je KorpaDrawer.tsx.
 export function KorpaStavka({
   stavka,
-  ukupnaKolicinaKorpe,
+  sveStavke,
   onAzuriraj,
   onUkloni,
 }: {
   stavka: StavkaKorpe;
-  ukupnaKolicinaKorpe: number;
+  // Cena stavke zavisi od ukupne količine SVIH stavki ISTE veličine u
+  // korpi (popust po tier-u, svaka veličina ima sopstveni cenovnik/pool —
+  // vidi cenaStavkeUKorpi u cene.ts), zato prima celu korpu, ne samo broj.
+  sveStavke: StavkaKorpe[];
   onAzuriraj: (patch: Partial<Pick<StavkaKorpe, "kolicina">>) => void;
   onUkloni: () => void;
 }) {
-  // Cena stavke zavisi od ukupne količine cele korpe (popust po tier-u), ne
-  // samo od sopstvene količine — zato prima ukupnaKolicinaKorpe kao prop.
-  const cena = cenaKarticaZaStavku(ukupnaKolicinaKorpe, stavka.kolicina);
-  // Precrtana cena: sa 1 stalkom u korpi prvobitna (3 790), inače cena bez
-  // popusta na količinu — isto kao u popupu.
+  const cena = cenaStavkeUKorpi(sveStavke, stavka);
+  const ukupnaKolicinaIsteVelicine = sveStavke
+    .filter((s) => s.velicina === stavka.velicina)
+    .reduce((z, s) => z + s.kolicina, 0);
+  // Precrtana cena: veći stalak — sa 1 komadom u korpi prvobitna (3 790),
+  // inače cena bez popusta na količinu (isto kao u popupu). Manji stalak —
+  // nema "prvobitnu", uvek cena bez popusta na količinu.
   const precrtana =
-    (ukupnaKolicinaKorpe <= 1 ? CENA_PRVOBITNA_ZA_JEDAN : CENA_JEDNE) * stavka.kolicina;
+    stavka.velicina === "manji"
+      ? CENA_JEDNE_MANJI * stavka.kolicina
+      : (ukupnaKolicinaIsteVelicine <= 1 ? CENA_PRVOBITNA_ZA_JEDAN : CENA_JEDNE) * stavka.kolicina;
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-field border border-[rgba(255,197,61,0.25)] bg-[rgba(255,197,61,0.06)] p-5">

@@ -7,9 +7,10 @@ import { Unos } from "@/components/forms/Unos";
 import { Selekt } from "@/components/forms/Selekt";
 import { useKorpa, type StavkaKorpe } from "@/components/sajt/KorpaKontekst";
 import {
-  cenaKarticaZaStavku,
+  cenaStavkeUKorpi,
   formatRSD,
   jedinicnaCena,
+  jedinicnaCenaManjiPrikaz,
   kolicinaSlovima,
   PRAG_BESPLATNE_DOSTAVE,
   PRAG_GRATIS_POKLONA,
@@ -18,8 +19,10 @@ import { validirajPorudzbinu, validirajUkupnuKolicinu } from "@/lib/validacijaPo
 import { slikaProizvoda, opticnaKorekcijaSkalaKorpa } from "@/lib/proizvod";
 
 // Cena po jedinici bez popusta na količinu — isti anchor kao u
-// DodajUKorpuPopup.tsx, da se vidi ušteda i ovde u pregledu.
+// DodajUKorpuPopup.tsx, da se vidi ušteda i ovde u pregledu. Odvojeno za
+// veći i manji stalak, svaki ima sopstveni cenovnik.
 const CENA_JEDNE = jedinicnaCena(1);
+const CENA_JEDNE_MANJI = jedinicnaCenaManjiPrikaz(1);
 
 type Polja = {
   email: string;
@@ -275,12 +278,20 @@ export function KorpaFormaNarudzbine({
                 {kolicinaSlovima(s.kolicina)} ({s.velicina === "manji" ? "manji" : "veći"}, {s.boja === "crna" ? "crni" : "beli"})
               </span>
               <span className="font-normal">
-                {CENA_JEDNE * s.kolicina > cenaKarticaZaStavku(ukupnaKolicina, s.kolicina) && (
-                  <span className="mr-1.5 text-caption line-through opacity-70">
-                    {formatRSD(CENA_JEDNE * s.kolicina)}
-                  </span>
-                )}
-                {formatRSD(cenaKarticaZaStavku(ukupnaKolicina, s.kolicina))}
+                {(() => {
+                  const cena = cenaStavkeUKorpi(stavke, s);
+                  const precrtana = (s.velicina === "manji" ? CENA_JEDNE_MANJI : CENA_JEDNE) * s.kolicina;
+                  return (
+                    <>
+                      {precrtana > cena && (
+                        <span className="mr-1.5 text-caption line-through opacity-70">
+                          {formatRSD(precrtana)}
+                        </span>
+                      )}
+                      {formatRSD(cena)}
+                    </>
+                  );
+                })()}
               </span>
             </div>
             {/* Naziv biznisa se ovde vezuje za konkretan stalak na koji se

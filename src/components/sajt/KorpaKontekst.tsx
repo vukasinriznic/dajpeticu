@@ -10,9 +10,8 @@ import {
   type ReactNode,
 } from "react";
 import { usePathname } from "next/navigation";
-import { cenaKartica } from "@/lib/cene";
 import { pratiDogadjaj, stavkaZaAnalitiku } from "@/lib/analitika";
-import { ukupnoKorpa } from "@/lib/cene";
+import { cenaStavkeUKorpi, ukupnoKorpa } from "@/lib/cene";
 import type { Boja, Velicina } from "@/lib/validacijaPorudzbine";
 import { Modal } from "@/components/core/Modal";
 import { DodajUKorpuPopup } from "@/components/sajt/DodajUKorpuPopup";
@@ -139,7 +138,9 @@ export function KorpaProvider({ children }: { children: ReactNode }) {
             dodajStavku(stavka);
             pratiDogadjaj("add_to_cart", {
               currency: "RSD",
-              value: cenaKartica(stavka.kolicina),
+              // Cena ZA OVU stavku, uzevši u obzir stavke iste veličine već
+              // u korpi (isti "pool" popusta kao i stvarna naplata).
+              value: cenaStavkeUKorpi([...stavke, stavka], stavka),
               items: [stavkaZaAnalitiku(stavka)],
             });
             setOtvorenModal(false);
