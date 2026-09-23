@@ -44,3 +44,13 @@ export function razmerProizvodaBroj(velicina: Velicina): number {
 export function nazivProizvoda(velicina: Velicina): string {
   return velicina === "manji" ? "Manji stalak" : "Veći stalak";
 }
+
+// Optička korekcija (22.09.2026., eksplicitno traženo za minijaturu u
+// korpi) — kartica_bela.png/kartica_crna.png su piksel-tačno iste veličine
+// (izmereno), ali crna, kao tamnija površina na svetlijoj pozadini reda u
+// korpi, IZGLEDA nešto krupnije (poznata optička varka, ne stvarna razlika
+// u pikselima). Sitno smanjenje SAMO crne varijante manjeg stalka to
+// ispravlja; veći stalak i beli manji stalak ostaju netaknuti (scale 1).
+export function opticnaKorekcijaSkala(velicina: Velicina, boja: Boja): number {
+  return velicina === "manji" && boja === "crna" ? 0.975 : 1;
+}

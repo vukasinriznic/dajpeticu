@@ -4,7 +4,7 @@ import { Trash2 } from "lucide-react";
 import Image from "next/image";
 import { Dugme } from "@/components/core/Dugme";
 import { MAX_KOLICINA, formatRSD, cenaKarticaZaStavku, jedinicnaCena, kolicinaSlovima } from "@/lib/cene";
-import { slikaProizvoda } from "@/lib/proizvod";
+import { slikaProizvoda, opticnaKorekcijaSkala } from "@/lib/proizvod";
 import type { StavkaKorpe } from "@/components/sajt/KorpaKontekst";
 
 // Prvobitna cena jednog stalka (ista kao u DodajUKorpuPopup.tsx) — precrtana kad korpa ima 1 stalak.
@@ -44,6 +44,7 @@ export function KorpaStavka({
             sizes="96px"
             quality={90}
             className="object-contain"
+            style={{ transform: `scale(${opticnaKorekcijaSkala(stavka.velicina, stavka.boja)})` }}
           />
         </span>
         <div className="flex flex-col gap-1">
