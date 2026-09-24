@@ -19,7 +19,7 @@ const POSILJALAC = "Daj Peticu <porudzbine@dajpeticu.shop>";
 const SLIKE = `${site.url}/email`;
 // Gmail kešira slike (i neuspešna preuzimanja) po URL-u — povećati broj kad
 // se neka slika u public/email/ promeni ili je jednom bila nedostupna.
-const VER = "?v=2";
+const VER = "?v=3";
 const FONT = "Arial, Helvetica, sans-serif";
 
 function slikaStalka(velicina: string, boja: string): string {
