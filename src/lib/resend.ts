@@ -17,10 +17,13 @@ const POSILJALAC = "Daj Peticu <porudzbine@dajpeticu.shop>";
 // (originali su ~1 MB, a WebP ne prikazuje Outlook), gledaju se preko
 // apsolutnog URL-a jer relativna putanja u mejlu ne postoji.
 const SLIKE = `${site.url}/email`;
+// Gmail kešira slike (i neuspešna preuzimanja) po URL-u — povećati broj kad
+// se neka slika u public/email/ promeni ili je jednom bila nedostupna.
+const VER = "?v=2";
 const FONT = "Arial, Helvetica, sans-serif";
 
 function slikaStalka(velicina: string, boja: string): string {
-  return `${SLIKE}/stalak-${velicina === "manji" ? "manji" : "veci"}-${boja === "crna" ? "crna" : "bela"}.png`;
+  return `${SLIKE}/stalak-${velicina === "manji" ? "manji" : "veci"}-${boja === "crna" ? "crna" : "bela"}.png${VER}`;
 }
 
 function stavkeHtml(stavke: Porudzbina["stavke"]): string {
@@ -65,7 +68,7 @@ function okvirMejla(naslov: string, telo: string): string {
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;">
           <tr>
             <td align="center" style="padding-bottom:20px;">
-              <img src="${SLIKE}/logo.png" width="72" height="72" alt="Daj Peticu" style="display:block;width:72px;height:72px;border:0;">
+              <img src="${SLIKE}/logo.png${VER}" width="72" height="72" alt="Daj Peticu" style="display:block;width:72px;height:72px;border:0;">
             </td>
           </tr>
           <tr>
