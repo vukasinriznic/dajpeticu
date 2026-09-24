@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { site } from "@/lib/site";
 import { esc } from "@/lib/html";
 import { formatRSD, kolicinaSlovima } from "@/lib/cene";
+import { EMAIL_SLIKE } from "@/lib/emailSlike";
 import type { Porudzbina } from "@/lib/validacijaPorudzbine";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -13,17 +14,27 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const POSILJALAC = "Daj Peticu <porudzbine@dajpeticu.shop>";
 
 // Mejl klijenti ne znaju moderni CSS (flex, grid, promenljive) — zato
-// tabele i inline stilovi. Slike su male PNG kopije iz public/email/
-// (originali su ~1 MB, a WebP ne prikazuje Outlook), gledaju se preko
-// apsolutnog URL-a jer relativna putanja u mejlu ne postoji.
-const SLIKE = `${site.url}/email`;
-// Gmail kešira slike (i neuspešna preuzimanja) po URL-u — povećati broj kad
-// se neka slika u public/email/ promeni ili je jednom bila nedostupna.
-const VER = "?v=3";
+// tabele i inline stilovi. Slike su UGRAĐENE u mejl kao inline prilozi
+// (cid:), ne linkovi ka sajtu: Gmail slike sa linka preuzima preko svog
+// proksija i za novi domen ih nije prikazivao (probano 24.09.2026.), a
+// ugrađene se prikazuju odmah, bez "Display images". Izvor su mali PNG-ovi u
+// emailSlike.ts.
 const FONT = "Arial, Helvetica, sans-serif";
 
-function slikaStalka(velicina: string, boja: string): string {
-  return `${SLIKE}/stalak-${velicina === "manji" ? "manji" : "veci"}-${boja === "crna" ? "crna" : "bela"}.png${VER}`;
+function kljucSlike(velicina: string, boja: string): string {
+  return `${velicina === "manji" ? "manji" : "veci"}-${boja === "crna" ? "crna" : "bela"}`;
+}
+
+// Prilozi samo za slike koje mejl stvarno koristi (bez duplikata kad je ista
+// varijanta u više stavki).
+function prilozi(stavke: Porudzbina["stavke"]) {
+  const kljucevi = new Set(["logo", ...stavke.map((s) => kljucSlike(s.velicina, s.boja))]);
+  return [...kljucevi].map((k) => ({
+    filename: `${k}.png`,
+    content: Buffer.from(EMAIL_SLIKE[k], "base64"),
+    contentType: "image/png",
+    contentId: k,
+  }));
 }
 
 function stavkeHtml(stavke: Porudzbina["stavke"]): string {
@@ -32,7 +43,7 @@ function stavkeHtml(stavke: Porudzbina["stavke"]): string {
       (s) => `
       <tr>
         <td width="84" valign="top" style="padding:10px 16px 10px 0;">
-          <img src="${slikaStalka(s.velicina, s.boja)}" width="72" height="119" alt="" style="display:block;width:72px;height:119px;border:0;">
+          <img src="cid:${kljucSlike(s.velicina, s.boja)}" width="72" height="119" alt="" style="display:block;width:72px;height:119px;border:0;">
         </td>
         <td valign="middle" style="padding:10px 0;font-family:${FONT};font-size:15px;line-height:1.5;color:#15171c;">
           <strong>${kolicinaSlovima(s.kolicina)}</strong><br>
@@ -68,7 +79,7 @@ function okvirMejla(naslov: string, telo: string): string {
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="width:100%;max-width:560px;">
           <tr>
             <td align="center" style="padding-bottom:20px;">
-              <img src="${SLIKE}/logo.png${VER}" width="72" height="72" alt="Daj Peticu" style="display:block;width:72px;height:72px;border:0;">
+              <img src="cid:logo" width="72" height="72" alt="Daj Peticu" style="display:block;width:72px;height:72px;border:0;">
             </td>
           </tr>
           <tr>
@@ -114,6 +125,7 @@ export async function posaljiObavestenjeVlasniku(porudzbina: Porudzbina & { ukup
       replyTo: porudzbina.email,
       subject: `Nova porudžbina — ${kolicinaSlovima(porudzbina.stavke.reduce((z, s) => z + s.kolicina, 0))}`,
       html,
+      attachments: prilozi(porudzbina.stavke),
     });
   } catch (greska) {
     console.error("Slanje mejla o porudžbini nije uspelo:", greska);
@@ -143,6 +155,7 @@ export async function posaljiPotvrduKupcu(porudzbina: Porudzbina & { ukupnaCena:
       replyTo: site.email,
       subject: "Vaša porudžbina je primljena — Daj Peticu",
       html,
+      attachments: prilozi(porudzbina.stavke),
     });
   } catch (greska) {
     console.error("Slanje potvrde kupcu nije uspelo:", greska);
