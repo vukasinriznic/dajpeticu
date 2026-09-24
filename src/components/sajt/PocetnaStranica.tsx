@@ -364,6 +364,7 @@ export function PocetnaStranica() {
                   sirina={sirinaMobilneKartice}
                   className="relative left-1/2 -translate-x-1/2"
                   interaktivna={false}
+                  prioritet
                 />
               </div>
             </UNaVidiku>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import { X } from "lucide-react";
 import { Dugme } from "@/components/core/Dugme";
 import { OcenaZvezdicama } from "@/components/core/OcenaZvezdicama";
@@ -137,6 +137,38 @@ export function DodajUKorpuPopup({
       setGreske({});
     }
   }, [otvoren, pocetnaKolicina, pocetnaVelicina]);
+
+  // Slike svih 4 varijanti (veličina × boja) se povlače u pozadini čim se
+  // popup otvori, sa ISTIM "sizes"/quality kao stvarni prikaz — browser tada
+  // bira isti kandidat iz srcset-a, pa promena veličine/boje uzima sliku iz
+  // keša umesto da je tek tad preuzima (bilo vidljivo sporo, 24.09.2026.).
+  // Ref drži reference da ih garbage collector ne prekine usred učitavanja.
+  const preloadRef = useRef<HTMLImageElement[]>([]);
+  useEffect(() => {
+    if (!otvoren) return;
+    const jeDesktop = window.matchMedia("(min-width: 768px)").matches;
+    const ucitane: HTMLImageElement[] = [];
+    for (const v of VELICINE) {
+      for (const b of ["bela", "crna"] as const) {
+        const sizes = jeDesktop
+          ? "500px"
+          : `${Math.round(sirinaMobilneKartice * opticnaKorekcijaSkalaPopup(v.vrednost, b))}px`;
+        const { props } = getImageProps({
+          src: slikaProizvoda(v.vrednost, b),
+          alt: "",
+          fill: true,
+          sizes,
+          quality: 90,
+        });
+        const img = new window.Image();
+        img.sizes = props.sizes ?? "";
+        img.srcset = props.srcSet ?? "";
+        img.src = props.src;
+        ucitane.push(img);
+      }
+    }
+    preloadRef.current = ucitane;
+  }, [otvoren, sirinaMobilneKartice]);
 
   // Google Places Autocomplete na polju "Naziv biznisa" — kači se SAMO
   // jednom na dati input (autocompleteZakacenRef), jer popup ostaje montiran
@@ -596,7 +628,7 @@ export function DodajUKorpuPopup({
             // više ne odgovara tekstu, ne treba da "preživi" u porudžbini.
             setGooglePlaceId(undefined);
           }}
-          placeholder="Unesite naziv vašeg biznisa"
+          placeholder="Unesite naziv biznisa i njegovu adresu"
           help="Koristimo ga da podesimo link na vašu Google stranu."
           tamno={tamno}
         />

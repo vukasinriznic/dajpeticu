@@ -40,6 +40,12 @@ export function Kartica3D({
   // ponašanje za sve postojeće pozive). Druge slike (npr. ravna kartica bez
   // stalka, CARD sekcija) prosleđuju sopstveni naziv.
   naziv = "Daj Peticu NFC stalak",
+  // Odvojeno od "interaktivna" (24.09.2026.): mobilni hero ima interaktivna=
+  // false (bez hover efekta), ali je to ista slika iznad pregiba — ranije je
+  // zbog toga bila "lazy" bez preload-a i pojavljivala se kasno (posebno u
+  // sporijim in-app pregledačima, npr. Instagram). Podrazumevano prati
+  // "interaktivna" kao pre, pa se ostali pozivi ne menjaju.
+  prioritet,
 }: {
   sirina?: number;
   interaktivna?: boolean;
@@ -47,6 +53,7 @@ export function Kartica3D({
   slika?: string;
   razmerSlike?: string;
   naziv?: string;
+  prioritet?: boolean;
   // Slika kartice je uža od kvadratnog omotača (RAZMER_SLIKE gore), pa
   // podrazumevano centriranje ostavlja providan prostor sa obe strane.
   // "left" (19.09.2026., mobilni hero) uklanja levi prostor — kartica
@@ -125,7 +132,7 @@ export function Kartica3D({
             fill
             sizes={`${sirina}px`}
             quality={90}
-            priority={interaktivna}
+            priority={prioritet ?? interaktivna}
             className="pointer-events-none object-contain"
           />
         </div>
