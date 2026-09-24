@@ -7,9 +7,10 @@ import type { Porudzbina } from "@/lib/validacijaPorudzbine";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// "onboarding@resend.dev" radi bez sopstvenog verifikovanog domena — zameniti
-// kad dajpeticu.rs bude registrovan i verifikovan u Resend-u.
-const POSILJALAC = "Daj Peticu <onboarding@resend.dev>";
+// dajpeticu.shop je verifikovan u Resend-u (24.09.2026.). Ovo sanduče ne
+// prima mejlove (nema Enable Receiving), pa svaki mejl nosi replyTo na
+// pravu adresu (site.email) — odgovor kupca ili vlasnika ne sme da nestane.
+const POSILJALAC = "Daj Peticu <porudzbine@dajpeticu.shop>";
 
 function stavkeHtml(stavke: Porudzbina["stavke"]): string {
   return stavke
@@ -37,6 +38,7 @@ export async function posaljiObavestenjeVlasniku(porudzbina: Porudzbina & { ukup
     await resend.emails.send({
       from: POSILJALAC,
       to: site.email,
+      replyTo: porudzbina.email,
       subject: `Nova porudžbina — ${kolicinaSlovima(porudzbina.stavke.reduce((z, s) => z + s.kolicina, 0))}`,
       html,
     });
@@ -47,11 +49,7 @@ export async function posaljiObavestenjeVlasniku(porudzbina: Porudzbina & { ukup
 
 // Potvrda kupcu — odvojena od gornjeg obaveštenja vlasniku (drugi primalac,
 // drugačiji ton: kupcu se ne šalje njegov sopstveni telefon/email nazad,
-// samo pregled onoga što je poručio). NAPOMENA: dok se dajpeticu.rs ne
-// verifikuje u Resend-u, "onboarding@resend.dev" pošiljalac po Resend-ovim
-// pravilima sme da šalje SAMO na email vlasnika naloga — mejl kupcu će
-// tiho propasti (uhvaćeno ispod, samo logovano) za bilo koju drugu adresu
-// dok verifikacija ne bude gotova.
+// samo pregled onoga što je poručio).
 export async function posaljiPotvrduKupcu(porudzbina: Porudzbina & { ukupnaCena: number }) {
   const html = `
     <h2>Hvala na porudžbini, ${esc(porudzbina.ime)}!</h2>
@@ -67,6 +65,7 @@ export async function posaljiPotvrduKupcu(porudzbina: Porudzbina & { ukupnaCena:
     await resend.emails.send({
       from: POSILJALAC,
       to: porudzbina.email,
+      replyTo: site.email,
       subject: "Vaša porudžbina je primljena — Daj Peticu",
       html,
     });
