@@ -21,11 +21,19 @@ type SnimakKorpe = { stavke: StavkaKorpe[]; ukupnaKolicina: number; ukupnaCena: 
 // (ZaglavljePlacanje), bez footera (Podnozje se ovde namerno ne renderuje).
 export default function PlacanjePage() {
   const router = useRouter();
-  const { stavke, hidrirano, ukupnaKolicina, ukupnaCena } = useKorpa();
+  const { stavke, hidrirano, ukupnaKolicina, ukupnaCena, zatvoriKorpu } = useKorpa();
   // Drži se OVDE (ne u KorpaFormaNarudzbine), jer uspešno slanje odmah prazni
   // korpu — da stranica ne bi preskočila na "korpa je prazna" pre nego što
   // korisnik vidi potvrdu, provera uspeha mora doći PRE provere praznine.
   const [poslato, setPoslato] = useState<{ telefon: string } | null>(null);
+
+  // Drawer korpe ostaje otvoren (zelen) preko stare stranice dok se ova ne
+  // iscrta, pa se tek ovde zatvara — inače bi za trenutak bio vidljiv beo
+  // ekran između drawera i ove stranice (KorpaKontekst.tsx ne zatvara pri
+  // prelasku na /placanje).
+  useEffect(() => {
+    zatvoriKorpu();
+  }, [zatvoriKorpu]);
 
   // Poslednje NEPRAZNO stanje korpe — kad korisnik isprazni korpu preko
   // drawer-a dok je već na /placanje (a ne pre ulaska na stranicu), stavke

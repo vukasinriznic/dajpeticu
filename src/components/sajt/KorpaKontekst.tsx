@@ -66,9 +66,13 @@ export function KorpaProvider({ children }: { children: ReactNode }) {
   // Obrazac "prilagodi stanje tokom render-a" (bez efekta).
   const putanja = usePathname();
   const [prethodnaPutanja, setPrethodnaPutanja] = useState(putanja);
+  // Izuzetak je /placanje (24.09.2026.): u trenutku kad se adresa promeni
+  // nova stranica još nije iscrtana, pa je ispod drawera bila stara (bela)
+  // stranica — ekran je "bljesnuo" belo dok drawer klizi napolje. Drawer tu
+  // zatvara sama /placanje kad se montira (vidi page.tsx).
   if (putanja !== prethodnaPutanja) {
     setPrethodnaPutanja(putanja);
-    setOtvorenaKorpa(false);
+    if (putanja !== "/placanje") setOtvorenaKorpa(false);
   }
 
   // Hidracija iz localStorage tek POSLE mount-a — u samom render-u bi server

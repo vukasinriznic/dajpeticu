@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -39,6 +40,17 @@ export function KorpaDrawer({
   onZatvori: () => void;
 }) {
   const router = useRouter();
+  // router.push() sam NE prefetch-uje rutu (za razliku od <Link>), pa je klik
+  // na "Plaćanje" čekao mrežu (kod na telefonu vidljivo: drawer ostane
+  // otvoren preko stare stranice, pola ekrana zeleno/pola belo, dok se
+  // /placanje ne preuzme). Prefetch čim korpa ima nešto u sebi — prazna
+  // korpa ne mora da povlači tu stranicu (početna, npr. iz Instagrama, ostaje
+  // laka). "preusmeravam" daje odmah vidljiv odgovor na klik; sam se vraća
+  // posle 4s da dugme ne ostane zaključano ako navigacija ne uspe.
+  useEffect(() => {
+    if (stavke.length > 0) router.prefetch("/placanje");
+  }, [stavke.length, router]);
+  const [preusmeravam, setPreusmeravam] = useState(false);
   // "Nastavite kupovinu" (oba dugmeta ispod) — otvara popup za dodavanje
   // stalka umesto da vodi na početnu (24.09.2026., eksplicitno traženo):
   // korisnik ostaje u toku porudžbine, bez skrolovanja do dugmeta na
@@ -176,7 +188,7 @@ export function KorpaDrawer({
               size="lg"
               full
               variant="gold"
-              disabled={prekoracenje}
+              disabled={prekoracenje || preusmeravam}
               // Bez onZatvori() — drawer ostaje preko stranice dok se ruta ne
               // promeni (KorpaKontekst ga tada zatvara), da se početna ne vidi.
               onClick={() => {
@@ -185,10 +197,12 @@ export function KorpaDrawer({
                   value: ukupnaCena,
                   items: stavke.map(stavkaZaAnalitiku),
                 });
+                setPreusmeravam(true);
+                setTimeout(() => setPreusmeravam(false), 4000);
                 router.push("/placanje");
               }}
             >
-              Plaćanje
+              {preusmeravam ? "Učitavamo…" : "Plaćanje"}
             </Dugme>
             <button
               type="button"
