@@ -569,27 +569,30 @@ export function PocetnaStranica() {
         <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <UNaVidiku rastegni>
             <Utisak
-              citat="Stavio sam stalak na pult u ponedeljak, do petka smo imali više novih ocena nego za prethodna 2 meseca."
-              ime="Marko Jović"
-              posao="Frizerski salon"
-              grad="Kragujevac"
+              citat="Stalak smo stavili na pult i već prve nedelje stigle su nove ocene. Mušterije ga same primete, tapnu telefonom i ostave recenziju dok čekaju."
+              ime="Beooptika"
+              posao="Optika"
+              grad="Beograd"
+              slika="/images/utisak-beooptika.png"
             />
           </UNaVidiku>
           <UNaVidiku rastegni kasnjenje={100}>
             <Utisak
               ton="inverse"
-              citat="Na prvu mi je delovalo skupo staviti stalak na svaki sto. Ispostavilo se da je to bila najisplativija odluka, recenzije stižu neprekidno. Preporuka!"
-              ime="Tijana Ilić"
-              posao="Kafić"
-              grad="Novi Sad"
+              citat="Stalak smo stavili na svaki sto. Gosti ga sami primete, mi ne moramo ništa da objašnjavamo, a recenzije stižu bez ikakvog podsećanja."
+              ime="Gennaro"
+              posao="Restoran"
+              grad="Beograd"
+              slika="/images/utisak-gennaro.png"
             />
           </UNaVidiku>
           <UNaVidiku rastegni kasnjenje={200}>
             <Utisak
               citat="Kod nas osoblje ne mora ništa da objašnjava, a recenzije rastu... pohvale."
-              ime="Dušan Petrović"
-              posao="Restoran"
-              grad="Niš"
+              ime="Greenfeel"
+              posao="Cvećara"
+              grad="Beograd"
+              slika="/images/utisak-greenfeel.png"
             />
           </UNaVidiku>
         </div>

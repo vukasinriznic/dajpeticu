@@ -48,17 +48,25 @@ export function Utisak({
         „{citat}“
       </p>
       <div className="mt-auto flex items-center gap-3">
-        {/* Krug sa fotografijom — placeholder ikonica dok ne stignu prave
-            slike vlasnika (svesno NE koristimo stock fotografiju stvarne
-            osobe za izmišljenu izjavu — vidi napomenu u razgovoru). */}
+        {/* Krug sa logotipom biznisa (25.09.2026.) — sečen na sam krug i
+            smanjen na 176px (44px × 4, oštro i na 3× ekranima). Bez slike
+            ostaje generička ikonica. */}
         <div
           className={`grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full ${
             inverse ? "bg-white/10" : "bg-surface-2"
           }`}
         >
           {slika ? (
-            // eslint-disable-next-line @next/next/no-img-element -- placeholder slot, next/image nepotrebno pre prave slike
-            <img src={slika} alt="" className="h-full w-full object-cover" />
+            // eslint-disable-next-line @next/next/no-img-element -- 176px PNG (~5 KB), next/image nepotrebno
+            <img
+              src={slika}
+              alt={`Logo: ${ime}`}
+              width={88}
+              height={88}
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover"
+            />
           ) : (
             <User size={20} className={inverse ? "text-white/70" : "text-text-muted"} strokeWidth={1.5} />
           )}
