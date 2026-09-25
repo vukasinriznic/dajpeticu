@@ -17,6 +17,9 @@ const proizvodJsonLd = {
   "@type": "Product",
   name: "Daj Peticu NFC stalak",
   description: site.opis,
+  // Slika koju Google koristi kao sličicu uz rezultat pretrage (25.09.2026.)
+  // — bez ovoga sam bira sliku sa stranice i uzeo je sivu pozadinu hero-a.
+  image: [`${site.url}/images/stalak-pretraga.jpg`],
   brand: { "@type": "Brand", name: site.naziv },
   offers: {
     "@type": "Offer",

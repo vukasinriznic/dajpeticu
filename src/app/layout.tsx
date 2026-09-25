@@ -54,10 +54,9 @@ export const metadata: Metadata = {
 
 // Organization structured data — sitewide (za razliku od Product schema,
 // koja živi samo na početnoj gde se proizvod stvarno "prodaje"). Namerno
-// NEMA "aggregateRating"/"review" polja — testimonijali na sajtu su
-// izričito nestvarni (placeholder dok ne stignu prave izjave mušterija), a
-// lažni review structured data je protiv Google-ovih pravila i rizikuje
-// kaznu, ne samo etičko pitanje.
+// NEMA "aggregateRating"/"review" polja — nemamo proverljive javne ocene
+// (Google traži da review structured data odgovara stvarnim, vidljivim
+// ocenama), a lažni review structured data rizikuje kaznu.
 const organizacijaJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
