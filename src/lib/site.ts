@@ -9,8 +9,8 @@ export const site = {
   url: "https://www.dajpeticu.shop",
   opis:
     "NFC stalak koji lokalnom biznisu donosi više Google recenzija. Jedan tap telefonom i mušterija je ostavila peticu, bez aplikacije, bez pretplate.",
-  telefon: "+381 65 533 9481",
-  telefonHref: "tel:+381655339481",
+  telefon: "+381 64 1275 039",
+  telefonHref: "tel:+381641275039",
   email: "dajpeticu.shop@gmail.com",
   instagramNaziv: "dajpeticu",
   instagram: "https://instagram.com/dajpeticu",
