@@ -579,7 +579,7 @@ export function PocetnaStranica() {
           <UNaVidiku rastegni kasnjenje={100}>
             <Utisak
               ton="inverse"
-              citat="Na prvu mi je delovalo skupo staviti stalak na svaki sto. Ispostavilo se da je to bila najisplativija odluka, recenzije stižu neprekidno. Preporuka!"
+              citat="Na prvu mi je delovalo neukusno staviti stalak na svaki sto. Ispostavilo se da je to bila najisplativija odluka, recenzije stižu neprekidno. Preporuka!"
               ime="Gennaro"
               posao="Restoran"
               grad="Beograd"
