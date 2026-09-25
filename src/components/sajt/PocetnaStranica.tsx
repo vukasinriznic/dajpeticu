@@ -569,7 +569,7 @@ export function PocetnaStranica() {
         <div className="grid grid-cols-1 items-stretch gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <UNaVidiku rastegni>
             <Utisak
-              citat="Stavio sam stalak na pult u ponedeljak, do petka smo imali više novih ocena nego za prethodna 2 meseca."
+              citat="Stavili smo stalak na pult u ponedeljak, do petka smo imali više novih ocena nego za prethodna 2 meseca."
               ime="Beooptika"
               posao="Optika"
               grad="Beograd"
