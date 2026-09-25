@@ -27,6 +27,17 @@ const proizvodJsonLd = {
     priceCurrency: "RSD",
     price: jedinicnaCena(1),
     availability: "https://schema.org/InStock",
+    // Politika povraćaja (25.09.2026.) — mora da odgovara stranici Uslovi
+    // ("Pravo na odustanak": 14 dana od prijema, bez obrazloženja). 90 dana
+    // zamene u slučaju kvara je garancija, ne povraćaj, pa se ovde ne navodi.
+    hasMerchantReturnPolicy: {
+      "@type": "MerchantReturnPolicy",
+      applicableCountry: "RS",
+      returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+      merchantReturnDays: 14,
+      returnMethod: "https://schema.org/ReturnByMail",
+      merchantReturnLink: `${site.url}/uslovi`,
+    },
   },
 };
 

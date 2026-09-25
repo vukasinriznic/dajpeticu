@@ -48,8 +48,9 @@ export default function UsloviPage() {
 
         <Odeljak naslov="Proizvod">
           <p className="m-0">
-            Prodajemo jedan proizvod, NFC stalak koji mušteriji otvara Google stranu za ocenu na
-            dodir ili skeniranje. Stalak je dostupan u beloj i crnoj boji, veličine 12,75 × 7,6 cm.
+            Prodajemo NFC stalak koji mušteriji otvara Google stranu za ocenu na dodir ili
+            skeniranje. Dostupan je u dve veličine, većem (12,75 × 7,6 cm) i manjem (8,56 × 5,4 cm),
+            u beloj i crnoj boji.
           </p>
         </Odeljak>
 
@@ -66,8 +67,8 @@ export default function UsloviPage() {
             radna dana. Trenutno dostavljamo samo na adrese u Srbiji.
           </p>
           <p className="m-0">
-            Za porudžbinu jednog stalka poštarinu plaćate kuriru ili poštaru pri preuzimanju
-            pošiljke. Od dva stalka poštarinu pokrivamo mi.
+            Poštarina je besplatna za porudžbine čija je ukupna vrednost preko 5.000 RSD. Za
+            manje porudžbine poštarinu plaćate kuriru ili poštaru pri preuzimanju pošiljke.
           </p>
         </Odeljak>
 
