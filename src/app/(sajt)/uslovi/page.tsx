@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Sekcija } from "@/components/sajt/Sekcija";
 import { Podvuceno } from "@/components/core/Podvuceno";
 import { site } from "@/lib/site";
+import { PRAG_GRATIS_VECI_STALAK, PRAG_GRATIS_MANJI_STALAK } from "@/lib/cene";
 
 export const metadata: Metadata = {
   title: "Uslovi korišćenja",
@@ -69,6 +70,15 @@ export default function UsloviPage() {
           <p className="m-0">
             Poštarina je besplatna za porudžbine čija je ukupna vrednost preko 5.000 RSD. Za
             manje porudžbine poštarinu plaćate kuriru ili poštaru pri preuzimanju pošiljke.
+          </p>
+        </Odeljak>
+
+        <Odeljak naslov="Gratis stalak na veće porudžbine">
+          <p className="m-0">
+            Ako u korpi imate {PRAG_GRATIS_VECI_STALAK} ili više manjih stalaka, dobijate gratis
+            jedan veći stalak, bilo koje boje. Ako imate {PRAG_GRATIS_MANJI_STALAK} ili više većih
+            stalaka, dobijate gratis jedan manji stalak, bilo koje boje. Poklon nije posebna stavka
+            u korpi niti menja cenu porudžbine — pakujemo ga uz pošiljku kad je prag ispunjen.
           </p>
         </Odeljak>
 
