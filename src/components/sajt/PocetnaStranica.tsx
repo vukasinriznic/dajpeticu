@@ -175,14 +175,18 @@ export function PocetnaStranica() {
               "radial-gradient(60% 60% at 78% 28%, var(--color-primary-quiet), transparent 70%), linear-gradient(180deg, rgb(255 255 255 / 0.12), transparent 40%)",
           }}
         />
-        {/* Vrlo tiho zrno preko cele slike — razbija "flat" fotografski izgled. */}
+        {/* Vrlo tiho zrno preko cele slike — razbija "flat" fotografski izgled.
+            Unapred izrađena PNG pločica (public/images/zrno.png, ~9 KB) umesto
+            ranijeg inline SVG feTurbulence filtera sa mix-blend-multiply
+            (08.10.2026.): turbulence se računa pri crtanju svake pločice
+            ekrana, pa su in-app pregledači (Instagram) crtali sadržaj ispod
+            njega (dugme "Poruči stalak") tek kad uđe u vidno polje — vidljivo
+            kao sečkanje/kasno pojavljivanje. Običan alfa-sloj bez blend moda
+            je skoro nevidljiva razlika, a skoro bez troška crtanja. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 opacity-[0.035] mix-blend-multiply"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E\")",
-          }}
+          className="pointer-events-none absolute inset-0"
+          style={{ backgroundImage: "url(/images/zrno.png)", backgroundSize: "120px 120px" }}
         />
         {/* Beli scrim iza teksta — pozadina je dosta "šarena" (geometrijski
             oblici menjaju svetlinu), pa tekst preko nje gubi na čitljivosti.
@@ -390,7 +394,7 @@ export function PocetnaStranica() {
                 izmereno). Omotač takođe mora eksplicitno na w-full da bi
                 se prvo ON razvukao na punu širinu kolone (335px), pa tek
                 onda dugme unutar njega na 100% TE (već pune) širine. */}
-            <UNaVidiku kasnjenje={120} className="flex w-full flex-wrap items-center gap-3 lg:w-auto lg:mt-4">
+            <UNaVidiku kasnjenje={120} className="flex w-full flex-wrap items-center gap-3 max-lg:will-change-transform lg:w-auto lg:mt-4">
               <Dugme
                 size="lg"
                 className={`w-full lg:w-auto ${DUGME_ISTAKNUTO}`}
