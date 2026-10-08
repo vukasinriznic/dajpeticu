@@ -330,6 +330,31 @@
   }
 }
 
+/* Hero parallax pozadina (08.10.2026.) — CSS scroll-driven animacija umesto
+   JS-a: radi na compositor niti, pa je glatka i na telefonu (JS scroll
+   listener je na mobilnom "sečkao", zato je ranije bio isključen). Isti
+   pomeraj kao raniji JS: 25% skrola, najviše 200px (dostignuto na 800px
+   skrola). Browseri bez podrške za animation-timeline (Firefox, stariji
+   Safari) dobijaju JS fallback na desktopu, na mobilnom statičnu sliku —
+   vidi PocetnaStranica.tsx. */
+@keyframes dp-parallax-hero {
+  to {
+    transform: translate3d(0, 200px, 0);
+  }
+}
+@supports (animation-timeline: scroll()) {
+  .dp-parallax-hero {
+    animation: dp-parallax-hero linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 800px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dp-parallax-hero {
+      animation: none;
+    }
+  }
+}
+
 /* Hero 3D kartica — tiho "disanje" u mirovanju, dok je niko ne dodiruje. */
 @keyframes dp-kartica-disanje {
   0%,

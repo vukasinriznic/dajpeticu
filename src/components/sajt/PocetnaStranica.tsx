@@ -94,14 +94,15 @@ export function PocetnaStranica() {
   // Bafer -220px gore/dole (ispod) sprečava da se ivica slike ogoli pri pomeraju.
   const parallaxRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    // Iskljuceno na mobilnom (19.09.2026., eksplicitno traženo, snimak
-    // ekrana potvrđuje sečkanje) — i pored rAF throttle-a i "preskoči ako
-    // se ne menja" optimizacije, scroll-driven transform na mobilnim
-    // browserima kasni za stvarnim skrolom (rAF se izvršava POSLE
-    // compositing-a), pa se vizuelno "lovi" umesto glatkog pomeraja. Efekat
-    // je i suptilan na malom ekranu, pa gašenje na mobilnom nije vidljiv
-    // gubitak. Isti lg prag (1024px) kao svuda po sajtu.
+    // Gde browser podržava CSS scroll-driven animacije (.dp-parallax-hero u
+    // globals.css) parallax radi čisto u CSS-u, na svim širinama, bez JS-a
+    // (08.10.2026., ukljuceno i na mobilnom). JS ispod je samo fallback za
+    // browsere bez te podrške (Firefox, stariji Safari) i to SAMO na desktopu:
+    // scroll-driven transform iz JS-a na mobilnim browserima kasni za nativnim
+    // skrolom (rAF posle compositing-a) i "sečka" (19.09.2026.), pa tamo
+    // bez CSS podrške slika ostaje statična. Isti lg prag (1024px) kao svuda.
     if (
+      CSS.supports("animation-timeline: scroll()") ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
       window.matchMedia("(max-width: 1023px)").matches
     ) {
@@ -152,7 +153,7 @@ export function PocetnaStranica() {
             dole (bafer) da parallax pomeraj nikad ne ogoli ivicu slike. */}
         <div
           ref={parallaxRef}
-          className="absolute inset-x-0 -top-[220px] -bottom-[220px] will-change-transform"
+          className="dp-parallax-hero absolute inset-x-0 -top-[220px] -bottom-[220px] will-change-transform"
         >
           <Image
             src="/images/hero_new.jpg"
