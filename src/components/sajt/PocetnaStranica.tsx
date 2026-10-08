@@ -93,6 +93,18 @@ export function PocetnaStranica() {
   // scroll frejmu bi bio suvišan trošak za ovako sitan vizuelni efekat.
   // Bafer -220px gore/dole (ispod) sprečava da se ivica slike ogoli pri pomeraju.
   const parallaxRef = useRef<HTMLDivElement>(null);
+  // Visina hero-a u CSS promenljivu (--hero-h) za mobilni opseg parallax
+  // animacije (vidi globals.css, .dp-parallax-hero) — meri se samo pri
+  // učitavanju i promeni veličine, ne tokom skrola.
+  useEffect(() => {
+    const hero = parallaxRef.current?.parentElement;
+    if (!hero || !CSS.supports("animation-timeline: scroll()")) return;
+    const postavi = () => hero.style.setProperty("--hero-h", `${hero.offsetHeight}px`);
+    postavi();
+    const posmatrac = new ResizeObserver(postavi);
+    posmatrac.observe(hero);
+    return () => posmatrac.disconnect();
+  }, []);
   useEffect(() => {
     // Gde browser podržava CSS scroll-driven animacije (.dp-parallax-hero u
     // globals.css) parallax radi čisto u CSS-u, na svim širinama, bez JS-a

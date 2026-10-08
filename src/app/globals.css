@@ -348,6 +348,17 @@
     animation-timeline: scroll(root block);
     animation-range: 0 800px;
   }
+  /* Mobilno (08.10.2026.): hero je tu viši od 800px skrola, pa je pomeranje
+     stajalo dok je hero još bilo vidljivo. Opseg je zato od 0 do visine
+     hero-a (--hero-h, postavlja PocetnaStranica.tsx pri učitavanju/promeni
+     veličine, NE na skrol): pomeranje traje dok hero potpuno ne izađe i
+     završava se baš tada, na istih 200px maksimuma (brzina je zato malo
+     manja od 25% skrola). */
+  @media (max-width: 1023px) {
+    .dp-parallax-hero {
+      animation-range: 0 var(--hero-h, 1100px);
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     .dp-parallax-hero {
       animation: none;
