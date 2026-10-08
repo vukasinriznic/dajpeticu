@@ -47,15 +47,16 @@ export const MAX_KOLICINA = 25;
 //   po CENI) — od preko 5.000 RSD ukupne vrednosti korpe. Kao i ranije,
 //   računa se na CELU korpu (veći i manji stalak zajedno), jer je dostava o
 //   fizičkoj pošiljci, ne o cenovniku po proizvodu.
-// - Gratis VEĆI stalak (24.09.2026., novo) — kad korpa ima 10 ili više
-//   MANJIH stalaka (bilo koje boje) — samo manji se broje, veći se ne
-//   računaju u ovaj prag (kupac koji već kupuje veće nema poseban podsticaj
-//   da ih poredja do 10, poklon je vezan konkretno za "10 malih").
-// - Gratis MANJI stalak (24.09.2026., novo) — simetrično obrnuto: kad korpa
-//   ima 3 ili više VEĆIH stalaka (bilo koje boje), samo veći se broje.
+// - Gratis VEĆI stalak (24.09.2026., novo; prag spušten sa 10 na 5
+//   08.10.2026., eksplicitno traženo) — kad korpa ima 5 ili više MANJIH
+//   stalaka (bilo koje boje) — samo manji se broje, veći se ne računaju u
+//   ovaj prag (poklon je vezan konkretno za "5 malih").
+// - Gratis MANJI stalak (24.09.2026., novo; prag spušten sa 3 na 2
+//   08.10.2026., eksplicitno traženo) — simetrično obrnuto: kad korpa ima 2
+//   ili više VEĆIH stalaka (bilo koje boje), samo veći se broje.
 export const PRAG_BESPLATNE_DOSTAVE_RSD = 5000;
-export const PRAG_GRATIS_VECI_STALAK = 10;
-export const PRAG_GRATIS_MANJI_STALAK = 3;
+export const PRAG_GRATIS_VECI_STALAK = 5;
+export const PRAG_GRATIS_MANJI_STALAK = 2;
 
 export function jedinicnaCena(kolicina: number): number {
   const k = Math.min(Math.max(Math.round(kolicina), 1), MAX_KOLICINA);

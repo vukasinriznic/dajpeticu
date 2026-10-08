@@ -536,7 +536,7 @@ export function DodajUKorpuPopup({
           {/* Podsticaj na veću porudžbinu — tri nezavisne pogodnosti, svaka
               sa sopstvenim pragom (24.09.2026., besplatna dostava PROMENJENA
               sa praga po količini na prag po CENI; dodat gratis veći stalak
-              na 10+ manjih). Pragovi su isti koje ukupnoKorpa()/stvarna
+              na PRAG_GRATIS_VECI_STALAK+ manjih). Pragovi su isti koje ukupnoKorpa()/stvarna
               korpa primenjuju, pa poruka nikad ne obeća nešto što se ne
               ostvari tačno tako. GLEDA CELU (buduću) korpu — postojeće
               stavke + ono što se ovde bira (24.09.2026., eksplicitno
