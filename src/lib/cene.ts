@@ -6,7 +6,7 @@
 // koraci su neravnomerni (blagi do 10 kom, od 11 nepromenjeno kao ranije).
 const UKUPNA_CENA_VECI: Record<number, number> = {
   1: 2990,
-  2: 5490,
+  2: 5290,
   3: 7790,
   4: 9890,
   5: 11890,
