@@ -527,7 +527,7 @@ export function DodajUKorpuPopup({
                 </span>
                 {kolicina > 1 && (
                   <Znacka className="!bg-primary !text-white">
-                    Ušteda {formatRSD((CENA_JEDNE - jedinicnaCena(kolicina)) * kolicina)}
+                    Ušteda {formatRSD(CENA_JEDNE * kolicina - cenaKartica(kolicina))}
                   </Znacka>
                 )}
               </>

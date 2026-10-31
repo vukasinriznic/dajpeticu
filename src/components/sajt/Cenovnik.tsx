@@ -77,7 +77,7 @@ export function Cenovnik({
               // mobilnom (25.09.2026., prijavljeno prelamanje na iPhone
               // 16 širini), a "-" ispred iznosa je uobičajen i jasan zapis
               // popusta i bez reči "Ušteda".
-              znacka={`-${formatRSD((cenaJedne - cenaPoKomadu) * p.kolicina)}`}
+              znacka={`-${formatRSD(cenaJedne * p.kolicina - cenaPaketa(p.kolicina, p.velicina))}`}
               istaknuta={"istaknuta" in p ? p.istaknuta : false}
               cta={`Izaberi ${kolicinaSlovima(p.kolicina)}`}
               onOdaberi={() => onOdaberi(p.kolicina, p.velicina)}

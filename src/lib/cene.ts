@@ -1,39 +1,35 @@
-// Cenovna tabela — revidirana na niže (13.09.2026) da bude konkurentnija
-// (konkurencija ne nudi popust na količinu uopšte). Nije formula, koraci su
-// namerno neravnomerni (veliki odmah posle 1, 2, 5, 10 kom, pa sve sitniji
-// do 25), pa je tabela pretraga, ne izračunavanje.
-// Cena po komadu, izvedena iz OKRUGLIH ukupnih cena (20.09.2026.) — vlasnik
-// zadaje okrugle iznose, a cena po komadu je ukupno / količina i uvek ceo
-// broj. Ukupno: 1=3.290, 2=5.990, 3=8.400, 4=10.700, 5=12.890, 6=14.490,
-// 7=15.890, 8=17.280, 9=18.450, 10=19.890, 11=21.340, 12=22.920, 13=24.310,
-// 14=25.620, 15=26.790, 16=28.000, 17=29.410, 18=30.780, 19=32.110,
-// 20=33.400, 21=34.650, 22=35.750, 23=37.030, 24=38.400, 25=39.800.
-const CENA_PO_KOLICINI: Record<number, number> = {
-  1: 3290,
-  2: 2995,
-  3: 2800,
-  4: 2675,
-  5: 2578,
-  6: 2415,
-  7: 2270,
-  8: 2160,
-  9: 2050,
-  10: 1989,
-  11: 1940,
-  12: 1910,
-  13: 1870,
-  14: 1830,
-  15: 1786,
-  16: 1750,
-  17: 1730,
-  18: 1710,
-  19: 1690,
-  20: 1670,
-  21: 1650,
-  22: 1625,
-  23: 1610,
-  24: 1600,
-  25: 1592,
+// Cenovna tabela VEĆEG stalka — nove niže cene (31.10.2026., pred pokretanje
+// plaćenih reklama; konkurencija je skuplja). Kao i kod manjeg, vlasnik zadaje
+// OKRUGLE UKUPNE cene po količini (nisu deljive celim brojem po komadu, npr.
+// 7.790 / 3), pa je stvarno naplaćen iznos UVEK direktno iz ove tabele, a
+// "cena po komadu" se samo izvodi (zaokruženo) radi prikaza. Nije formula,
+// koraci su neravnomerni (blagi do 10 kom, od 11 nepromenjeno kao ranije).
+const UKUPNA_CENA_VECI: Record<number, number> = {
+  1: 2990,
+  2: 5490,
+  3: 7790,
+  4: 9890,
+  5: 11890,
+  6: 13690,
+  7: 15390,
+  8: 16990,
+  9: 18490,
+  10: 19890,
+  11: 21340,
+  12: 22920,
+  13: 24310,
+  14: 25620,
+  15: 26790,
+  16: 28000,
+  17: 29410,
+  18: 30780,
+  19: 32110,
+  20: 33400,
+  21: 34650,
+  22: 35750,
+  23: 37030,
+  24: 38400,
+  25: 39800,
 };
 
 // Porudžbine se za sada ne primaju iznad 25 kartica (veće količine —
@@ -58,52 +54,54 @@ export const PRAG_BESPLATNE_DOSTAVE_RSD = 5000;
 export const PRAG_GRATIS_VECI_STALAK = 5;
 export const PRAG_GRATIS_MANJI_STALAK = 2;
 
-export function jedinicnaCena(kolicina: number): number {
-  const k = Math.min(Math.max(Math.round(kolicina), 1), MAX_KOLICINA);
-  return CENA_PO_KOLICINI[k];
-}
-
-export function cenaKartica(kolicina: number): number {
-  return jedinicnaCena(kolicina) * kolicina;
-}
-
-// Manji stalak (23.09.2026.) — potpuno drugačiji cenovnik od većeg: vlasnik
-// je odredio OKRUGLE UKUPNE cene direktno (isti brojevi kao u PDF cenovniku
-// koji se šalje kupcima — DAJPETICU_DRIVE/CENE_PDF/Cenovnik_Kartice.pdf),
-// ne cenu po komadu koja se množi količinom (ta tabela se ne deli čisto na
-// cele dinare). Stvarno naplaćen iznos je UVEK direktno iz ove tabele;
-// "cena po komadu" za manji se samo IZVODI (ukupno/količina) za prikaz.
-const UKUPNA_CENA_MANJI: Record<number, number> = {
-  1: 2490,
-  2: 4490,
-  3: 6390,
-  4: 7990,
-  5: 9790,
-  6: 10990,
-  7: 11990,
-  8: 12990,
-  9: 13990,
-  10: 14990,
-  11: 16290,
-  12: 17290,
-  13: 18290,
-  14: 19290,
-  15: 20290,
-  16: 21190,
-  17: 22190,
-  18: 23190,
-  19: 24390,
-  20: 25190,
-  21: 26290,
-  22: 26990,
-  23: 27990,
-  24: 28990,
-  25: 29990,
-};
-
 function steziKolicinu(kolicina: number): number {
   return Math.min(Math.max(Math.round(kolicina), 1), MAX_KOLICINA);
 }
+
+// Ukupna cena za K većih stalaka — direktno iz tabele.
+export function cenaKartica(kolicina: number): number {
+  return UKUPNA_CENA_VECI[steziKolicinu(kolicina)];
+}
+
+// Samo za prikaz ("X RSD/kom") — zaokruženo; stvarna cena je cenaKartica(),
+// nikad ovaj broj × količina.
+export function jedinicnaCena(kolicina: number): number {
+  const k = steziKolicinu(kolicina);
+  return Math.round(UKUPNA_CENA_VECI[k] / k);
+}
+
+// Manji stalak (23.09.2026., nove niže cene 31.10.2026.) — sopstveni cenovnik
+// (isti brojevi kao u PDF cenovniku koji se šalje kupcima —
+// DAJPETICU_DRIVE/CENE_PDF/Cenovnik_Kartice.pdf): OKRUGLE UKUPNE cene
+// direktno, ne cena po komadu. Stvarno naplaćen iznos je UVEK direktno iz
+// ove tabele; "cena po komadu" se samo IZVODI (ukupno/količina) za prikaz.
+const UKUPNA_CENA_MANJI: Record<number, number> = {
+  1: 1990,
+  2: 3690,
+  3: 5290,
+  4: 6790,
+  5: 8190,
+  6: 9490,
+  7: 10690,
+  8: 11790,
+  9: 12890,
+  10: 13990,
+  11: 15290,
+  12: 16290,
+  13: 17290,
+  14: 18290,
+  15: 19290,
+  16: 20190,
+  17: 21190,
+  18: 22190,
+  19: 23390,
+  20: 24190,
+  21: 25290,
+  22: 25990,
+  23: 26990,
+  24: 27990,
+  25: 28990,
+};
 
 export function ukupnaCenaManji(kolicina: number): number {
   return UKUPNA_CENA_MANJI[steziKolicinu(kolicina)];
@@ -146,30 +144,19 @@ export function ukupnaKolicinaVecihUKorpi(stavke: StavkaZaCenu[]): number {
 
 // Cena JEDNE stavke (jednog reda u korpi) — zavisi od ukupne količine SVIH
 // stavki ISTE veličine u korpi (popust po tier-u), ne cele korpe.
-// Veći: tačno cena-po-komadu × sopstvena količina (uvek se tačno sabira do
-// ukupno, jer je cenovnik zadat po komadu).
-// Manji: PROPORCIONALAN deo ukupne cene tier-a (cenovnik je po UKUPNOJ
-// količini, ne po komadu) — kad je u korpi samo JEDNA stavka te veličine
-// (najčešći slučaj), ovo je prosto ukupnaCenaManji(kolicina). Sa više boja
-// iste veličine u korpi, deli se srazmerno i zaokružuje po redu; stvarno
-// NAPLAĆEN ukupan iznos korpe (ukupnoKorpa ispod) i dalje dolazi direktno
-// iz tabele, ne sabiranjem redova, pa sitno zaokruživanje ovde (do 1-2 RSD)
-// nikad ne menja šta se stvarno naplati.
+// Obe veličine su zadate UKUPNOM cenom po količini (ne po komadu), pa je cena
+// reda PROPORCIONALAN deo ukupne cene tier-a — kad je u korpi samo JEDNA
+// stavka te veličine (najčešći slučaj), ovo je prosto ukupna cena iz tabele.
+// Sa više boja iste veličine u korpi, deli se srazmerno i zaokružuje po redu;
+// stvarno NAPLAĆEN ukupan iznos korpe (ukupnoKorpa ispod) i dalje dolazi
+// direktno iz tabele, ne sabiranjem redova, pa sitno zaokruživanje ovde (do
+// 1-2 RSD) nikad ne menja šta se stvarno naplati.
 export function cenaStavkeUKorpi(stavke: StavkaZaCenu[], stavka: StavkaZaCenu): number {
   const velicina = stavka.velicina ?? "veci";
   const ukupnaZaVelicinu = ukupnaKolicinaZaVelicinu(stavke, velicina);
-  if (velicina === "manji") {
-    if (ukupnaZaVelicinu <= 0) return 0;
-    return Math.round(ukupnaCenaManji(ukupnaZaVelicinu) * (stavka.kolicina / ukupnaZaVelicinu));
-  }
-  return jedinicnaCena(ukupnaZaVelicinu) * stavka.kolicina;
-}
-
-// Zadržano zbog kompatibilnosti gde se poziva sa "ukupnaKolicinaKorpe"
-// direktno izračunatom napolju (uvek za VEĆI stalak — manji ide isključivo
-// preko cenaStavkeUKorpi, koji zna da razdvoji veličine).
-export function cenaKarticaZaStavku(ukupnaKolicinaKorpe: number, stavkaKolicina: number): number {
-  return jedinicnaCena(ukupnaKolicinaKorpe) * stavkaKolicina;
+  if (ukupnaZaVelicinu <= 0) return 0;
+  const ukupnaCena = velicina === "manji" ? ukupnaCenaManji(ukupnaZaVelicinu) : cenaKartica(ukupnaZaVelicinu);
+  return Math.round(ukupnaCena * (stavka.kolicina / ukupnaZaVelicinu));
 }
 
 export function ukupnoKorpa(stavke: StavkaZaCenu[]): number {
